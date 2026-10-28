@@ -805,7 +805,7 @@ function tafelAuf(name) {
   tafel.classList.toggle('breit', !!t.breit);
   zerfallAbbrechen();
   tafel.hidden = false; tafel.classList.remove('an'); void tafel.offsetWidth;
-  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; tafelAnimationStarten();
+  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; cTeile = cLinks = null; tafelAnimationStarten();
   tafel.classList.add('an'); schleier.classList.add('an');
   document.getElementById('tafel-zu').focus({ preventScroll: true });
 }
@@ -914,17 +914,21 @@ function tafelAnimationStarten() {
     // Über uns: Familienbaum, auf großen Bildschirmen groß links neben dem Fenster, sonst im Fenster
     const baumDraussen = offeneTafel === 'unternehmen' && r.left > 240;
     const motivLinks = offeneTafel === 'speisekarte' && r.left > 240;   // Adam (v46): festes Motiv links neben der Speisekarte
-    tafel.classList.remove('mit-baum'); tafel.classList.toggle('mit-motiv', offeneTafel === 'unternehmen' || offeneTafel === 'speisekarte');
-    if (offeneTafel === 'unternehmen' || offeneTafel === 'speisekarte' || bcv.classList.contains('an')) {
+    const laternenLinks = offeneTafel === 'catering' && r.left > 240;   // Adam (v48): Laternen links neben dem Catering
+    const mitMotiv = offeneTafel === 'unternehmen' || offeneTafel === 'speisekarte' || offeneTafel === 'catering';
+    tafel.classList.remove('mit-baum'); tafel.classList.toggle('mit-motiv', mitMotiv);
+    if (mitMotiv || bcv.classList.contains('an')) {
       if (bcv.width !== Math.round(innerWidth * dpr) || bcv.height !== Math.round(innerHeight * dpr)) { bcv.width = Math.round(innerWidth * dpr); bcv.height = Math.round(innerHeight * dpr); }
       bg.setTransform(dpr, 0, 0, dpr, 0, 0); bg.clearRect(0, 0, innerWidth, innerHeight);
-      bcv.classList.toggle('an', baumDraussen || motivLinks);
+      bcv.classList.toggle('an', baumDraussen || motivLinks || laternenLinks);
     }
     // draußen liegt der Baum auf der abgedunkelten Startseite, darum dort immer in leuchtenden Farben
     if (baumDraussen) familienBaum(bg, r.left, innerHeight, Math.max(0, rahmenZeit - 0.3), false, maus.x, maus.y);
     if (motivLinks) linkesMotiv(bg, r.left, innerHeight, dt, maus.x, maus.y, hellJetzt);
+    if (laternenLinks) cateringLinks(bg, r.left, innerHeight, maus.x, maus.y);
     if (offeneTafel === 'unternehmen') verwandlung(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'speisekarte') kartenMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
+    else if (offeneTafel === 'catering') cateringMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else {
     // Ornament in der Ecke unten rechts
     const cx = r.width * 0.92, cy = r.height * 0.9, R = Math.max(r.width, r.height) * 0.42;
@@ -1219,6 +1223,90 @@ function linkesMotiv(c, w, h, dt, mx, my, hellJetzt) {
     c.fillStyle = `rgba(${Math.round(q[2] + (255 - q[2]) * auf)},${Math.round(q[3] + (230 - q[3]) * auf)},${Math.round(q[4] + (190 - q[4]) * auf)},${hel.toFixed(3)})`;
     c.fillRect(p.x, p.y, gr, gr);
   }
+  c.globalCompositeOperation = 'source-over';
+}
+
+/* Catering (Adam, v48): im Fenster heben sich zwei Teegläser, stoßen an und funkeln (hinter dem Formular),
+   links daneben hängen am Laptop drei Orient-Laternen, die sanft schwingen. Beide aus Lichtpunkten,
+   die beim Öffnen von überall zusammenfliegen und der Maus ausweichen. */
+const C_TAU = Math.PI * 2, C_PI = Math.PI;
+const cGlatt = x => x * x * (3 - 2 * x);
+const cRing = (cx, cy, rx, ry, u) => [cx + Math.cos(u * C_TAU) * rx, cy + Math.sin(u * C_TAU) * ry];
+const cDrehen = (x, y, px, py, w) => { const c = Math.cos(w), s = Math.sin(w), dx = x - px, dy = y - py; return [px + dx * c - dy * s, py + dx * s + dy * c]; };
+const C_TEE = (z, t) => {
+    const p = (t * .22) % 1, an = p < .45 ? cGlatt(p / .45) : p < .55 ? 1 : p < .9 ? 1 - cGlatt((p - .55) / .35) : 0;
+    const H = .98, W = .22, unten = .62, r0 = .2, ganz = r0 * Math.cos(W) + H * Math.sin(W);                           // so weit rücken sie, bis sich die Ränder berühren
+    const r = v => v < .6 ? .2 - .085 * Math.pow(v / .6, 1.4) : .115 + .06 * Math.sin((v - .6) / .4 * C_PI / 2) - (v > .93 ? (v - .93) * .9 : 0);
+    if (z.a >= .88) {                                                                                                 // Funkeln beim Anstoßen
+      const e = (p - .45) / .3, ky = unten - .12 + r0 * Math.sin(W) - H * Math.cos(W);
+      if (e < 0 || e > 1) return [0, ky, 0, 0];
+      const w = z.b * C_TAU, d = (.06 + .5 * Math.pow(z.c, .7)) * (1 - Math.pow(1 - e, 3));
+      return [Math.cos(w) * d, ky + Math.sin(w) * d * .8, [0, 3, 1][Math.floor(z.d * 3)], Math.pow(1 - e, 1.4) * (.5 + .5 * Math.abs(Math.sin(t * 20 + z.d * 30)))];
+    }
+    const s = z.a < .44 ? -1 : 1, bx = s * (.5 + (ganz - .5) * an), by = unten - .12 * an, w = -s * W * an, q = z.b;
+    const glas = (lx, ly) => cDrehen(bx + lx, by + ly, bx, by, w);
+    if (q < .3) { const v = z.c, seite = z.d < .5 ? -1 : 1, [x, y] = glas(seite * r(v), -H + v * H); return [x, y, 3, seite > 0 ? .8 : .45]; }   // Glasrand
+    if (q < .38) { const a = z.c * C_TAU, [x, y] = glas(Math.cos(a) * r0, -H + Math.sin(a) * .035); return [x, y, 3, .75]; }                       // Öffnung
+    if (q < .7) { const v = .2 + z.c * .77, [x, y] = glas((z.d * 2 - 1) * r(v) * .86, -H + v * H); return [x, y, v < .23 ? 0 : z.d > .7 ? 2 : 1, v < .23 ? .8 : .42]; }   // Tee
+    if (q < .84) { const [x, y] = cRing(s * .5, unten + .04, .3, .055, z.c); return [x, y, 0, .7]; }                                              // Untertasse bleibt stehen
+    const h = (z.c + t * .12) % 1, [rx, ry] = glas(0, -H);                                                                                       // Dampf
+    return [rx + (z.d - .5) * .14 + Math.sin(h * 7 + t + z.d * 3) * (.03 + h * .06), ry - .05 - h * .55, 3, Math.sin(C_PI * h) * .4 * (1 - an * .6)];
+  };
+const C_LATERNEN = (z, t) => {
+    const L = [[-.58, .95, 1.15, 5, 0], [.03, 1.45, 1.6, 1, 1.9], [.62, .7, 1.05, 4, 3.4]];   // x, Kette, Größe, Glasfarbe, Phase
+    const k = z.a < .3 ? 0 : z.a < .7 ? 1 : 2, [px, kette, G, glas, ph] = L[k], oben = -1.5;
+    const schwung = Math.sin(t * .8 + ph) * .06 + Math.sin(t * .31 + ph * 2) * .025;
+    const flackern = .7 + .18 * Math.sin(t * 7.3 + k * 2.1) + .12 * Math.sin(t * 12.7 + k);
+    const r = v => (.05 + .14 * Math.pow(Math.sin(C_PI * v), .6)) * G, rumpf = kette + .08 * G, H = .34 * G;
+    let lx, ly, fa, ha; const q = z.b;
+    if (q < .07) { lx = 0; ly = z.c * kette; fa = 3; ha = .3; }                                                    // Kette
+    else if (q < .13) { lx = (z.d * 2 - 1) * (.03 + .06 * Math.sin(C_PI / 2 * z.c)) * G; ly = kette + z.c * .08 * G; fa = 0; ha = .85; }   // Kuppel
+    else if (q < .38) { const v = z.c, phi = Math.floor(z.d * 6) / 6 * C_TAU + t * .25, vorn = Math.sin(phi);           // Rippen, drehen sich
+      lx = Math.cos(phi) * r(v); ly = rumpf + v * H; fa = 0; ha = vorn > 0 ? .5 + .45 * vorn : .18; }
+    else if (q < .46) { const v = z.c < .5 ? .1 : .9, w = z.d * C_TAU; lx = Math.cos(w) * r(v); ly = rumpf + v * H + Math.sin(w) * r(v) * .2; fa = 0; ha = .8; }   // Bänder
+    else if (q < .7) { const v = .08 + z.c * .84, s = z.d * 2 - 1; lx = s * r(v) * .9; ly = rumpf + v * H; fa = glas; ha = (.25 + .3 * (1 - Math.abs(s))) * flackern; }   // farbiges Glas
+    else if (q < .78) { const v = z.c, b = .05 * G * Math.sin(C_PI * Math.pow(v, .6));                                  // Flamme
+      lx = (z.d * 2 - 1) * b + Math.sin(t * 9 + v * 4) * .006; ly = rumpf + H * .38 + v * .13 * G; fa = v < .5 ? 3 : 1; ha = .95 * flackern; }
+    else if (q < .83) { lx = (z.d * 2 - 1) * .035 * G * (1 - z.c); ly = rumpf + H + z.c * .13 * G; fa = 0; ha = .7; }   // Spitze unten
+    else if (q > .93) { const h = (z.c + t * .04) % 1;                                                             // Lichtpunkte schweben nach oben
+      return [(z.d * 2 - 1) * 1.05 + Math.sin(h * 8 + z.d * 30) * .05, 1.5 - h * 3, [0, 3, glas][Math.floor(z.c * 3)], .5 * Math.pow(Math.sin(C_PI * h), 1.5) * (.4 + .6 * Math.max(0, Math.sin(t * 3 + z.d * 50)))]; }
+    else { const w = z.c * C_TAU, rad = Math.sqrt(z.d) * .45 * G; lx = Math.cos(w) * rad; ly = rumpf + H * .5 + Math.sin(w) * rad * 1.1; fa = glas; ha = .13 * flackern * (1 - Math.sqrt(z.d) * .6); }   // Lichtschein
+    const [x, y] = cDrehen(px + lx, oben + ly, px, oben, schwung);
+    return [x, y, fa, ha];
+  };
+let cTeile = null, cLinks = null, cZeit = 0;
+function cNeueTeile(n, w, h) {
+  return Array.from({ length: n }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() },
+    x: Math.random() * w, y: Math.random() * h, vx: 0, vy: 0, s: 1.3 + Math.random() * 1.5 }));
+}
+function cPunkte(c, teile, form, cx, cy, S, mx, my, pal, staerke, weit) {
+  for (let n = 0, bis = sparsam ? 1300 : teile.length; n < bis; n++) { const p = teile[n];
+    const [x, y, fa, ha] = form(p.z, cZeit), tx = cx + x * S, ty = cy + y * S;
+    p.vx = (p.vx + (tx - p.x) * 0.07) * 0.85; p.vy = (p.vy + (ty - p.y) * 0.07) * 0.85;
+    const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
+    if (d < weit && d > 0.1) { const k = (1 - d / weit) * 2.5; p.vx += dx / d * k; p.vy += dy / d * k; }
+    p.x += p.vx; p.y += p.vy;
+    const hel = ha * staerke; if (hel < 0.02) continue;
+    const fc = pal[fa] || pal[0];
+    c.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, hel).toFixed(3)})`;
+    const gr = sparsam ? p.s * 1.35 : p.s;   // im Sparmodus sind es weniger Punkte, darum etwas größer
+    c.fillRect(p.x, p.y, gr, gr);
+  }
+}
+function cateringMotiv(c, w, h, dt, hellJetzt, mx, my) {
+  cZeit += dt;
+  if (!cTeile) cTeile = cNeueTeile(V_ANZAHL, w, h);
+  const kopf = document.querySelector('.tafel-kopf').offsetHeight;
+  const S = Math.min(w * 0.48, (h - kopf) * 0.46), cx = w / 2, cy = kopf + (h - kopf) * 0.5 + S * 0.14;   // Gläser mittig im Fenster
+  if (!hellJetzt) c.globalCompositeOperation = 'lighter';
+  cPunkte(c, cTeile, C_TEE, cx, cy, S, mx, my, hellJetzt ? K_FARBEN.hell : K_FARBEN.dunkel, hellJetzt ? 0.8 : 1, 70);
+  c.globalCompositeOperation = 'source-over';
+}
+function cateringLinks(c, w, h, mx, my) {   // liegt auf der abgedunkelten Startseite, darum immer leuchtend
+  if (!cLinks || cLinks.w !== w || cLinks.h !== h) { cLinks = cNeueTeile(2400, w, h); cLinks.w = w; cLinks.h = h; }
+  const S = Math.min(w * 0.46, h * 0.345);
+  c.globalCompositeOperation = 'lighter';
+  cPunkte(c, cLinks, C_LATERNEN, w / 2, 1.5 * S, S, mx, my, K_FARBEN.dunkel, 1, 90);   // Ketten beginnen am oberen Rand
   c.globalCompositeOperation = 'source-over';
 }
 
@@ -1729,7 +1817,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v43</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v48</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
