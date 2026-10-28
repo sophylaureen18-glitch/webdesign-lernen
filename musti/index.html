@@ -342,6 +342,31 @@ h1 em { font-style: normal; font-weight: 400; color: transparent; background: li
 @keyframes fuellen { from { width: 0; } }
 h3 { margin: 6px 0 0; font: 700 11.5px var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--safran); }
 .quelle { font-size: 12px; color: var(--leise); margin: 0; }
+
+/* Bewertungen (Adam, v49): echte Stimmen der Gäste, oben ein Karussell, darunter alle mit Filter */
+.karussell { display: grid; position: relative; padding: 26px 22px 12px; border: 1px solid var(--linie); border-radius: 20px; background: color-mix(in srgb, var(--grund-tief) 35%, transparent); }
+.karussell::before { content: "\201C"; position: absolute; top: -6px; left: 16px; font: 400 76px/1 var(--anzeige); color: var(--safran); opacity: .45; pointer-events: none; }
+.karussell figure { grid-area: 1 / 1; align-self: center; margin: 0; opacity: 0; transform: translateY(8px); transition: opacity .7s, transform .7s; visibility: hidden; }
+.karussell figure.an { opacity: 1; transform: none; visibility: visible; }
+.karussell blockquote { margin: 0; font: 400 20px/1.38 var(--anzeige); }
+.karussell figcaption { margin-top: 10px; font: 600 13px var(--sans); color: var(--safran); }
+.karussell .punkte { grid-area: 2 / 1; display: flex; justify-content: center; margin-top: 8px; }
+.karussell .punkte button { width: 28px; height: 28px; border: 0; padding: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.karussell .punkte button::after { content: ""; width: 8px; height: 8px; border-radius: 8px; background: var(--linie); transition: width .3s, background .3s; }
+.karussell .punkte button[aria-current="true"]::after { width: 22px; background: var(--safran); }
+.stimmen { display: flex; flex-direction: column; gap: 12px; }
+.stimme { border: 1px solid var(--linie); border-radius: 16px; padding: 15px 17px; background: color-mix(in srgb, var(--grund-tief) 35%, transparent); display: flex; flex-direction: column; gap: 9px; animation: rein .5s both; }
+.stimme[hidden] { display: none; }
+.stimme header { display: flex; align-items: center; gap: 12px; }
+.stimme .bild { width: 38px; height: 38px; flex: none; border-radius: 50%; display: grid; place-items: center; font: 400 18px var(--anzeige); color: var(--knopf-text); background: linear-gradient(135deg, var(--safran), var(--glut)); }
+.stimme header div { min-width: 0; }
+.stimme header b { display: block; font: 600 15px var(--sans); }
+.stimme header small { font-size: 12.5px; color: var(--leise); }
+.sterne { margin-left: auto; color: var(--safran); letter-spacing: 1px; font-size: 14px; white-space: nowrap; }
+.stimm-text p { margin: 0 0 6px; font-size: 15px; line-height: 1.55; }
+.stimm-text p:last-child { margin: 0; }
+.stimm-text.zu { max-height: 7.9em; overflow: hidden; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+.stimme .mehr { align-self: flex-start; background: none; border: 0; padding: 4px 0; font: 600 13px var(--sans); color: var(--safran); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .tafel a { color: var(--safran); }
 
 .siegel { display: grid; grid-template-columns: 92px 1fr; gap: 16px; align-items: center; border: 1px solid var(--linie); border-radius: 16px; padding: 14px; }
@@ -674,6 +699,66 @@ function karteHtml(kat) {
     `<li><b>${esc(n)}${m.length ? `<span class="marken">${m.map(x => `<em class="${x}">${MARKEN[x]}</em>`).join('')}</span>` : ''}</b><span class="preis">${p}</span><span>${esc(b)}</span></li>`).join('');
 }
 
+/* Echte Bewertungen (Adam, v49, Bildschirmfotos von Google, Facebook, Restaurant Guru und der alten Seite).
+   Texte unverändert, nur die Nachnamen abgekürzt (Datenschutz der Gäste). Neueste zuerst. */
+const STIMMEN = [
+  { name: 'OlliE', quelle: 'Google', text: 'Bin jedes Jahr zur Maisernte in der Magdeburger Börde und dann ist Musti Döner in Wanzleben Pflicht.\nSehr lecker, ordentliche Portionen zu angemessenen Preisen. Das Personal ist sehr aufmerksam und freundlich. Kann ich nur empfehlen.' },
+  { name: 'Paddy', quelle: 'Google', text: 'Traveling through Germany and staying in Burg Wenzleben hotel we ventured into the town and discovered a charming and very friendly brasserie, the Multi-bistro. A family run business with warm friendly family members. Highly recommended for an enjoyable sojourn.' },
+  { name: 'Jaissie', quelle: 'Google', text: 'Wir sind extra aus NRW angereist, um wieder einmal bei Musti in Wanzleben-Börde zu essen – und es hat sich mehr als gelohnt! Schon beim Betreten spürt man diese unglaubliche Herzlichkeit. Man fühlt sich sofort enorm freundlich aufgenommen und richtig willkommen. Das Team ist einfach fantastisch: aufmerksam, fröhlich und immer mit einem Lächeln. Hier merkt man, dass Gastfreundschaft noch großgeschrieben wird. Das Essen war wieder absolut köstlich – frisch, geschmackvoll und auf höchstem Niveau. Besonders beeindruckend ist, wie gerne und unkompliziert Wünsche erfüllt und sogar aktiv angeboten werden. Das macht den Besuch zu etwas ganz Besonderem. Seit vielen Jahren kommen wir immer wieder (auch die lange Anfahrt aus NRW nehmen wir gerne in Kauf) und es bleibt einfach durchweg perfekt. Musti ist für uns keine normale Gaststätte, sondern ein echtes Highlight, auf das wir uns jedes Mal riesig freuen. Vielen lieben Dank an das ganze Team für diese wunderbare Zeit! Ihr seid einfach klasse. Absolute Weiterempfehlung – kommt her, ihr werdet nicht enttäuscht sein!' },
+  { name: 'Christopher H.', quelle: 'Google', text: 'Ein wirklich super geiler Döner, vom Geschmack und den frischen Zutaten. Große Portion für einen normalen Preis und das in dieser Zeit, wo alles teurer wird und erhöht werden muss. Musti-Bistro ist ein toller Laden und die Mitarbeiter, alle freundlich, zuvorkommend und cool drauf. Besonders Hasan, bester Mann und ein richtiger Kumpel-Typ.\nEs ist immer gut besucht und da muss man auch mit rechnen, dass man warten muss. Aber es wird was zu trinken angeboten und alles sehr locker. Das Warten lohnt sich, wenn es mal voller sein sollte.' },
+  { name: 'Steffi', quelle: 'Restaurant Guru', text: 'Unglaublich leckeres Essen, immer frisch mit viel Liebe zubereitet. Alle sind sehr nett, man fühlt sich als Gast sehr willkommen, wie ein lang vermisster Verwandter. Wir fahren zum Döner / Salatteller essen immer von Magdeburg hin. Das erste Mal schmeckt mir Hähnchen-Dönerfleisch. Unbedingt das Haus-gemachte Pizzabrot bestellen- jammie!!' },
+  { name: 'Andre G.', quelle: 'Facebook', text: 'Ein wirklich tolles Bistro mit sehr lieber Bedienung. Preis Leistung top! Es schmeckt wunderbar. Nicht zu vergleichen mit anderen mir bekannten Döner Bistros. Es ist wirklich außergewöhnlich und auf jeden Fall empfehlenswert. Liebe Grüße an Claudi' },
+  { name: 'Jessica B.', quelle: 'Facebook', text: 'der Beste Döner weit und breit !!!\nIch liebe ihn... Und die Jungs sind auch irre nett !! ♡♡ gehe sehr sehr gern dorthin. teşekkür ederim.' },
+  { name: 'Neelhtak O.', quelle: 'Facebook', text: 'Durch Zufall auf dem Weg zur Rennstrecke entdeckt, abends eingekehrt und für top befunden.\nSuper leckeres Essen, sehr nette Bedienung. Gepflegte, moderne Einrichtung. WC’s sehr hygienisch, ausreichend Parkplätze vorhanden.\nWenn wir das nächste mal in der Nähe sind, werden wir auf alle Fälle wieder vorbeischauen.' },
+  { name: 'Bor S.', quelle: 'Facebook', text: 'Wir hatten Probleme mit unserem Roller und der Besitzer dieses Restaurants half uns enorm, wir sind super dankbar und das Essen war auch der hammer, danke danke danke!!!' },
+  { name: 'Doreen W.', quelle: 'Facebook', text: 'Wir sind jetzt nun seid mehreren Jahren dort zu Gast, jedoch haben wie nie etwas auszusetzen gehabt. Wir fühlen uns dort immer Willkommen und ziehen dieses Restaurant vor auch die nächsten Jahre als unseren Lieblings Restaurant. Danke an das tolle Team was täglich alles für seine Gäste gibt.\nManche deutschen Restaurants können sich hier definitiv mal eine Scheibe abschneiden' },
+  { name: 'Dalvinder S.', quelle: '', text: 'Fast alle Gerichte sind sehr lecker – besonders den Döner Kebab solltet ihr unbedingt probieren!' },
+  { name: 'Marcela P.', quelle: '', text: 'Der Ort ist modern und sauber, das Personal empfängt einen immer mit einem Lächeln. Man fühlt sich respektiert und willkommen. Das Essen ist lecker und immer frisch!' },
+  { name: 'Лилия Б.', quelle: '', text: 'Leckeres Essen, große Portionen und sehr angenehmer Service. Vielen Dank!' },
+];
+const KARUSSELL = ['Marcela P.', 'Dalvinder S.', 'Bor S.', 'Лилия Б.'];   // nur kurze, damit das Karussell nicht springt
+const STERNE = '<span class="sterne" aria-label="5 von 5 Sternen">★★★★★</span>';
+function karussellHtml() {
+  const liste = KARUSSELL.map(n => STIMMEN.find(x => x.name === n));
+  return `<div class="karussell" id="karussell" aria-roledescription="Karussell" aria-label="Stimmen unserer Gäste">
+    ${liste.map((x, i) => `<figure class="${i ? '' : 'an'}" aria-hidden="${i ? 'true' : 'false'}"><blockquote>„${x.text}“</blockquote><figcaption>${x.name} · ★★★★★</figcaption></figure>`).join('')}
+    <div class="punkte">${liste.map((x, i) => `<button type="button" data-stimme="${i}" aria-label="Stimme ${i + 1} von ${liste.length}" aria-current="${!i}"></button>`).join('')}</div>
+  </div>`;
+}
+function stimmenHtml() {
+  const zahl = q => STIMMEN.filter(x => x.quelle === q).length;
+  const filter = [['', `Alle (${STIMMEN.length})`], ['Google', `Google (${zahl('Google')})`], ['Facebook', `Facebook (${zahl('Facebook')})`], ['Restaurant Guru', `Restaurant Guru (${zahl('Restaurant Guru')})`]];
+  return `<div class="reiter" role="tablist" aria-label="Bewertungen filtern">${filter.map(([q, t], i) => `<button type="button" role="tab" data-quelle="${q}" aria-selected="${!i}">${t}</button>`).join('')}</div>
+    <div class="stimmen" id="stimmen">${STIMMEN.map(x => `<article class="stimme" data-von="${x.quelle}">
+      <header><span class="bild" aria-hidden="true">${x.name[0]}</span><div><b>${x.name}</b><small>${x.quelle ? 'auf ' + x.quelle : 'Gast'}</small></div>${STERNE}</header>
+      <div class="stimm-text${x.text.length > 300 ? ' zu' : ''}">${x.text.split('\n').map(z => `<p>${z}</p>`).join('')}</div>
+      ${x.text.length > 300 ? '<button type="button" class="mehr" aria-expanded="false">Weiterlesen</button>' : ''}
+    </article>`).join('')}</div>`;
+}
+let karussellUhr = 0, karussellPause = false;
+function karussellZeigen(i) {
+  const k = document.getElementById('karussell'); if (!k) return false;
+  const fig = k.querySelectorAll('figure'), pk = k.querySelectorAll('.punkte button');
+  fig.forEach((f, n) => { f.classList.toggle('an', n === i); f.setAttribute('aria-hidden', n !== i); });
+  pk.forEach((b, n) => b.setAttribute('aria-current', n === i));
+  k.dataset.jetzt = i; return true;
+}
+function karussellStarten() {
+  clearInterval(karussellUhr);
+  const k = document.getElementById('karussell'); if (!k) return;
+  if (!k.dataset.hoert) {   // mit der Maus darüber bleibt die Stimme stehen
+    k.dataset.hoert = 1; karussellPause = false;
+    k.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') karussellPause = true; });
+    k.addEventListener('pointerleave', () => { karussellPause = false; });
+  }
+  karussellUhr = setInterval(() => {
+    if (karussellPause) return;
+    const k = document.getElementById('karussell');
+    if (!k) { clearInterval(karussellUhr); return; }
+    karussellZeigen((+(k.dataset.jetzt || 0) + 1) % KARUSSELL.length);
+  }, 7000);
+}
+
 const TAFELN = {
   speisekarte: () => ({
     ober: 'Täglich frisch', titel: 'Speisekarte', breit: true,
@@ -729,13 +814,15 @@ const TAFELN = {
   bewertungen: () => ({
     ober: 'Das sagen unsere Gäste', titel: 'Bewertungen',
     inhalt: `<div class="zeile-kopieren" style="font-size:56px;line-height:1">4,7<span style="font:600 15px var(--sans);color:var(--leise)">von 5 Sternen<br>1.190 Bewertungen bei Google</span></div>
-        <blockquote style="margin:0;font:400 21px/1.35 var(--anzeige)">„Fast alle Gerichte sind sehr lecker, besonders den Döner Kebab solltet ihr unbedingt probieren!“<footer style="font:600 13px var(--sans);color:var(--safran);margin-top:6px">Dalvinder Singh · ★★★★★</footer></blockquote>
+        ${karussellHtml()}
         <div class="balken"><span>Google</span><i style="--w:94%"></i><b>4,7</b></div>
         <p class="quelle">4,7 von 5 Sternen aus 1.190 Google-Bewertungen. Auf coolibri.de:</p>
         <div class="balken"><span>Service</span><i style="--w:86%"></i><b>8,6</b></div>
         <div class="balken"><span>Essen</span><i style="--w:83%"></i><b>8,3</b></div>
         <div class="balken"><span>Ambiente</span><i style="--w:81%"></i><b>8,1</b></div>
-        <p class="quelle">300 Bewertungen, Durchschnitt 8,3 von 10. Quelle: <a href="https://coolibri.de/restaurant/musti-bistro-wanzleben-boerde/" target="_blank" rel="noopener">coolibri.de</a></p>`,
+        <p class="quelle">300 Bewertungen, Durchschnitt 8,3 von 10. Quelle: <a href="https://coolibri.de/restaurant/musti-bistro-wanzleben-boerde/" target="_blank" rel="noopener">coolibri.de</a></p>
+        <h3>Stimmen unserer Gäste</h3>
+        ${stimmenHtml()}`,
   }),
   catering: () => ({
     ober: 'Für Feiern und Veranstaltungen', titel: 'Catering',
@@ -799,7 +886,7 @@ function tafelAuf(name) {
   const t = TAFELN[name](); offeneTafel = name; letzterFokus = document.activeElement;
   document.getElementById('tafel-ober').textContent = t.ober;
   document.getElementById('tafel-titel').textContent = t.titel;
-  const inhalt = document.getElementById('tafel-inhalt'); inhalt.innerHTML = t.inhalt; inhaltNachOben();
+  const inhalt = document.getElementById('tafel-inhalt'); inhalt.innerHTML = t.inhalt; inhaltNachOben(); karussellStarten();
   document.querySelectorAll('.menue [data-tafel], .menue-unten [data-tafel]').forEach(b => b.setAttribute('aria-expanded', b.dataset.tafel === name));
   document.getElementById('startseite').removeAttribute('aria-current');
   tafel.classList.toggle('breit', !!t.breit);
@@ -1389,6 +1476,18 @@ document.addEventListener('click', e => {
     kat.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b === kat));
     document.getElementById('karte').innerHTML = karteHtml(kat.dataset.kat);
   }
+  const st = e.target.closest('[data-stimme]');
+  if (st) { karussellZeigen(+st.dataset.stimme); karussellStarten(); }
+  const qu = e.target.closest('[data-quelle]');
+  if (qu) {
+    qu.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b === qu));
+    document.querySelectorAll('#stimmen .stimme').forEach(a => { a.hidden = !!qu.dataset.quelle && a.dataset.von !== qu.dataset.quelle; });
+  }
+  const mehr = e.target.closest('.stimme .mehr');
+  if (mehr) {
+    const auf = mehr.getAttribute('aria-expanded') !== 'true', text = mehr.previousElementSibling;
+    text.classList.toggle('zu', !auf); mehr.setAttribute('aria-expanded', auf); mehr.textContent = auf ? 'Weniger' : 'Weiterlesen';
+  }
   if (e.target.id === 'kopieren') {
     const ziel = document.getElementById('nummer');
     navigator.clipboard.writeText(ziel.textContent).then(() => { e.target.textContent = 'Kopiert'; })
@@ -1817,7 +1916,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v48</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v49</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
