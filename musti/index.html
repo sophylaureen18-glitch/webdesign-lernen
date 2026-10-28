@@ -1268,7 +1268,15 @@ function neigungAusSchwerkraft(sx, sy) {
 function neigungLesen(e) {
   sensorInfo.ereignisse++;
   if (e.beta == null || e.gamma == null) return;
-  sensorInfo.mitWerten++;
+  sensorInfo.mitWerten++; sensorInfo.relativ++;
+  const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
+  neigungAusSchwerkraft(Math.cos(b) * Math.sin(g), Math.sin(b));
+}
+// 1b (v42): manche Android-Handys liefern die Lage nur als „absolute“ Lage (mit Kompass)
+function absolutLesen(e) {
+  sensorInfo.absolut++;
+  if (sensorInfo.relativ || e.beta == null || e.gamma == null) return;   // normale Lage kommt schon an
+  sensorInfo.absolutMitWerten++; sensorInfo.mitWerten++;
   const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
   neigungAusSchwerkraft(Math.cos(b) * Math.sin(g), Math.sin(b));
 }
@@ -1280,6 +1288,7 @@ function bewegungLesen(e) {
   const a = e.accelerationIncludingGravity;
   if (!a || a.x == null || a.y == null) return;
   sensorInfo.bewegungMitWerten++;
+  if (e.rotationRate && e.rotationRate.alpha != null) sensorInfo.gyro = 'ja';
   if (sensorInfo.mitWerten) return;                 // Lage-Sensor liefert schon, der ist ruhiger
   // iPhones melden die Richtung umgekehrt: hochkant gehalten zeigt y dann nach unten
   if (beschlUmgedreht === null) {
@@ -1291,8 +1300,9 @@ function bewegungLesen(e) {
   const k = (beschlUmgedreht ? -1 : 1) / 9.81;
   neigungAusSchwerkraft(Math.max(-1, Math.min(1, -a.x * k)), Math.max(-1, Math.min(1, a.y * k)));
 }
-sensorInfo.bewegung = 0; sensorInfo.bewegungMitWerten = 0;
+Object.assign(sensorInfo, { bewegung: 0, bewegungMitWerten: 0, relativ: 0, absolut: 0, absolutMitWerten: 0, gyro: 'nein' });
 addEventListener('deviceorientation', neigungLesen);
+addEventListener('deviceorientationabsolute', absolutLesen);
 addEventListener('devicemotion', bewegungLesen);
 // Handy ohne Neige-Werte nach 2 s (Sensor gesperrt oder abgelehnt): dann wandert die Rosette von selbst
 let selbstWandern = false;
@@ -1523,7 +1533,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v41</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v42</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
