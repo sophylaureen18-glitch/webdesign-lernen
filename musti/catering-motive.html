@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catering-Motive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Vorschau für Adam: je drei Motiv-Ideen fürs Catering, links (Laptop) und im Fenster */
+:root { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --safran: #f2a93b; --linie: rgba(242,169,59,.28); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); } }
+:root[data-theme="light"] { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); }
+:root[data-theme="dark"] { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --linie: rgba(242,169,59,.28); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--grund); color: var(--text); font: 400 15px/1.5 "Hanken Grotesk", system-ui, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 60px; }
+h1 { font: 400 clamp(32px, 6vw, 50px)/1.05 Gloock, serif; margin: 0 0 8px; }
+h2 { font: 400 26px/1.1 Gloock, serif; margin: 34px 0 4px; }
+.ober { font: 700 11px "Hanken Grotesk"; letter-spacing: .22em; text-transform: uppercase; color: var(--safran); margin: 0 0 8px; }
+.intro, .unter { color: var(--leise); max-width: 64ch; margin: 0 0 18px; }
+.unter { font-size: 14px; margin-bottom: 12px; }
+.knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.knoepfe button { font: 600 13px "Hanken Grotesk"; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--linie); background: transparent; color: var(--text); cursor: pointer; }
+.knoepfe button[aria-pressed="true"] { background: var(--safran); border-color: var(--safran); color: #2a0b12; }
+.drei { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .drei { grid-template-columns: 1fr; } }
+.motiv { margin: 0; background: #150508; border: 1px solid var(--linie); border-radius: 18px; overflow: hidden; color: #f7e7d3; }
+.motiv .flaeche { position: relative; }
+.motiv canvas { display: block; width: 100%; aspect-ratio: 3 / 4; touch-action: pan-y; }
+.fenster { background: #1d070d; }
+.hell .fenster { background: #efd9b5; }
+.motiv figcaption { padding: 10px 14px 14px; border-top: 1px solid rgba(242,169,59,.18); background: #150508; }
+.motiv h3 { margin: 0; font: 400 21px Gloock, serif; display: flex; gap: 8px; align-items: baseline; }
+.motiv h3 span { font: 700 12.5px "Hanken Grotesk"; color: #2a0b12; background: #f2a93b; border-radius: 999px; padding: 1px 9px; }
+.motiv p { margin: 2px 0 0; color: #cdaa8d; font-size: 13.5px; }
+/* angedeutetes Formular über dem Fenster-Motiv, damit man sieht, wie es hinter dem Text wirkt */
+.formular { position: absolute; inset: 0; padding: 22px 20px; display: flex; flex-direction: column; gap: 9px; pointer-events: none; color: #f7e7d3; }
+.formular b { font: 400 28px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; }
+.formular small { font: 700 10px "Hanken Grotesk"; letter-spacing: .2em; color: #f2a93b; margin-top: 4px; }
+.formular i { display: block; height: 32px; border-radius: 10px; border: 1px solid rgba(242,169,59,.3); background: rgba(18,4,10,.55); }
+.formular i.gross { height: 78px; }
+.formular u { text-decoration: none; text-align: center; font: 600 13px "Hanken Grotesk"; color: #2a0b12; padding: 9px; border-radius: 12px; background: linear-gradient(90deg, #f2a93b, #ff6b3d); }
+.hell .formular { color: #33100a; }
+.hell .formular b { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+.hell .formular small { color: #8a4b06; }
+.hell .formular i { border-color: rgba(138,75,6,.35); background: rgba(240,212,165,.6); }
+.hell .formular u { color: #fff4e3; background: linear-gradient(90deg, #8a4b06, #a8320c); }
+.ohne-formular .formular { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <p class="ober">Musti Bistro · Catering · Motive</p>
+  <h1>Zwei Motive fürs Catering</h1>
+  <p class="intro">Je drei Ideen: eine Reihe für den dunklen Bereich links neben dem Catering-Fenster am Laptop, eine Reihe für den Hintergrund im Fenster selbst. Fahr mit der Maus oder dem Finger darüber, dann weichen die Punkte aus. Schreib mir einfach eine Zahl und einen Buchstaben, zum Beispiel „2 und B“.</p>
+
+  <h2>Links daneben (nur Laptop)</h2>
+  <p class="unter">Bleibt stehen, solange das Catering-Fenster offen ist.</p>
+  <div class="drei">
+    <figure class="motiv"><div class="flaeche"><canvas data-art="laternen"></canvas></div><figcaption><h3><span>1</span>Orient-Laternen</h3><p>Drei Laternen hängen von oben und schwingen sanft. Im farbigen Glas flackert ein kleines Licht.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="lichter"></canvas></div><figcaption><h3><span>2</span>Lichterketten</h3><p>Festliche Lichterketten über die ganze Fläche. Die Lämpchen leuchten in Wellen auf, Goldglitzer rieselt.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="etagere"></canvas></div><figcaption><h3><span>3</span>Buffet-Etagere</h3><p>Eine Etagere mit drei Ebenen. Die Speisen darauf drehen sich langsam im Kreis.</p></figcaption></figure>
+  </div>
+
+  <h2>Im Catering-Fenster (Handy, Tablet, Laptop)</h2>
+  <p class="unter">Liegt hinter dem Text und dem Formular, wie bei der Speisekarte.</p>
+  <div class="knoepfe">
+    <button type="button" id="k-formular" aria-pressed="true">Formular darüber zeigen</button>
+    <button type="button" id="k-hell" aria-pressed="false">Helle Ansicht</button>
+  </div>
+  <div class="drei" id="fenster-reihe">
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="tee"></canvas><div class="formular"><b>Catering</b><small>ANFRAGE SENDEN</small><i></i><i></i><i class="gross"></i><u>Anfrage absenden</u></div></div><figcaption><h3><span>A</span>Teegläser stoßen an</h3><p>Zwei Teegläser heben sich, stoßen an und funkeln. Danach stellen sie sich zurück.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="tafel"></canvas><div class="formular"><b>Catering</b><small>ANFRAGE SENDEN</small><i></i><i></i><i class="gross"></i><u>Anfrage absenden</u></div></div><figcaption><h3><span>B</span>Festtafel</h3><p>Eine lange Tafel von oben. Teller für Teller kommen Gäste dazu, die Kerzen flackern.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="feuer"></canvas><div class="formular"><b>Catering</b><small>ANFRAGE SENDEN</small><i></i><i></i><i class="gross"></i><u>Anfrage absenden</u></div></div><figcaption><h3><span>C</span>Feuerwerk</h3><p>Kleines Feuerwerk in Mustis Farben: Raketen steigen auf und zerplatzen leise.</p></figcaption></figure>
+  </div>
+</main>
+<script>
+const TAU = Math.PI * 2, PI = Math.PI;
+// Farben: 0 Gold, 1 Glut-Orange, 2 Paprika, 3 Creme, 4 Jade, 5 Granat, 6 Tomate, 7 Kräutergrün
+const FARBEN = {
+  dunkel: [[242, 169, 59], [255, 120, 42], [224, 72, 50], [255, 226, 180], [143, 211, 162], [190, 40, 70], [255, 80, 60], [110, 200, 95]],
+  hell:   [[138, 75, 6], [168, 50, 12], [147, 32, 26], [110, 56, 10], [40, 110, 60], [120, 20, 50], [180, 40, 25], [50, 120, 40]],
+};
+const glatt = x => x * x * (3 - 2 * x);
+const ring = (cx, cy, rx, ry, u) => [cx + Math.cos(u * TAU) * rx, cy + Math.sin(u * TAU) * ry];
+const scheibe = (cx, cy, r, u, v, ry = r) => { const w = u * TAU, q = Math.sqrt(v); return [cx + Math.cos(w) * r * q, cy + Math.sin(w) * ry * q]; };
+const drehen = (x, y, px, py, w) => { const c = Math.cos(w), s = Math.sin(w), dx = x - px, dy = y - py; return [px + dx * c - dy * s, py + dx * s + dy * c]; };
+
+// Jede Form bekommt pro Punkt vier Zufallszahlen (z.a bis z.d) und die Zeit t.
+// Zurück kommt [x, y, Farbe, Helligkeit], x etwa -1 bis 1, y nach unten.
+const FORMEN = {
+  laternen: (z, t) => {
+    const L = [[-.58, .95, 1.15, 5, 0], [.03, 1.45, 1.6, 1, 1.9], [.62, .7, 1.05, 4, 3.4]];   // x, Kette, Größe, Glasfarbe, Phase
+    const k = z.a < .3 ? 0 : z.a < .7 ? 1 : 2, [px, kette, G, glas, ph] = L[k], oben = -1.5;
+    const schwung = Math.sin(t * .8 + ph) * .06 + Math.sin(t * .31 + ph * 2) * .025;
+    const flackern = .7 + .18 * Math.sin(t * 7.3 + k * 2.1) + .12 * Math.sin(t * 12.7 + k);
+    const r = v => (.05 + .14 * Math.pow(Math.sin(PI * v), .6)) * G, rumpf = kette + .08 * G, H = .34 * G;
+    let lx, ly, fa, ha; const q = z.b;
+    if (q < .07) { lx = 0; ly = z.c * kette; fa = 3; ha = .3; }                                                    // Kette
+    else if (q < .13) { lx = (z.d * 2 - 1) * (.03 + .06 * Math.sin(PI / 2 * z.c)) * G; ly = kette + z.c * .08 * G; fa = 0; ha = .85; }   // Kuppel
+    else if (q < .38) { const v = z.c, phi = Math.floor(z.d * 6) / 6 * TAU + t * .25, vorn = Math.sin(phi);           // Rippen, drehen sich
+      lx = Math.cos(phi) * r(v); ly = rumpf + v * H; fa = 0; ha = vorn > 0 ? .5 + .45 * vorn : .18; }
+    else if (q < .46) { const v = z.c < .5 ? .1 : .9, w = z.d * TAU; lx = Math.cos(w) * r(v); ly = rumpf + v * H + Math.sin(w) * r(v) * .2; fa = 0; ha = .8; }   // Bänder
+    else if (q < .7) { const v = .08 + z.c * .84, s = z.d * 2 - 1; lx = s * r(v) * .9; ly = rumpf + v * H; fa = glas; ha = (.25 + .3 * (1 - Math.abs(s))) * flackern; }   // farbiges Glas
+    else if (q < .78) { const v = z.c, b = .05 * G * Math.sin(PI * Math.pow(v, .6));                                  // Flamme
+      lx = (z.d * 2 - 1) * b + Math.sin(t * 9 + v * 4) * .006; ly = rumpf + H * .38 + v * .13 * G; fa = v < .5 ? 3 : 1; ha = .95 * flackern; }
+    else if (q < .83) { lx = (z.d * 2 - 1) * .035 * G * (1 - z.c); ly = rumpf + H + z.c * .13 * G; fa = 0; ha = .7; }   // Spitze unten
+    else if (q > .93) { const h = (z.c + t * .04) % 1;                                                             // Lichtpunkte schweben nach oben
+      return [(z.d * 2 - 1) * 1.05 + Math.sin(h * 8 + z.d * 30) * .05, 1.5 - h * 3, [0, 3, glas][Math.floor(z.c * 3)], .5 * Math.pow(Math.sin(PI * h), 1.5) * (.4 + .6 * Math.max(0, Math.sin(t * 3 + z.d * 50)))]; }
+    else { const w = z.c * TAU, rad = Math.sqrt(z.d) * .45 * G; lx = Math.cos(w) * rad; ly = rumpf + H * .5 + Math.sin(w) * rad * 1.1; fa = glas; ha = .13 * flackern * (1 - Math.sqrt(z.d) * .6); }   // Lichtschein
+    const [x, y] = drehen(px + lx, oben + ly, px, oben, schwung);
+    return [x, y, fa, ha];
+  },
+  lichter: (z, t) => {
+    const k = Math.floor(z.a * 4), y0 = -1.25 + k * .62, durch = .26 + (k % 2) * .08 + Math.sin(t * .7 + k * 1.3) * .025;
+    const kette = x => y0 + durch * (1 - x * x), q = z.b;
+    if (q < .16) { const x = -1.12 + z.c * 2.24; return [x, kette(x), 3, .2]; }                                       // Draht
+    if (q < .78) { const j = Math.floor(z.c * 11), u = (z.c * 11) % 1, bx = -1 + j * .2 + (k % 2 ? .1 : 0), by = kette(bx) + .06;
+      const an = .25 + .75 * Math.pow(Math.max(0, Math.sin(t * 1.9 - j * .75 + k * 1.4)), 2), fa = [0, 1, 5, 4, 3][(j + k * 2) % 5];
+      if (z.d < .35) { const [x, y] = scheibe(bx, by + .01, .1, u, z.d / .35); return [x, y, fa, .14 * an]; }        // Schein
+      const [x, y] = scheibe(bx, by, .032, u, (z.d - .35) / .65, .042); return [x, y, fa, .35 + .65 * an]; }         // Lämpchen
+    const h = (z.c + t * .05) % 1, x = (z.d * 2 - 1) * 1.05 + Math.sin(h * 9 + z.c * 20 + t) * .04;                  // Glitzer rieselt
+    return [x, -1.5 + h * 3, [0, 3, 1][Math.floor(z.d * 3)], .55 * Math.pow(Math.sin(PI * h), 1.5) * (.4 + .6 * Math.max(0, Math.sin(t * 5 + z.c * 60)))];
+  },
+  etagere: (z, t) => {
+    const E = [[.86, .9, 9, 1], [.62, .26, 7, -1], [.4, -.36, 5, 1]], q = z.a;                                        // Radius, Höhe, Speisen, Drehrichtung
+    if (q < .06) return [0, -.8 + z.b * 1.9, 0, .65];                                                                  // Stange
+    if (q < .1) { const [x, y] = ring(0, 1.1, .3, .05, z.b); return [x, y, 0, .6]; }                                   // Fuß
+    if (q < .16) { const [x, y] = scheibe(0, -.86, .055, z.b, z.c); return [x, y, 3, .6 + .4 * Math.sin(t * 3)]; }     // Knauf
+    const k = Math.floor(z.b * 3), u = (z.b * 3) % 1, [R, ty, m, dir] = E[k];
+    if (q < .45) { const w = u * TAU, x = Math.cos(w) * R * (1 + .025 * Math.sin(w * 26)), y = ty + Math.sin(w) * R * .2; return [x, y, 0, Math.sin(w) > 0 ? .85 : .4]; }   // Tellerrand
+    if (q < .52) { const [x, y] = scheibe(0, ty, R * .95, u, z.c, R * .19); return [x, y, 3, .07]; }                  // Tellerfläche
+    const j = Math.floor(u * m), a = j / m * TAU + t * .35 * dir, vorn = Math.sin(a), g = k === 0 ? .075 : .055;      // Speisen
+    const [x, y] = scheibe(Math.cos(a) * R * .66, ty - .05 + vorn * R * .13, g * (.8 + .2 * vorn), z.c, z.d, g * .7);
+    return [x, y, z.c > .8 && z.d < .3 ? 3 : [6, 4, 0, 2, 7, 1][(j + k) % 6], .3 + .55 * (vorn + 1) / 2];
+  },
+  tee: (z, t) => {
+    const p = (t * .22) % 1, an = p < .45 ? glatt(p / .45) : p < .55 ? 1 : p < .9 ? 1 - glatt((p - .55) / .35) : 0;
+    const H = .98, W = .22, unten = .62, r0 = .2, ganz = r0 * Math.cos(W) + H * Math.sin(W);                           // so weit rücken sie, bis sich die Ränder berühren
+    const r = v => v < .6 ? .2 - .085 * Math.pow(v / .6, 1.4) : .115 + .06 * Math.sin((v - .6) / .4 * PI / 2) - (v > .93 ? (v - .93) * .9 : 0);
+    if (z.a >= .88) {                                                                                                 // Funkeln beim Anstoßen
+      const e = (p - .45) / .3, ky = unten - .12 + r0 * Math.sin(W) - H * Math.cos(W);
+      if (e < 0 || e > 1) return [0, ky, 0, 0];
+      const w = z.b * TAU, d = (.06 + .5 * Math.pow(z.c, .7)) * (1 - Math.pow(1 - e, 3));
+      return [Math.cos(w) * d, ky + Math.sin(w) * d * .8, [0, 3, 1][Math.floor(z.d * 3)], Math.pow(1 - e, 1.4) * (.5 + .5 * Math.abs(Math.sin(t * 20 + z.d * 30)))];
+    }
+    const s = z.a < .44 ? -1 : 1, bx = s * (.5 + (ganz - .5) * an), by = unten - .12 * an, w = -s * W * an, q = z.b;
+    const glas = (lx, ly) => drehen(bx + lx, by + ly, bx, by, w);
+    if (q < .3) { const v = z.c, seite = z.d < .5 ? -1 : 1, [x, y] = glas(seite * r(v), -H + v * H); return [x, y, 3, seite > 0 ? .8 : .45]; }   // Glasrand
+    if (q < .38) { const a = z.c * TAU, [x, y] = glas(Math.cos(a) * r0, -H + Math.sin(a) * .035); return [x, y, 3, .75]; }                       // Öffnung
+    if (q < .7) { const v = .2 + z.c * .77, [x, y] = glas((z.d * 2 - 1) * r(v) * .86, -H + v * H); return [x, y, v < .23 ? 0 : z.d > .7 ? 2 : 1, v < .23 ? .8 : .42]; }   // Tee
+    if (q < .84) { const [x, y] = ring(s * .5, unten + .04, .3, .055, z.c); return [x, y, 0, .7]; }                                              // Untertasse bleibt stehen
+    const h = (z.c + t * .12) % 1, [rx, ry] = glas(0, -H);                                                                                       // Dampf
+    return [rx + (z.d - .5) * .14 + Math.sin(h * 7 + t + z.d * 3) * (.03 + h * .06), ry - .05 - h * .55, 3, Math.sin(PI * h) * .4 * (1 - an * .6)];
+  },
+  tafel: (z, t) => {
+    const zyk = (t / 10) % 1, gaeste = Math.floor(glatt(Math.min(1, zyk / .6)) * 16.99), voll = zyk > .6, q = z.a;
+    if (q < .16) { const w = z.b * TAU, c = Math.cos(w), s = Math.sin(w);                                              // Tischrand
+      return [.36 * Math.sign(c) * Math.pow(Math.abs(c), .2), 1.0 * Math.sign(s) * Math.pow(Math.abs(s), .2), 0, .7]; }
+    if (q < .22) return [(z.b * 2 - 1) * .1, -.95 + z.c * 1.9, 5, .13];                                                  // Tischläufer
+    if (q < .32) { const k = Math.floor(z.b * 3), cy = -.55 + k * .55, fl = .75 + .25 * Math.sin(t * 8 + k * 2) * Math.sin(t * 5.3 + k);   // Kerzen
+      if (z.c < .45) { const [x, y] = scheibe(0, cy, .025, z.d, (z.c / .45), .04); return [x, y, z.c < .2 ? 3 : 1, .95 * fl]; }
+      const [x, y] = scheibe(0, cy, .17, z.d, (z.c - .45) / .55); return [x, y, 1, .12 * fl]; }
+    if (q < .42) { const k = Math.floor(z.b * 4), cy = [-.8, -.27, .27, .8][k], u = (z.b * 4) % 1;                     // Platten mit Essen
+      if (z.c < .4) { const [x, y] = ring(0, cy, .2, .09, u); return [x, y, 0, .55]; }
+      const [x, y] = scheibe(0, cy, .16, u, z.d, .065); return [x, y, [6, 4, 2, 7][(k + Math.floor(z.c * 7)) % 4], .5]; }
+    const sitz = Math.floor(z.b * 16), u = (z.b * 16) % 1;                                                              // 16 Plätze
+    const [px, py] = sitz < 14 ? [sitz < 7 ? -.58 : .58, -.84 + (sitz % 7) * .28] : [0, sitz === 14 ? -1.2 : 1.2];
+    const folge = sitz < 14 ? (sitz % 7) * 2 + (sitz >= 7) : sitz, da = folge < gaeste;
+    const puls = voll ? .75 + .25 * Math.sin(t * 4 - folge * .5) : 1;
+    if (z.c < .45) { const [x, y] = ring(px, py, .09, .09, u); return [x, y, da ? 0 : 3, (da ? .85 : .16) * puls]; }      // Teller
+    if (z.c < .65) { const w = (u - .5) * 1.6 + (sitz < 14 ? (px < 0 ? PI : 0) : (py < 0 ? -PI / 2 : PI / 2));   // Stuhl
+      return [px + Math.cos(w) * .15, py + Math.sin(w) * .15, 0, da ? .45 : .12]; }
+    const [x, y] = scheibe(px, py, .05, u, z.d); return [x, y, [6, 7, 1, 4][sitz % 4], da ? .75 * puls : 0];           // Essen auf dem Teller
+  },
+  feuer: (z, t) => {
+    const N = 5, k = Math.floor(z.a * N), P = 3.6, tk = t + k * P / N, zyk = Math.floor(tk / P), p = (tk / P) % 1;
+    const zufall = n => { const s = Math.sin(n * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
+    const bx = (zufall(zyk) * 2 - 1) * .7, by = -1.05 + zufall(zyk + .5) * .9, fa = [0, 1, 5, 4, 3, 6][Math.floor(zufall(zyk + .25) * 6)], steig = .28;
+    if (p < steig) { const e = p / steig, hy = 1.5 + (by - 1.5) * (1 - Math.pow(1 - e, 2)), hx = bx + Math.sin(e * 6) * .02;   // Rakete steigt
+      if (z.b > .12) return [hx, hy, fa, 0];
+      return [hx, hy + z.b / .12 * .25, 3, .7 * (1 - z.b / .12)]; }
+    const e = (p - steig) / (1 - steig), w = z.b * TAU, d = .45 * Math.pow(z.c, .35) * (1 - Math.pow(1 - e, 3));          // zerplatzt
+    return [bx + Math.cos(w) * d, by + Math.sin(w) * d + .35 * e * e, z.d > .85 ? 3 : fa, Math.pow(1 - e, 1.4) * (.5 + .5 * Math.abs(Math.sin(t * 14 + z.d * 40)))];
+  },
+};
+const ANZAHL = { laternen: 2400, lichter: 2200, etagere: 2200, tee: 2400, tafel: 2400, feuer: 2400 };
+
+let hell = false;
+const flaechen = [...document.querySelectorAll('canvas')].map(cv => {
+  const f = { cv, g: cv.getContext('2d'), art: cv.dataset.art, fenster: !!cv.closest('.fenster'), w: 0, h: 0, teile: [], zeiger: { x: -999, y: -999 }, sichtbar: false };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); f.zeiger.x = e.clientX - r.left; f.zeiger.y = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', () => { f.zeiger.x = f.zeiger.y = -999; });
+  cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') f.zeiger.x = f.zeiger.y = -999; });
+  return f;
+});
+function messen() { for (const f of flaechen) { const r = f.cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  if (Math.round(r.width) === f.w && Math.round(r.height) === f.h) continue;
+  f.w = Math.round(r.width); f.h = Math.round(r.height); f.dpr = dpr; f.cv.width = f.w * dpr; f.cv.height = f.h * dpr;
+  f.teile = Array.from({ length: ANZAHL[f.art] }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() },
+    x: Math.random() * f.w, y: Math.random() * f.h, vx: 0, vy: 0, s: 1.2 + Math.random() * 1.3 })); } }
+const io = new IntersectionObserver(es => es.forEach(e => { flaechen.find(f => f.cv === e.target).sichtbar = e.isIntersecting; }));
+flaechen.forEach(f => io.observe(f.cv));
+addEventListener('resize', messen); messen();
+
+const knopfF = document.getElementById('k-formular'), knopfH = document.getElementById('k-hell'), reihe = document.getElementById('fenster-reihe');
+knopfF.addEventListener('click', () => { const an = knopfF.getAttribute('aria-pressed') !== 'true'; knopfF.setAttribute('aria-pressed', an); reihe.classList.toggle('ohne-formular', !an); });
+knopfH.addEventListener('click', () => { hell = knopfH.getAttribute('aria-pressed') !== 'true'; knopfH.setAttribute('aria-pressed', hell); reihe.classList.toggle('hell', hell); });
+
+let vor = performance.now(), t = 0;
+function schleife(jetzt) {
+  const dt = Math.max(0, Math.min(.05, (jetzt - vor) / 1000)); vor = jetzt; t += dt;
+  for (const f of flaechen) {
+    if (!f.sichtbar || !f.w) continue;
+    const g = f.g, imHellen = f.fenster && hell, pal = imHellen ? FARBEN.hell : FARBEN.dunkel, staerke = imHellen ? .8 : 1;
+    g.setTransform(f.dpr, 0, 0, f.dpr, 0, 0); g.clearRect(0, 0, f.w, f.h);
+    const S = Math.min(f.w * .46, f.h * .345), cx = f.w / 2, cy = f.h / 2;
+    g.globalCompositeOperation = imHellen ? 'source-over' : 'lighter';
+    for (const p of f.teile) {
+      const [x, y, fa, ha] = FORMEN[f.art](p.z, t), tx = cx + x * S, ty = cy + y * S;
+      p.vx = (p.vx + (tx - p.x) * .07) * .85; p.vy = (p.vy + (ty - p.y) * .07) * .85;
+      const dx = p.x - f.zeiger.x, dy = p.y - f.zeiger.y, d = Math.hypot(dx, dy);
+      if (d < 70 && d > .1) { const k = (1 - d / 70) * 2.6; p.vx += dx / d * k; p.vy += dy / d * k; }
+      p.x += p.vx; p.y += p.vy;
+      if (ha < .02) continue;
+      const fc = pal[fa] || pal[0];
+      g.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, ha * staerke).toFixed(3)})`; g.fillRect(p.x, p.y, p.s, p.s);
+    }
+    g.globalCompositeOperation = 'source-over';
+  }
+  requestAnimationFrame(schleife);
+}
+requestAnimationFrame(schleife);
+</script>
+</body>
+</html>
