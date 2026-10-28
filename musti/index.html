@@ -778,7 +778,7 @@ function tafelAuf(name) {
   const t = TAFELN[name](); offeneTafel = name; letzterFokus = document.activeElement;
   document.getElementById('tafel-ober').textContent = t.ober;
   document.getElementById('tafel-titel').textContent = t.titel;
-  const inhalt = document.getElementById('tafel-inhalt'); inhalt.innerHTML = t.inhalt; inhalt.scrollTop = 0;
+  const inhalt = document.getElementById('tafel-inhalt'); inhalt.innerHTML = t.inhalt; inhaltNachOben();
   document.querySelectorAll('.menue [data-tafel], .menue-unten [data-tafel]').forEach(b => b.setAttribute('aria-expanded', b.dataset.tafel === name));
   document.getElementById('startseite').removeAttribute('aria-current');
   tafel.classList.toggle('breit', !!t.breit);
@@ -1101,6 +1101,12 @@ function tafelZu() {
   if (leise) setTimeout(() => { if (!offeneTafel) tafel.hidden = true; }, 600);
   if (letzterFokus) letzterFokus.focus({ preventScroll: true });
 }
+// Adam (v44): neue Seite in der Speisekarte beginnt immer ganz oben. Sofort statt sanft, und nochmal nach
+// einem Moment, denn auf dem Handy würde ein noch laufender Wisch-Schwung das Hochscrollen sonst abbrechen
+function inhaltNachOben() {
+  const inh = document.getElementById('tafel-inhalt');
+  inh.scrollTop = 0; requestAnimationFrame(() => { inh.scrollTop = 0; }); setTimeout(() => { inh.scrollTop = 0; }, 120);
+}
 document.addEventListener('click', e => {
   const knopf = e.target.closest('[data-tafel]');
   if (knopf) { tafelAuf(knopf.dataset.tafel); return; }
@@ -1108,7 +1114,7 @@ document.addEventListener('click', e => {
   if (sp || zur) {
     const ziel = document.querySelector('#tafel-inhalt .ansicht[data-fuer="spezial"]');
     ziel.innerHTML = sp ? spezialSeite(+sp.dataset.spezial) : spezialHtml();
-    document.getElementById('tafel-inhalt').scrollTo({ top: 0, behavior: 'smooth' });
+    inhaltNachOben();
     (ziel.querySelector(sp ? '[data-spezial-zurueck]' : '.gericht') || ziel).focus({ preventScroll: true });
   }
   const sprung = e.target.closest('[data-sprung]');
@@ -1117,6 +1123,7 @@ document.addEventListener('click', e => {
   if (ans) {
     ans.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b === ans));
     document.querySelectorAll('#tafel-inhalt .ansicht').forEach(a => { a.hidden = a.dataset.fuer !== ans.dataset.ansicht; });
+    inhaltNachOben();
   }
   const kat = e.target.closest('[data-kat]');
   if (kat) {
