@@ -934,7 +934,9 @@ function tafelAnimationStarten() {
    mit einfacher Pixeldichte und das Über-uns-Motiv mit weniger Punkten. Versteckte Seiten malen ohnehin nicht. */
 let sparsam = false, langsamZeit = 0;
 function pixelDichte() { return sparsam ? 1 : Math.min(2, devicePixelRatio || 1); }
+let bildRate = 0;
 function lastPruefen(dt) {
+  if (dt > 0) bildRate += (1 / dt - bildRate) * 0.05;
   if (sparsam || document.hidden || dt <= 0) return;
   langsamZeit = dt > 1 / 40 ? langsamZeit + dt : Math.max(0, langsamZeit - dt * 0.5);   // dt ist hier die echte Zeit seit dem letzten Bild
   if (langsamZeit > 2) { sparsam = true; messen(); }
@@ -1227,29 +1229,50 @@ const drehung = { stern: 0, innen: 0, blatt: 0, ring: 0, kern: 0 };
 const maus = { x: -999, y: -999 };
 // Adam: die Rosette wandert gegen die Maus (Maus runter = Rosette hoch, Maus links = Rosette rechts). Das Muster bleibt still.
 const ver = { x: 0, y: 0 }, VER_WEIT = 46;
-// Neigung des Handys: x und y von -1 bis 1, gemessen ab der Haltung, in der man das Handy gerade hält
-const neigung = { x: 0, y: 0, aktiv: false, basisB: null, basisG: null };
-const sensorInfo = { ereignisse: 0, mitWerten: 0, erlaubnis: '–' };
+// Neigung des Handys: x und y von -1 bis 1, gemessen ab der Haltung, in der man das Handy gerade hält.
+// Adam (v37): direkter und genauer. Gemessen wird die Richtung der Schwerkraft (springt nicht, auch wenn man
+// das Handy steil hält), geglättet mit einem 1-Euro-Filter: ruhig beim Stillhalten, sofort bei schneller Bewegung.
+const neigung = { x: 0, y: 0, aktiv: false, basisX: null, basisY: null };
+const sensorInfo = { ereignisse: 0, mitWerten: 0, erlaubnis: '–', proSekunde: 0 };
+function euroFilter(minSchnitt, tempo) {
+  let wert = null, ableitung = 0, zuletzt = 0;
+  const anteil = (schnitt, dt) => 1 / (1 + 1 / (2 * Math.PI * schnitt * dt));
+  return (x, t) => {
+    if (wert === null) { wert = x; zuletzt = t; return x; }
+    const dt = Math.max(0.004, Math.min(0.1, t - zuletzt)); zuletzt = t;
+    ableitung += anteil(1, dt) * ((x - wert) / dt - ableitung);
+    wert += anteil(minSchnitt + tempo * Math.abs(ableitung), dt) * (x - wert);
+    return wert;
+  };
+}
+const filterX = euroFilter(1.2, 0.8), filterY = euroFilter(1.2, 0.8);
+const VOLL_GENEIGT = 0.24;                           // so viel Schwerkraft-Anteil (ca. 14°) = ganz ausgelenkt
+let sensorTakt = { n: 0, ab: performance.now() };
 function neigungLesen(e) {
   sensorInfo.ereignisse++;
   if (e.beta == null || e.gamma == null) return;
   sensorInfo.mitWerten++;
+  const jetzt = performance.now();
+  sensorTakt.n++; if (jetzt - sensorTakt.ab > 1000) { sensorInfo.proSekunde = sensorTakt.n; sensorTakt = { n: 0, ab: jetzt }; }
+  const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
+  const sx = Math.cos(b) * Math.sin(g), sy = Math.sin(b);   // Schwerkraft im Handy: seitlich und vor/zurück
   // Querformat: die Achsen tauschen
   const winkel = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
-  let lr = e.gamma, vh = e.beta;
-  if (winkel === 90) { lr = e.beta; vh = -e.gamma; } else if (winkel === -90 || winkel === 270) { lr = -e.beta; vh = e.gamma; }
-  if (neigung.basisB === null) { neigung.basisB = vh; neigung.basisG = lr; }
-  // die Ruhelage wandert ganz langsam mit, damit es sich auch nach dem Hinsetzen richtig anfühlt
-  neigung.basisB += (vh - neigung.basisB) * 0.002; neigung.basisG += (lr - neigung.basisG) * 0.002;
-  neigung.x = Math.max(-1, Math.min(1, (lr - neigung.basisG) / 15));
-  neigung.y = Math.max(-1, Math.min(1, (vh - neigung.basisB) / 15));
+  let lr = sx, vh = sy;
+  if (winkel === 90) { lr = sy; vh = -sx; } else if (winkel === -90 || winkel === 270) { lr = -sy; vh = sx; }
+  if (neigung.basisX === null) { neigung.basisX = lr; neigung.basisY = vh; }
+  // die Ruhelage wandert sehr langsam mit (ca. 30 s), damit es sich auch nach dem Hinsetzen richtig anfühlt
+  neigung.basisX += (lr - neigung.basisX) * 0.0006; neigung.basisY += (vh - neigung.basisY) * 0.0006;
+  const t = jetzt / 1000;
+  neigung.x = Math.max(-1, Math.min(1, filterX((lr - neigung.basisX) / VOLL_GENEIGT, t)));
+  neigung.y = Math.max(-1, Math.min(1, filterY((vh - neigung.basisY) / VOLL_GENEIGT, t)));
   neigung.aktiv = true;
 }
 addEventListener('deviceorientation', neigungLesen);
 // Handy ohne Neige-Werte nach 2 s (Sensor gesperrt oder abgelehnt): dann wandert die Rosette von selbst
 let selbstWandern = false;
 if (matchMedia('(pointer: coarse)').matches) setTimeout(() => { if (!sensorInfo.mitWerten) selbstWandern = true; }, 2000);
-addEventListener('orientationchange', () => { neigung.basisB = null; });
+addEventListener('orientationchange', () => { neigung.basisX = null; });
 // iPhone fragt einmal um Erlaubnis, das geht nur nach einer Berührung
 if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
   addEventListener('touchend', function fragen() {
@@ -1346,12 +1369,12 @@ function malen(jetzt) {
   // Handy (Adam): Neigen und Drehen wirkt wie die Maus, Handy nach links geneigt = Rosette wandert nach rechts
   // Adam (v33): deutlicher spürbar, links/rechts und vor/zurück, auf dem Handy weiter als mit der Maus
   const perNeigung = neigung.aktiv && maus.x < -900;
-  if (perNeigung) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2); zielX = -neigung.x * weit; zielY = -neigung.y * weit; }
+  if (perNeigung) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.22); zielX = -neigung.x * weit; zielY = -neigung.y * weit; }
   // Sensor gesperrt (z. B. in der Claude-Vorschau): die Rosette wandert langsam von selbst, der Finger geht weiter vor
   else if (selbstWandern && maus.x < -900) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2) * 0.7;
     zielX = Math.sin(zeit * 0.31) * weit; zielY = Math.sin(zeit * 0.23 + 1.2) * weit * 0.8; }
   // gleitet sanft hinterher; beim Neigen (Adam, v36) fast ohne Verzögerung
-  const weich = 1 - Math.pow(perNeigung ? 0.0003 : 0.08, dt);
+  const weich = perNeigung ? 1 : 1 - Math.pow(0.08, dt);   // Neigung ist schon gefiltert: direkt folgen
   const altX = ver.x, altY = ver.y;
   ver.x += (zielX - ver.x) * weich; ver.y += (zielY - ver.y) * weich;
   // beim Neigen bewegt sich die ganze Rosette sofort als Ganzes mit, statt Punkt für Punkt nachzufedern
@@ -1472,7 +1495,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
