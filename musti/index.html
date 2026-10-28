@@ -315,6 +315,20 @@ h1 em { font-style: normal; font-weight: 400; color: transparent; background: li
 .fotorahmen { aspect-ratio: 16 / 9; max-width: 100%; border-radius: 14px; border: 1px dashed var(--linie); display: grid; place-items: center; text-align: center; color: var(--leise); font-size: 13.5px; padding: 12px; box-sizing: border-box; background: radial-gradient(circle at 50% 120%, color-mix(in srgb, var(--glut) 22%, transparent), transparent 70%); }
 
 .raster { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+/* Catering-Anfrage (Adam, v47, wie auf Mustis bisheriger Seite) */
+.anfrage { display: flex; flex-direction: column; gap: 16px; border: 1px solid var(--linie); border-radius: 18px; padding: 22px; background: color-mix(in srgb, var(--grund-tief) 55%, transparent); }
+.anfrage label { display: flex; flex-direction: column; gap: 7px; font: 600 14.5px var(--sans); color: var(--text); }
+.anfrage label i { font-style: normal; color: var(--paprika); }
+.anfrage input, .anfrage textarea { box-sizing: border-box; font: 400 16px/1.45 var(--sans); color: var(--text); width: 100%; padding: 13px 15px; border-radius: 12px;
+  border: 1px solid var(--linie); background: color-mix(in srgb, var(--grund) 75%, transparent); transition: border-color .2s, box-shadow .2s; }
+.anfrage textarea { min-height: 130px; resize: vertical; }
+.anfrage ::placeholder { color: var(--leise); opacity: .65; }
+.anfrage input:focus, .anfrage textarea:focus { outline: none; border-color: var(--safran); box-shadow: 0 0 0 3px color-mix(in srgb, var(--safran) 25%, transparent); }
+.anfrage .fehlt { border-color: var(--paprika); }
+.anfrage .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border-radius: 14px; font-size: 16px; }
+.anfrage .btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.anfrage-info { margin: 0; text-align: center; font-size: 13px; color: var(--leise); }
+.anfrage-info.ok { color: var(--safran); }
 .kachel { border: 1px solid var(--linie); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
 .kachel b { font: 400 19px var(--anzeige); }
 .kachel span { font-size: 13.5px; color: var(--leise); }
@@ -729,8 +743,15 @@ const TAFELN = {
       ${gerichteListe(VOLLE_KARTE.find(g => g.name === 'Buffet')).replace(/<p class="gruppe-hinweis">.*?<\/p>/, '')}
       <h3>Preis</h3>
       <p style="margin:0">Auf Anfrage, je nach Gästezahl und Auswahl.</p>
-      <h3>Anfragen</h3>
-      <p style="margin:0;font:400 22px/1.4 var(--anzeige)"><a href="tel:+493920960693">039209 60693</a><br><a href="mailto:mustibistro.shop@gmail.com">mustibistro.shop@gmail.com</a></p>`,
+      <h3>Anfrage senden</h3>
+      <form class="anfrage" id="anfrage" novalidate>
+        <label><span>Name <i>*</i></span><input name="name" type="text" autocomplete="name" placeholder="z. B. Max Mustermann" required></label>
+        <label><span>Telefonnummer <i>*</i></span><input name="telefon" type="tel" autocomplete="tel" inputmode="tel" placeholder="z. B. +49 151 12345678" required></label>
+        <label><span>Ihre Anfrage <i>*</i></span><textarea name="anfrage" rows="5" required placeholder="z. B. Termin: 15. August 2026, 18:00 Uhr&#10;Anlass: Geburtstag / Firmenfeier / Hochzeit&#10;Personenanzahl: ca. 50 Personen&#10;Gewünschte Gerichte: Döner-Buffet, Falafel, Salate"></textarea></label>
+        <button class="btn voll" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg>Anfrage absenden</button>
+        <p class="anfrage-info" id="anfrage-info" aria-live="polite">Ihre Anfrage wird an mustibistro.shop@gmail.com weitergeleitet.</p>
+      </form>
+      <p style="margin:0;color:var(--leise)">Oder direkt: <a href="tel:+493920960693">039209 60693</a> · <a href="mailto:mustibistro.shop@gmail.com">mustibistro.shop@gmail.com</a></p>`,
   }),
   zertifikate: () => ({
     ober: 'Worauf du dich verlassen kannst', titel: 'Zertifikate',
@@ -1289,6 +1310,20 @@ document.addEventListener('click', e => {
 document.getElementById('tafel-zu').addEventListener('click', tafelZu);
 schleier.addEventListener('click', tafelZu);
 addEventListener('keydown', e => { if (e.key === 'Escape') tafelZu(); });
+// Catering-Anfrage: ohne eigenen Server öffnet sich das E-Mail-Programm mit der fertig ausgefüllten Nachricht
+document.addEventListener('submit', e => {
+  const f = e.target.closest('#anfrage'); if (!f) return;
+  e.preventDefault();
+  const felder = [...f.querySelectorAll('[required]')], leer = felder.filter(x => !x.value.trim());
+  felder.forEach(x => x.classList.toggle('fehlt', !x.value.trim()));
+  const info = document.getElementById('anfrage-info');
+  if (leer.length) { info.classList.remove('ok'); info.textContent = 'Bitte füllen Sie alle Felder mit * aus.'; leer[0].focus(); return; }
+  const [name, telefon, text] = ['name', 'telefon', 'anfrage'].map(n => f.elements[n].value.trim());
+  const betreff = `Catering-Anfrage von ${name}`, inhalt = `Name: ${name}\nTelefon: ${telefon}\n\n${text}`;
+  location.href = `mailto:mustibistro.shop@gmail.com?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(inhalt)}`;
+  info.classList.add('ok'); info.textContent = 'Ihr E-Mail-Programm öffnet sich mit der fertigen Anfrage. Bitte dort nur noch auf Senden tippen.';
+});
+document.addEventListener('input', e => { if (e.target.closest && e.target.closest('#anfrage') && e.target.value.trim()) e.target.classList.remove('fehlt'); });
 addEventListener('keydown', e => { const sp = e.target.closest && e.target.closest('[data-spezial]'); if (sp && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); sp.click(); } });
 document.getElementById('startseite').addEventListener('click', tafelZu);
 
