@@ -784,7 +784,7 @@ function tafelAuf(name) {
   tafel.classList.toggle('breit', !!t.breit);
   zerfallAbbrechen();
   tafel.hidden = false; tafel.classList.remove('an'); void tafel.offsetWidth;
-  rahmenZeit = 0; vFort = 0; kNeu = true; tafelAnimationStarten();
+  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; tafelAnimationStarten();
   tafel.classList.add('an'); schleier.classList.add('an');
   document.getElementById('tafel-zu').focus({ preventScroll: true });
 }
@@ -892,14 +892,16 @@ function tafelAnimationStarten() {
     const hellJetzt = istHell();
     // Über uns: Familienbaum, auf großen Bildschirmen groß links neben dem Fenster, sonst im Fenster
     const baumDraussen = offeneTafel === 'unternehmen' && r.left > 240;
+    const motivLinks = offeneTafel === 'speisekarte' && r.left > 240;   // Adam (v46): festes Motiv links neben der Speisekarte
     tafel.classList.remove('mit-baum'); tafel.classList.toggle('mit-motiv', offeneTafel === 'unternehmen' || offeneTafel === 'speisekarte');
-    if (offeneTafel === 'unternehmen' || bcv.classList.contains('an')) {
+    if (offeneTafel === 'unternehmen' || offeneTafel === 'speisekarte' || bcv.classList.contains('an')) {
       if (bcv.width !== Math.round(innerWidth * dpr) || bcv.height !== Math.round(innerHeight * dpr)) { bcv.width = Math.round(innerWidth * dpr); bcv.height = Math.round(innerHeight * dpr); }
       bg.setTransform(dpr, 0, 0, dpr, 0, 0); bg.clearRect(0, 0, innerWidth, innerHeight);
-      bcv.classList.toggle('an', baumDraussen);
+      bcv.classList.toggle('an', baumDraussen || motivLinks);
     }
     // draußen liegt der Baum auf der abgedunkelten Startseite, darum dort immer in leuchtenden Farben
     if (baumDraussen) familienBaum(bg, r.left, innerHeight, Math.max(0, rahmenZeit - 0.3), false, maus.x, maus.y);
+    if (motivLinks) linkesMotiv(bg, r.left, innerHeight, dt, maus.x, maus.y, hellJetzt);
     if (offeneTafel === 'unternehmen') verwandlung(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'speisekarte') kartenMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else {
@@ -1157,6 +1159,44 @@ function kartenMotiv(c, w, h, dt, hellJetzt, mx, my) {
     const fc = e < 0.5 ? pal[fa] : pal[fb];
     c.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, hel).toFixed(3)})`;
     c.fillRect(p.x, p.y, p.s, p.s);
+  }
+  c.globalCompositeOperation = 'source-over';
+}
+
+/* Links neben der Speisekarte (Adam, v46, nur wenn dort Platz ist): Mustis Logo aus roten Lichtpunkten.
+   Die Punkte nehmen die Farben des echten Logos an, ein heller Schimmer fließt langsam von links nach rechts
+   durch den Schwung. Im Dunkeln leuchtend, im Hellen in den echten Logofarben. Weicht der Maus aus. */
+const L_ANZAHL = 5000;
+let lTeile = null, lZeit = 0, logoPunkte = null;
+function logoAbtasten() {                               // einmal: alle sichtbaren Pixel des Logos als Zielpunkte
+  const img = document.querySelector('.marke img');
+  if (!img || !img.complete || !img.naturalWidth) return null;
+  const w = img.naturalWidth, h = img.naturalHeight, c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'); g.drawImage(img, 0, 0); const d = g.getImageData(0, 0, w, h).data, s = Math.max(w, h) / 2, punkte = [];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = (y * w + x) * 4; if (d[i + 3] > 140) punkte.push([(x - w / 2) / s, (y - h / 2) / s, d[i], d[i + 1], d[i + 2]]); }
+  return punkte.length ? punkte : null;
+}
+function linkesMotiv(c, w, h, dt, mx, my, hellJetzt) {
+  lZeit += dt;
+  if (!logoPunkte && !(logoPunkte = logoAbtasten())) return;
+  if (!lTeile || lTeile.w !== w || lTeile.h !== h) {
+    lTeile = Array.from({ length: L_ANZAHL }, () => ({ q: logoPunkte[Math.floor(Math.random() * logoPunkte.length)],
+      x: Math.random() * w, y: Math.random() * h, vx: 0, vy: 0, s: 1.1 + Math.random() * 1.1 }));
+    lTeile.w = w; lTeile.h = h;
+  }
+  const S = Math.min(w * 0.44, h * 0.5), cx = w / 2, cy = h * 0.5;
+  c.globalCompositeOperation = hellJetzt ? 'source-over' : 'lighter';
+  for (let n = 0, bis = sparsam ? 2500 : lTeile.length; n < bis; n++) { const p = lTeile[n], q = p.q;
+    const tx = cx + (q[0] * 0.95 + Math.sin(q[1] * 8 + lZeit * 1.3) * 0.006) * S, ty = cy + q[1] * 0.95 * S;
+    p.vx = (p.vx + (tx - p.x) * 0.07) * 0.85; p.vy = (p.vy + (ty - p.y) * 0.07) * 0.85;
+    const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
+    if (d < 90 && d > 0.1) { const k = (1 - d / 90) * 2.6; p.vx += dx / d * k; p.vy += dy / d * k; }
+    p.x += p.vx; p.y += p.vy;
+    const welle = Math.max(0, Math.cos(q[0] * 3 - lZeit * 1.2)) ** 6, hel = 0.8 + 0.2 * welle;
+    // der Schimmer hellt die Logofarbe auf (im Dunkeln), die Punkte sind im Sparmodus etwas größer, weil es weniger sind
+    const auf = hellJetzt ? 0 : welle * 0.55, gr = sparsam ? p.s * 1.35 : p.s;
+    c.fillStyle = `rgba(${Math.round(q[2] + (255 - q[2]) * auf)},${Math.round(q[3] + (230 - q[3]) * auf)},${Math.round(q[4] + (190 - q[4]) * auf)},${hel.toFixed(3)})`;
+    c.fillRect(p.x, p.y, gr, gr);
   }
   c.globalCompositeOperation = 'source-over';
 }
