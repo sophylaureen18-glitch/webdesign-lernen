@@ -1248,14 +1248,10 @@ function euroFilter(minSchnitt, tempo) {
 const filterX = euroFilter(1.2, 0.8), filterY = euroFilter(1.2, 0.8);
 const VOLL_GENEIGT = 0.24;                           // so viel Schwerkraft-Anteil (ca. 14°) = ganz ausgelenkt
 let sensorTakt = { n: 0, ab: performance.now() };
-function neigungLesen(e) {
-  sensorInfo.ereignisse++;
-  if (e.beta == null || e.gamma == null) return;
-  sensorInfo.mitWerten++;
+// sx/sy: Schwerkraft im Handy, seitlich und vor/zurück (-1 bis 1), egal aus welchem Sensor
+function neigungAusSchwerkraft(sx, sy) {
   const jetzt = performance.now();
   sensorTakt.n++; if (jetzt - sensorTakt.ab > 1000) { sensorInfo.proSekunde = sensorTakt.n; sensorTakt = { n: 0, ab: jetzt }; }
-  const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
-  const sx = Math.cos(b) * Math.sin(g), sy = Math.sin(b);   // Schwerkraft im Handy: seitlich und vor/zurück
   // Querformat: die Achsen tauschen
   const winkel = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
   let lr = sx, vh = sy;
@@ -1268,15 +1264,45 @@ function neigungLesen(e) {
   neigung.y = Math.max(-1, Math.min(1, filterY((vh - neigung.basisY) / VOLL_GENEIGT, t)));
   neigung.aktiv = true;
 }
+// 1. Weg: Lage-Sensor (Gyroskop), am ruhigsten
+function neigungLesen(e) {
+  sensorInfo.ereignisse++;
+  if (e.beta == null || e.gamma == null) return;
+  sensorInfo.mitWerten++;
+  const b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
+  neigungAusSchwerkraft(Math.cos(b) * Math.sin(g), Math.sin(b));
+}
+// 2. Weg (Adam, v40): manche Handys liefern dort keine Werte. Dann die Schwerkraft direkt
+// aus dem Beschleunigungssensor lesen, den hat jedes Handy.
+let beschlUmgedreht = null;
+function bewegungLesen(e) {
+  sensorInfo.bewegung++;
+  const a = e.accelerationIncludingGravity;
+  if (!a || a.x == null || a.y == null) return;
+  sensorInfo.bewegungMitWerten++;
+  if (sensorInfo.mitWerten) return;                 // Lage-Sensor liefert schon, der ist ruhiger
+  // iPhones melden die Richtung umgekehrt: hochkant gehalten zeigt y dann nach unten
+  if (beschlUmgedreht === null) {
+    const hochkant = !((screen.orientation && screen.orientation.angle) || window.orientation);
+    if (hochkant && Math.abs(a.y) > 2) beschlUmgedreht = a.y < 0;
+    else if (!hochkant) beschlUmgedreht = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    else return;
+  }
+  const k = (beschlUmgedreht ? -1 : 1) / 9.81;
+  neigungAusSchwerkraft(Math.max(-1, Math.min(1, -a.x * k)), Math.max(-1, Math.min(1, a.y * k)));
+}
+sensorInfo.bewegung = 0; sensorInfo.bewegungMitWerten = 0;
 addEventListener('deviceorientation', neigungLesen);
+addEventListener('devicemotion', bewegungLesen);
 // Handy ohne Neige-Werte nach 2 s (Sensor gesperrt oder abgelehnt): dann wandert die Rosette von selbst
 let selbstWandern = false;
-if (matchMedia('(pointer: coarse)').matches) setTimeout(() => { if (!sensorInfo.mitWerten) selbstWandern = true; }, 2000);
+if (matchMedia('(pointer: coarse)').matches) setTimeout(() => { if (!neigung.aktiv) selbstWandern = true; }, 2000);
 addEventListener('orientationchange', () => { neigung.basisX = null; });
 // iPhone fragt einmal um Erlaubnis, das geht nur nach einer Berührung
 if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
   addEventListener('touchend', function fragen() {
     DeviceOrientationEvent.requestPermission().then(r => { sensorInfo.erlaubnis = r; }).catch(err => { sensorInfo.erlaubnis = 'Fehler: ' + (err && err.name || err); });
+    if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function') DeviceMotionEvent.requestPermission().catch(() => {});
     removeEventListener('touchend', fragen);
   });
 }
@@ -1371,7 +1397,7 @@ function malen(jetzt) {
   const perNeigung = neigung.aktiv && maus.x < -900;
   if (perNeigung) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.22); zielX = -neigung.x * weit; zielY = -neigung.y * weit; }
   // Sensor gesperrt (z. B. in der Claude-Vorschau): die Rosette wandert langsam von selbst, der Finger geht weiter vor
-  else if (selbstWandern && maus.x < -900) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2) * 0.7;
+  else if (selbstWandern && !neigung.aktiv && maus.x < -900) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2) * 0.7;
     zielX = Math.sin(zeit * 0.31) * weit; zielY = Math.sin(zeit * 0.23 + 1.2) * weit * 0.8; }
   // gleitet sanft hinterher; beim Neigen (Adam, v36) fast ohne Verzögerung
   // Neigung: kurzes, weiches Gleiten (ca. 0,07 s) gegen Ruckeln zwischen den Sensor-Takten, flüssig wie die Maus
@@ -1496,7 +1522,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v39</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v40</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
