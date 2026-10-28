@@ -1240,7 +1240,7 @@ function neigungLesen(e) {
   if (winkel === 90) { lr = e.beta; vh = -e.gamma; } else if (winkel === -90 || winkel === 270) { lr = -e.beta; vh = e.gamma; }
   if (neigung.basisB === null) { neigung.basisB = vh; neigung.basisG = lr; }
   // die Ruhelage wandert ganz langsam mit, damit es sich auch nach dem Hinsetzen richtig anfühlt
-  neigung.basisB += (vh - neigung.basisB) * 0.004; neigung.basisG += (lr - neigung.basisG) * 0.004;
+  neigung.basisB += (vh - neigung.basisB) * 0.002; neigung.basisG += (lr - neigung.basisG) * 0.002;
   neigung.x = Math.max(-1, Math.min(1, (lr - neigung.basisG) / 15));
   neigung.y = Math.max(-1, Math.min(1, (vh - neigung.basisB) / 15));
   neigung.aktiv = true;
@@ -1345,12 +1345,17 @@ function malen(jetzt) {
   let zielY = maus.y < -900 ? 0 : -Math.max(-1, Math.min(1, (maus.y - H / 2) / (H / 2))) * VER_WEIT;
   // Handy (Adam): Neigen und Drehen wirkt wie die Maus, Handy nach links geneigt = Rosette wandert nach rechts
   // Adam (v33): deutlicher spürbar, links/rechts und vor/zurück, auf dem Handy weiter als mit der Maus
-  if (neigung.aktiv && maus.x < -900) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2); zielX = -neigung.x * weit; zielY = -neigung.y * weit; }
+  const perNeigung = neigung.aktiv && maus.x < -900;
+  if (perNeigung) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2); zielX = -neigung.x * weit; zielY = -neigung.y * weit; }
   // Sensor gesperrt (z. B. in der Claude-Vorschau): die Rosette wandert langsam von selbst, der Finger geht weiter vor
   else if (selbstWandern && maus.x < -900) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2) * 0.7;
     zielX = Math.sin(zeit * 0.31) * weit; zielY = Math.sin(zeit * 0.23 + 1.2) * weit * 0.8; }
-  const weich = 1 - Math.pow(0.08, dt);            // gleitet sanft hinterher
+  // gleitet sanft hinterher; beim Neigen (Adam, v36) fast ohne Verzögerung
+  const weich = 1 - Math.pow(perNeigung ? 0.0003 : 0.08, dt);
+  const altX = ver.x, altY = ver.y;
   ver.x += (zielX - ver.x) * weich; ver.y += (zielY - ver.y) * weich;
+  // beim Neigen bewegt sich die ganze Rosette sofort als Ganzes mit, statt Punkt für Punkt nachzufedern
+  const schubX = perNeigung ? ver.x - altX : 0, schubY = perNeigung ? ver.y - altY : 0;
   menueImKreis();
   const schimmer = zeit * 0.55;                       // Lichtschimmer läuft im Kreis
   const reich = Math.max(60, RO.R * 0.2), reich2 = reich * reich;
@@ -1359,6 +1364,7 @@ function malen(jetzt) {
     if (zeit < p.start) continue;
     const w = p.a + drehung[p.ebene];
     const tf = TIEFE[p.ebene] || 1, tx = RO.x + ver.x * tf + Math.cos(w) * p.r * RO.R * atmen, ty = RO.y + ver.y * tf + Math.sin(w) * p.r * RO.R * atmen;
+    p.x += schubX * tf; p.y += schubY * tf;
     p.vx = (p.vx + (tx - p.x) * 0.06) * 0.86;
     p.vy = (p.vy + (ty - p.y) * 0.06) * 0.86;
     { const sp = Math.hypot(p.vx, p.vy); if (sp > 24) { p.vx *= 24 / sp; p.vy *= 24 / sp; } }   // weicher Einflug statt Sprung
