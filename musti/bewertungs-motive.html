@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bewertungs-Motive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Vorschau für Adam: je drei Motiv-Ideen für die Bewertungen, links (Laptop) und im Fenster */
+:root { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --safran: #f2a93b; --linie: rgba(242,169,59,.28); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); } }
+:root[data-theme="light"] { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); }
+:root[data-theme="dark"] { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --linie: rgba(242,169,59,.28); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--grund); color: var(--text); font: 400 15px/1.5 "Hanken Grotesk", system-ui, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 60px; }
+h1 { font: 400 clamp(32px, 6vw, 50px)/1.05 Gloock, serif; margin: 0 0 8px; }
+h2 { font: 400 26px/1.1 Gloock, serif; margin: 34px 0 4px; }
+.ober { font: 700 11px "Hanken Grotesk"; letter-spacing: .22em; text-transform: uppercase; color: var(--safran); margin: 0 0 8px; }
+.intro, .unter { color: var(--leise); max-width: 64ch; margin: 0 0 18px; }
+.unter { font-size: 14px; margin-bottom: 12px; }
+.knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.knoepfe button { font: 600 13px "Hanken Grotesk"; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--linie); background: transparent; color: var(--text); cursor: pointer; }
+.knoepfe button[aria-pressed="true"] { background: var(--safran); border-color: var(--safran); color: #2a0b12; }
+.drei { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .drei { grid-template-columns: 1fr; } }
+.motiv { margin: 0; background: #150508; border: 1px solid var(--linie); border-radius: 18px; overflow: hidden; color: #f7e7d3; }
+.motiv .flaeche { position: relative; }
+.motiv canvas { display: block; width: 100%; aspect-ratio: 3 / 4; touch-action: pan-y; }
+.fenster { background: #1d070d; }
+.hell .fenster { background: #efd9b5; }
+.motiv figcaption { padding: 10px 14px 14px; border-top: 1px solid rgba(242,169,59,.18); background: #150508; }
+.motiv h3 { margin: 0; font: 400 21px Gloock, serif; display: flex; gap: 8px; align-items: baseline; }
+.motiv h3 span { font: 700 12.5px "Hanken Grotesk"; color: #2a0b12; background: #f2a93b; border-radius: 999px; padding: 1px 9px; }
+.motiv p { margin: 2px 0 0; color: #cdaa8d; font-size: 13.5px; }
+/* angedeutetes Formular über dem Fenster-Motiv, damit man sieht, wie es hinter dem Text wirkt */
+.formular { position: absolute; inset: 0; padding: 22px 20px; display: flex; flex-direction: column; gap: 9px; pointer-events: none; color: #f7e7d3; }
+.formular b { font: 400 28px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; }
+.formular small { font: 700 10px "Hanken Grotesk"; letter-spacing: .2em; color: #f2a93b; margin-top: 4px; }
+.formular i { display: block; height: 32px; border-radius: 10px; border: 1px solid rgba(242,169,59,.3); background: rgba(18,4,10,.55); }
+.formular i.gross { height: 78px; }
+.formular u { text-decoration: none; text-align: center; font: 600 13px "Hanken Grotesk"; color: #2a0b12; padding: 9px; border-radius: 12px; background: linear-gradient(90deg, #f2a93b, #ff6b3d); }
+.hell .formular { color: #33100a; }
+.hell .formular b { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+.hell .formular small { color: #8a4b06; }
+.hell .formular i { border-color: rgba(138,75,6,.35); background: rgba(240,212,165,.6); }
+.hell .formular u { color: #fff4e3; background: linear-gradient(90deg, #8a4b06, #a8320c); }
+.ohne-formular .formular { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <p class="ober">Musti Bistro · Bewertungen · Motive</p>
+  <h1>Zwei Motive für die Bewertungen</h1>
+  <p class="intro">Je drei Ideen: eine Reihe für den dunklen Bereich links neben dem Bewertungen-Fenster am Laptop, eine Reihe für den Hintergrund im Fenster selbst. Fahr mit der Maus oder dem Finger darüber, dann weichen die Punkte aus. Schreib mir einfach eine Zahl und einen Buchstaben, zum Beispiel „2 und B“.</p>
+
+  <h2>Links daneben (nur Laptop)</h2>
+  <p class="unter">Bleibt stehen, solange das Bewertungen-Fenster offen ist.</p>
+  <div class="drei">
+    <figure class="motiv"><div class="flaeche"><canvas data-art="kranz"></canvas></div><figcaption><h3><span>1</span>Lorbeerkranz mit 4,7</h3><p>Ein goldener Siegerkranz, darin fünf Sterne und Mustis Google-Note. Ein Glanz läuft die Zweige hinauf.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="himmel"></canvas></div><figcaption><h3><span>2</span>Fünf-Sterne-Himmel</h3><p>Ein Sternbild aus fünf großen Sternen im funkelnden Nachthimmel, ab und zu zieht eine Sternschnuppe vorbei.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="blasen"></canvas></div><figcaption><h3><span>3</span>Sprechblasen</h3><p>Sprechblasen steigen langsam auf wie Stimmen der Gäste, darin Sterne, ein Herz oder „…“.</p></figcaption></figure>
+  </div>
+
+  <h2>Im Bewertungen-Fenster (Handy, Tablet, Laptop)</h2>
+  <p class="unter">Liegt hinter dem Text, wie bei der Speisekarte und dem Catering.</p>
+  <div class="knoepfe">
+    <button type="button" id="k-formular" aria-pressed="true">Text darüber zeigen</button>
+    <button type="button" id="k-hell" aria-pressed="false">Helle Ansicht</button>
+  </div>
+  <div class="drei" id="fenster-reihe">
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="sterne"></canvas><div class="formular"><b>Bewertungen</b><small>DAS SAGEN UNSERE GÄSTE</small><i class="gross"></i><i></i><i></i><i></i></div></div><figcaption><h3><span>A</span>Fünf Sterne leuchten auf</h3><p>Fünf große Sterne füllen sich nacheinander mit Licht, wie eine Bewertung, dann funkeln alle zusammen.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="herz"></canvas><div class="formular"><b>Bewertungen</b><small>DAS SAGEN UNSERE GÄSTE</small><i class="gross"></i><i></i><i></i><i></i></div></div><figcaption><h3><span>B</span>Schlagendes Herz</h3><p>Ein großes Herz schlägt im Takt, kleine Herzen steigen daraus auf.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="buch"></canvas><div class="formular"><b>Bewertungen</b><small>DAS SAGEN UNSERE GÄSTE</small><i class="gross"></i><i></i><i></i><i></i></div></div><figcaption><h3><span>C</span>Gästebuch</h3><p>Ein offenes Gästebuch: Zeile für Zeile wird geschrieben, dann blättert die Seite um.</p></figcaption></figure>
+  </div>
+</main>
+<script>
+const TAU = Math.PI * 2, PI = Math.PI;
+// Farben: 0 Gold, 1 Glut-Orange, 2 Paprika, 3 Creme, 4 Jade, 5 Granat, 6 Tomate, 7 Kräutergrün
+const FARBEN = {
+  dunkel: [[242, 169, 59], [255, 120, 42], [224, 72, 50], [255, 226, 180], [143, 211, 162], [190, 40, 70], [255, 80, 60], [110, 200, 95]],
+  hell:   [[138, 75, 6], [168, 50, 12], [147, 32, 26], [110, 56, 10], [40, 110, 60], [120, 20, 50], [180, 40, 25], [50, 120, 40]],
+};
+const glatt = x => x * x * (3 - 2 * x);
+const ring = (cx, cy, rx, ry, u) => [cx + Math.cos(u * TAU) * rx, cy + Math.sin(u * TAU) * ry];
+const scheibe = (cx, cy, r, u, v, ry = r) => { const w = u * TAU, q = Math.sqrt(v); return [cx + Math.cos(w) * r * q, cy + Math.sin(w) * ry * q]; };
+const drehen = (x, y, px, py, w) => { const c = Math.cos(w), s = Math.sin(w), dx = x - px, dy = y - py; return [px + dx * c - dy * s, py + dx * s + dy * c]; };
+
+// Jede Form bekommt pro Punkt vier Zufallszahlen (z.a bis z.d) und die Zeit t.
+// Zurück kommt [x, y, Farbe, Helligkeit], x etwa -1 bis 1, y nach unten.
+// Sterne: 10 Ecken, abwechselnd außen und innen
+const sternEcke = (k, R, dreh) => { const a = -PI / 2 + k * PI / 5 + dreh, rr = k % 2 ? R * .42 : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const sternRand = (cx, cy, R, u, dreh = 0) => { const k = Math.floor(u * 10), f = u * 10 - k, [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const sternFlaeche = (cx, cy, R, u, v, w, dreh = 0) => { const k = Math.floor(u * 10), [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh);
+  let a = v, b = w; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [cx + x1 * a + x2 * b, cy + y1 * a + y2 * b]; };
+// Herz: Spitze unten, etwa -0,7 bis 1 hoch
+const herzRand = (cx, cy, s, u) => { const q = u * TAU; return [cx + 16 * Math.pow(Math.sin(q), 3) / 17 * s, cy - (13 * Math.cos(q) - 5 * Math.cos(2 * q) - 2 * Math.cos(3 * q) - Math.cos(4 * q)) / 17 * s]; };
+const herzFlaeche = (cx, cy, s, u, v) => { const [x, y] = herzRand(cx, cy, s, u), q = Math.sqrt(v); return [cx + (x - cx) * q, cy + (y - cy) * q]; };
+// „4,7“ in Gloock als Punktewolke (wird einmal abgetastet, sobald die Schrift geladen ist)
+let notePunkte = [];
+document.fonts.load('400 200px Gloock').catch(() => {}).then(() => {
+  const c = document.createElement('canvas'); c.width = 420; c.height = 240; const g = c.getContext('2d');
+  g.font = '400 200px Gloock, serif'; g.textAlign = 'center'; g.fillStyle = '#000'; g.fillText('4,7', 210, 190);
+  const d = g.getImageData(0, 0, 420, 240).data;
+  for (let y = 0; y < 240; y += 2) for (let x = 0; x < 420; x += 2) if (d[(y * 420 + x) * 4 + 3] > 140) notePunkte.push([(x - 210) / 210, (y - 120) / 210]);
+});
+
+const FORMEN = {
+  kranz: (z, t) => {
+    const cx = 0, cy = .1, R = .86, q = z.a;
+    if (q < .5) {                                                                           // zwei Lorbeerzweige
+      const seite = z.b < .5 ? -1 : 1, u = q / .5, ta = PI / 2 + .25, tb = 3 * PI / 2 - .5, th = ta + (tb - ta) * u;
+      const px = Math.cos(th) * R, py = cy + Math.sin(th) * R, glanz = Math.pow(Math.max(0, Math.sin(u * 6 - t * 1.6)), 6);
+      if (z.c < .14) return [seite < 0 ? px : -px, py, 0, .55 + .45 * glanz];                    // Stiel
+      const j = Math.floor(u * 10), uj = (j + .5) / 10, tj = ta + (tb - ta) * uj, bx = Math.cos(tj) * R, by = cy + Math.sin(tj) * R;
+      const tx = -Math.sin(tj), ty = Math.cos(tj), nx = Math.cos(tj), ny = Math.sin(tj), aussen = z.d < .5 ? 1 : -1;
+      const wackel = .08 * Math.sin(t * 1.5 + j), w = .62 * aussen + wackel, dx = tx * Math.cos(w) + nx * Math.sin(w), dy = ty * Math.cos(w) + ny * Math.sin(w);
+      const L = .2 * (1 - .35 * uj), s = z.c, qb = ((z.d * 2) % 1 * 2 - 1) * .055 * Math.sin(PI * s);
+      const x = bx + dx * s * L - dy * qb, y = by + dy * s * L + dx * qb, ader = Math.abs(qb) < .006;
+      return [seite < 0 ? x : -x, y, ader ? 3 : 0, (ader ? .8 : .5) + .45 * Math.pow(Math.max(0, Math.sin(uj * 6 - t * 1.6)), 6)];
+    }
+    if (q < .62) { const k = Math.floor(z.b * 5), [x, y] = z.c < .45 ? sternRand((k - 2) * .2, -.36 + .045 * (k - 2) * (k - 2), .07, z.d) : sternFlaeche((k - 2) * .2, -.36 + .045 * (k - 2) * (k - 2), .07, z.d, z.c, (z.c * 7) % 1);
+      return [x, y, z.c < .45 ? 0 : 3, .6 + .4 * Math.sin(t * 2.2 + k * 1.3)]; }
+    if (q < .96) { if (!notePunkte.length) return [0, cy, 0, 0];                            // die Note in der Mitte
+      const p = notePunkte[Math.floor(z.b * notePunkte.length)], welle = Math.pow(Math.max(0, Math.cos(p[0] * 3 - t * 1.2)), 6);
+      return [p[0] * .5, cy + .1 + p[1] * .5, welle > .3 ? 3 : 0, .7 + .3 * welle]; }
+    const w = z.b * TAU, r = .3 + z.c * .9; return [Math.cos(w) * r * .9, cy + Math.sin(w) * r, 3, .5 * Math.pow(Math.max(0, Math.sin(t * 3 + z.d * 40)), 8)];   // Funkeln
+  },
+  himmel: (z, t) => {
+    const STERNE = [[-.72, -.5, .12], [-.36, -.2, .14], [0, -.62, .16], [.36, -.18, .13], [.72, -.46, .11]], q = z.a;
+    if (q < .42) return [(z.b * 2 - 1) * 1.08, (z.c * 2 - 1) * 1.45, z.d < .7 ? 3 : 0, .1 + .55 * Math.pow(Math.max(0, Math.sin(t * (1 + z.d * 2) + z.d * 40)), 3)];   // Sternenfeld
+    if (q < .78) { const k = Math.floor(z.b * 5), [sx, sy, R] = STERNE[k], an = .55 + .45 * Math.pow(Math.max(0, Math.sin(t * 1.4 - k * .9)), 2), dreh = Math.sin(t * .3 + k) * .08;
+      if (z.c < .4) { const [x, y] = sternRand(sx, sy, R, z.d, dreh); return [x, y, 0, an]; }
+      if (z.c < .85) { const [x, y] = sternFlaeche(sx, sy, R, z.d, (z.c - .4) / .45, (z.c * 13) % 1, dreh); return [x, y, 3, .45 * an]; }
+      const [x, y] = scheibe(sx, sy, R * 2.2, z.d, (z.c - .85) / .15); return [x, y, 0, .08 * an]; }                         // Schein
+    if (q < .84) { const k = Math.floor(z.b * 4), [x1, y1] = STERNE[k], [x2, y2] = STERNE[k + 1], u = z.c; return [x1 + (x2 - x1) * u, y1 + (y2 - y1) * u, 3, Math.floor(u * 18) % 2 ? 0 : .22]; }   // Linien
+    const k = z.a < .92 ? 0 : 1, P = 6.5, p = ((t + k * 3.1) / P) % 1, e = p / .14;                                       // Sternschnuppen
+    const x0 = k ? -.2 : .9, y0 = k ? -1.3 : -1.1, hx = x0 - e * 1.5, hy = y0 + e * .95;
+    if (e > 1) return [x0, y0, 3, 0];
+    const hinten = z.b * .5; return [hx + hinten * 1.5 / 1.77, hy - hinten * .95 / 1.77, 3, (1 - z.b) * Math.sin(PI * e) * .95];
+  },
+  blasen: (z, t) => {
+    const k = Math.floor(z.a * 5), P = 11, h = ((t / P) + k / 5) % 1, xs = [-.45, .4, -.1, .55, -.55][k], bw = [.36, .3, .4, .28, .32][k], bh = bw * .62;
+    const cx = xs + Math.sin(h * 5 + k) * .08, cy = 1.55 - h * 3.2, ha = Math.pow(Math.sin(PI * h), .7), u = (z.a * 5) % 1;
+    if (u < .5) { const w = z.b * TAU, c = Math.cos(w), s = Math.sin(w); return [cx + bw * Math.sign(c) * Math.pow(Math.abs(c), .3), cy + bh * Math.sign(s) * Math.pow(Math.abs(s), .3), 3, .7 * ha]; }   // Blase
+    if (u < .6) { const v = z.b, [x, y] = v < .5 ? [cx - bw * .35 - v * .3, cy + bh + v * .36] : [cx - bw * .5 + (v - .5) * .5, cy + bh + .18 - (v - .5) * .36]; return [x, y, 3, .6 * ha]; }   // Spitze
+    const art = k % 3;
+    if (art === 0) { const j = Math.floor(z.b * 5), [x, y] = z.c < .5 ? sternRand(cx + (j - 2) * bw * .36, cy, bw * .13, z.d) : sternFlaeche(cx + (j - 2) * bw * .36, cy, bw * .13, z.d, z.c - .5, (z.c * 9) % 1); return [x, y, 0, .9 * ha]; }
+    if (art === 1) { const [x, y] = z.c < .5 ? herzRand(cx, cy + .02, bh * .55, z.b) : herzFlaeche(cx, cy + .02, bh * .55, z.b, z.d); return [x, y, z.c < .5 ? 6 : 5, (z.c < .5 ? .95 : .55) * ha]; }
+    const j = Math.floor(z.b * 3), [x, y] = scheibe(cx + (j - 1) * bw * .4, cy - Math.max(0, Math.sin(t * 5 - j * .8)) * .05, bw * .09, z.c, z.d); return [x, y, 0, .9 * ha];
+  },
+  sterne: (z, t) => {
+    const p = (t / 7) % 1, k = Math.floor(z.a * 5), sx = (k - 2) * .4, sy = -.08 + .06 * (k - 2) * (k - 2), an = .08 + k * .1;
+    const lit = p > an && p < .88, seit = (p - an) * 7, pop = lit ? 1 + .3 * Math.exp(-seit * 6) : 1, aus = p > .88 ? 1 - (p - .88) / .12 : 1;
+    const funkeln = p > .58 && p < .88 ? .8 + .2 * Math.sin(t * 9 + k) : 1, R = .17 * pop, u = (z.a * 5) % 1;
+    if (u < .35) { const [x, y] = sternRand(sx, sy, R, z.b); return [x, y, 0, lit ? .95 * funkeln : .25]; }
+    if (u < .85) { const [x, y] = sternFlaeche(sx, sy, R, z.b, z.c, z.d); return [x, y, z.c + z.d > 1.4 ? 3 : 0, lit ? .55 * funkeln : 0]; }
+    if (!lit || seit > .9) return [sx, sy, 0, 0];                                                 // Funken beim Aufleuchten
+    const w = z.b * TAU, d = (.12 + .3 * z.c) * (1 - Math.pow(1 - seit / .9, 3));
+    return [sx + Math.cos(w) * d, sy + Math.sin(w) * d, 3, (1 - seit / .9) * .9 * aus];
+  },
+  herz: (z, t) => {
+    const b = t % 1.2, schlag = Math.exp(-Math.pow((b - .1) / .05, 2)) + .6 * Math.exp(-Math.pow((b - .32) / .06, 2)), s = .82 * (1 + .07 * schlag), q = z.a;
+    if (q < .4) { const [x, y] = herzRand(0, -.05, s, z.b); return [x, y, z.c < .7 ? 6 : 0, .8 + .2 * schlag]; }
+    if (q < .75) { const [x, y] = herzFlaeche(0, -.05, s, z.b, z.c); return [x, y, z.d < .5 ? 5 : 2, .3 + .25 * schlag]; }
+    const k = Math.floor(z.b * 6), h = ((t / 5) + k / 6) % 1, hx = Math.sin(k * 2.4) * .55 + Math.sin(h * 6 + k) * .07, hy = -.4 - h * 1.1;   // kleine Herzen
+    const [x, y] = z.c < .55 ? herzRand(hx, hy, .1, z.d) : herzFlaeche(hx, hy, .1, z.d, (z.c - .55) / .45);
+    return [x, y, z.c < .55 ? 6 : 3, Math.sin(PI * h) * .85];
+  },
+  buch: (z, t) => {
+    const p = (t / 8) % 1, schreiben = Math.min(1, p / .72), q = z.a, PB = .82, OB = -.56, UB = .5;
+    const oben = x => OB - .07 * Math.sin(PI * Math.abs(x) / PB), unten = x => UB - .03 * Math.sin(PI * Math.abs(x) / PB);
+    const zeile = (seite, i, u) => { const x0 = seite * .1, x1 = seite * (PB - .1), x = x0 + (x1 - x0) * u; return [x, OB + .14 + i * .1 - .07 * Math.sin(PI * Math.abs(x) / PB) + Math.sin(u * 60 + i) * .006]; };
+    const wort = (i, u) => Math.sin(u * 37 + i * 3) > -.6;
+    if (q < .22) { const v = z.b, seite = z.c < .5 ? -1 : 1, w = v * 4;                                    // Seitenränder und Einband
+      let x, y; if (w < 1) { x = seite * w * PB; y = oben(x); } else if (w < 2) { x = seite * PB; y = OB + (w - 1) * (UB - OB); } else if (w < 3) { x = seite * (3 - w) * PB; y = unten(x); } else { x = 0; y = OB + (w - 3) * (UB - OB); }
+      const ein = z.d < .3; return [ein ? x * 1.05 : x, ein ? y + .05 : y, ein ? 5 : 0, ein ? .45 : .75]; }
+    if (q < .47) { const i = Math.floor(z.b * 8), u = z.c, [x, y] = zeile(-1, i, u); return [x, y, 3, wort(i, u) ? .45 : 0]; }   // linke Seite: voll
+    if (q < .77) { const i = Math.floor(z.b * 8), u = z.c, fort = Math.max(0, Math.min(1, schreiben * 8 - i));               // rechte Seite: wird geschrieben
+      if (p > .8) return [PB * .5, 0, 3, 0];
+      if (i === 0) { const j = Math.floor(u * 5), [x, y] = sternFlaeche(.18 + j * .1, OB + .14, .035, z.d, (u * 5) % 1, (z.d * 7) % 1); return [x, y, 0, fort > j / 5 ? .9 : 0]; }
+      const [x, y] = zeile(1, i, u); return [x, y, 3, wort(i, u) && u < fort ? .6 : 0]; }
+    const phi = p > .8 && p < .95 ? PI * glatt((p - .8) / .15) : -1;                                    // die Seite blättert um
+    if (phi < 0) return [PB * .5, 0, 0, 0];
+    const v = z.b, w = z.c * PB, x = w * Math.cos(phi), hebt = Math.sin(phi) * .12 * (w / PB);
+    if (v < .45) { const r = z.d < .5; return [x, (r ? oben(w) : unten(w)) - hebt, 0, .8]; }
+    const i = Math.floor((v - .45) / .55 * 8), [, y] = zeile(1, i, z.c); return [x, y - hebt, 3, wort(i, z.c) ? .35 * Math.abs(Math.cos(phi)) + .15 : 0];
+  },
+};
+const ANZAHL = { kranz: 2600, himmel: 2400, blasen: 2200, sterne: 2400, herz: 2400, buch: 2600 };
+
+let hell = false;
+const flaechen = [...document.querySelectorAll('canvas')].map(cv => {
+  const f = { cv, g: cv.getContext('2d'), art: cv.dataset.art, fenster: !!cv.closest('.fenster'), w: 0, h: 0, teile: [], zeiger: { x: -999, y: -999 }, sichtbar: false };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); f.zeiger.x = e.clientX - r.left; f.zeiger.y = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', () => { f.zeiger.x = f.zeiger.y = -999; });
+  cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') f.zeiger.x = f.zeiger.y = -999; });
+  return f;
+});
+function messen() { for (const f of flaechen) { const r = f.cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  if (Math.round(r.width) === f.w && Math.round(r.height) === f.h) continue;
+  f.w = Math.round(r.width); f.h = Math.round(r.height); f.dpr = dpr; f.cv.width = f.w * dpr; f.cv.height = f.h * dpr;
+  f.teile = Array.from({ length: ANZAHL[f.art] }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() },
+    x: Math.random() * f.w, y: Math.random() * f.h, vx: 0, vy: 0, s: 1.2 + Math.random() * 1.3 })); } }
+const io = new IntersectionObserver(es => es.forEach(e => { flaechen.find(f => f.cv === e.target).sichtbar = e.isIntersecting; }));
+flaechen.forEach(f => io.observe(f.cv));
+addEventListener('resize', messen); messen();
+
+const knopfF = document.getElementById('k-formular'), knopfH = document.getElementById('k-hell'), reihe = document.getElementById('fenster-reihe');
+knopfF.addEventListener('click', () => { const an = knopfF.getAttribute('aria-pressed') !== 'true'; knopfF.setAttribute('aria-pressed', an); reihe.classList.toggle('ohne-formular', !an); });
+knopfH.addEventListener('click', () => { hell = knopfH.getAttribute('aria-pressed') !== 'true'; knopfH.setAttribute('aria-pressed', hell); reihe.classList.toggle('hell', hell); });
+
+let vor = performance.now(), t = 0;
+function schleife(jetzt) {
+  const dt = Math.max(0, Math.min(.05, (jetzt - vor) / 1000)); vor = jetzt; t += dt;
+  for (const f of flaechen) {
+    if (!f.sichtbar || !f.w) continue;
+    const g = f.g, imHellen = f.fenster && hell, pal = imHellen ? FARBEN.hell : FARBEN.dunkel, staerke = imHellen ? .8 : 1;
+    g.setTransform(f.dpr, 0, 0, f.dpr, 0, 0); g.clearRect(0, 0, f.w, f.h);
+    const S = Math.min(f.w * .46, f.h * .345), cx = f.w / 2, cy = f.h / 2;
+    g.globalCompositeOperation = imHellen ? 'source-over' : 'lighter';
+    for (const p of f.teile) {
+      const [x, y, fa, ha] = FORMEN[f.art](p.z, t), tx = cx + x * S, ty = cy + y * S;
+      p.vx = (p.vx + (tx - p.x) * .07) * .85; p.vy = (p.vy + (ty - p.y) * .07) * .85;
+      const dx = p.x - f.zeiger.x, dy = p.y - f.zeiger.y, d = Math.hypot(dx, dy);
+      if (d < 70 && d > .1) { const k = (1 - d / 70) * 2.6; p.vx += dx / d * k; p.vy += dy / d * k; }
+      p.x += p.vx; p.y += p.vy;
+      if (ha < .02) continue;
+      const fc = pal[fa] || pal[0];
+      g.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, ha * staerke).toFixed(3)})`; g.fillRect(p.x, p.y, p.s, p.s);
+    }
+    g.globalCompositeOperation = 'source-over';
+  }
+  requestAnimationFrame(schleife);
+}
+requestAnimationFrame(schleife);
+</script>
+</body>
+</html>
