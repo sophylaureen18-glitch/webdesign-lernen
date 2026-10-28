@@ -1374,7 +1374,8 @@ function malen(jetzt) {
   else if (selbstWandern && maus.x < -900) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2) * 0.7;
     zielX = Math.sin(zeit * 0.31) * weit; zielY = Math.sin(zeit * 0.23 + 1.2) * weit * 0.8; }
   // gleitet sanft hinterher; beim Neigen (Adam, v36) fast ohne Verzögerung
-  const weich = perNeigung ? 1 : 1 - Math.pow(0.08, dt);   // Neigung ist schon gefiltert: direkt folgen
+  // Neigung: kurzes, weiches Gleiten (ca. 0,07 s) gegen Ruckeln zwischen den Sensor-Takten, flüssig wie die Maus
+  const weich = 1 - Math.pow(perNeigung ? 6e-7 : 0.08, dt);
   const altX = ver.x, altY = ver.y;
   ver.x += (zielX - ver.x) * weich; ver.y += (zielY - ver.y) * weich;
   // beim Neigen bewegt sich die ganze Rosette sofort als Ganzes mit, statt Punkt für Punkt nachzufedern
