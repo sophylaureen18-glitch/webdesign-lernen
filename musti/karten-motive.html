@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speisekarten-Motive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Vorschau für Adam: je zwei Motiv-Ideen für jede Seite der Speisekarte */
+:root { --grund: #2a0b12; --karte: #1d070d; --text: #f7e7d3; --leise: #cdaa8d; --safran: #f2a93b; --linie: rgba(242,169,59,.28); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); } }
+:root[data-theme="light"] { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); }
+:root[data-theme="dark"] { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --linie: rgba(242,169,59,.28); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--grund); color: var(--text); font: 400 15px/1.5 "Hanken Grotesk", system-ui, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 60px; }
+h1 { font: 400 clamp(32px, 6vw, 50px)/1.05 Gloock, serif; margin: 0 0 8px; }
+.ober { font: 700 11px "Hanken Grotesk"; letter-spacing: .22em; text-transform: uppercase; color: var(--safran); margin: 0 0 8px; }
+.intro { color: var(--leise); max-width: 64ch; margin: 0 0 22px; }
+.probe { background: var(--karte); border: 1px solid var(--linie); border-radius: 20px; overflow: hidden; color: #f7e7d3; }
+.probe canvas { display: block; width: 100%; height: clamp(260px, 44vw, 400px); touch-action: pan-y; }
+.probe .leiste { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 14px; border-top: 1px solid rgba(242,169,59,.18); align-items: center; }
+.probe .leiste span { font: 600 13px "Hanken Grotesk"; color: #cdaa8d; margin-right: 6px; }
+.probe .leiste b { font: 600 12.5px "Hanken Grotesk"; padding: 5px 11px; border-radius: 999px; border: 1px solid rgba(242,169,59,.28); color: #cdaa8d; }
+.probe .leiste b.an { background: #f2a93b; color: #2a0b12; border-color: #f2a93b; }
+.seite { margin-top: 34px; }
+.seite h2 { font: 400 26px/1.1 Gloock, serif; margin: 0 0 4px; display: flex; gap: 10px; align-items: baseline; }
+.seite h2 span { font: 700 13px "Hanken Grotesk"; color: var(--safran); }
+.seite > p { margin: 0 0 12px; color: var(--leise); font-size: 14px; }
+.paar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 560px) { .paar { grid-template-columns: 1fr; } }
+.motiv { margin: 0; background: var(--karte); border: 1px solid var(--linie); border-radius: 18px; overflow: hidden; color: #f7e7d3; }
+.motiv canvas { display: block; width: 100%; aspect-ratio: 4 / 3; touch-action: pan-y; }
+.motiv figcaption { padding: 10px 14px 14px; border-top: 1px solid rgba(242,169,59,.18); }
+.motiv h3 { margin: 0; font: 400 21px Gloock, serif; display: flex; gap: 8px; align-items: baseline; }
+.motiv h3 span { font: 700 12.5px "Hanken Grotesk"; color: #2a0b12; background: #f2a93b; border-radius: 999px; padding: 1px 9px; }
+.motiv p { margin: 2px 0 0; color: #cdaa8d; font-size: 13.5px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="ober">Musti Bistro · Speisekarte · Hintergrund-Motive</p>
+  <h1>Ein Motiv für jede Seite</h1>
+  <p class="intro">So könnte es im Speisekarten-Fenster aussehen: Tippt man eine Seite an, zerstreuen sich die Lichtpunkte im Hintergrund und setzen sich zum Motiv dieser Seite zusammen. Oben läuft die Probe mit allen A-Ideen nacheinander. Darunter hat jede Seite zwei Ideen, A und B. Schreib mir einfach zum Beispiel „Pizza B, Pasta A …“. Wenn dir eine Idee ganz fehlt, sag es, dann zeichne ich neue.</p>
+  <div class="probe"><canvas id="probe"></canvas><div class="leiste" id="leiste"><span>Gerade:</span></div></div>
+  <div id="seiten"></div>
+</main>
+<script>
+const TAU = Math.PI * 2, PI = Math.PI;
+// Farben: 0 Gold, 1 Glut-Orange, 2 Paprika, 3 Creme, 4 Jade/Grün, 5 Granat, 6 Tomate, 7 Kräutergrün
+const FARBEN = [[242, 169, 59], [255, 120, 42], [224, 72, 50], [255, 226, 180], [143, 211, 162], [190, 40, 70], [255, 80, 60], [110, 200, 95]];
+// kleine Zeichen-Helfer: alle geben [x, y] zurück, Koordinaten etwa -1 bis 1, y nach unten
+const strecke = (x1, y1, x2, y2, u) => [x1 + (x2 - x1) * u, y1 + (y2 - y1) * u];
+const ring = (cx, cy, rx, ry, u) => [cx + Math.cos(u * TAU) * rx, cy + Math.sin(u * TAU) * ry];
+const scheibe = (cx, cy, r, u, v, ry = r) => { const w = u * TAU, q = Math.sqrt(v); return [cx + Math.cos(w) * r * q, cy + Math.sin(w) * ry * q]; };
+const dampf = (z, t, x0, y0, hoehe, k = 3) => { const s = Math.floor(z.c * k), h = (z.b + t * .14 + s * .31) % 1;
+  return [x0 + (s - (k - 1) / 2) * .16 + Math.sin(h * 7 + s * 2 + t) * (.03 + h * .07), y0 - h * hoehe, 3, Math.sin(PI * h) * .6]; };
+
+const SEITEN = [
+  { titel: 'Speisekarte · Spezialitäten', text: 'Die Startseite der Speisekarte mit den sechs Spezialitäten.', ideen: [
+    { name: 'Sechs Teller im Kreis', text: 'Ein Teller für jede Spezialität, der Kreis dreht sich langsam. In der Mitte ein Stern.', form: (z, t) => {
+      if (z.a < .12) { const k = Math.floor(z.b * 16), u = z.c, r1 = k % 2 ? .07 : .17, r2 = (k + 1) % 2 ? .07 : .17, w1 = k * PI / 8 + t * .2, w2 = w1 + PI / 8;
+        return [Math.cos(w1) * r1 * (1 - u) + Math.cos(w2) * r2 * u, Math.sin(w1) * r1 * (1 - u) + Math.sin(w2) * r2 * u, 0, 1]; }
+      const k = Math.floor(z.b * 6), w = k / 6 * TAU + t * .08 - PI / 2, cx = Math.cos(w) * .64, cy = Math.sin(w) * .64;
+      if (z.c < .5) { const [x, y] = ring(cx, cy, .2, .2, z.d); return [x, y, 0, .8]; }
+      const [x, y] = scheibe(cx, cy, .13, z.d, (z.c - .5) * 2); return [x, y, [1, 6, 3, 7, 2, 0][k], .55 + .3 * Math.sin(t * 2 + k)]; } },
+    { name: 'Teller mit Besteck', text: 'Ein großer Teller, links die Gabel, rechts das Messer. Der Tellerrand glänzt.', form: (z, t) => {
+      if (z.a < .45) { const r = z.c < .7 ? .56 : .42, [x, y] = ring(0, 0, r, r, z.b); const glanz = Math.max(0, Math.cos(z.b * TAU - t * .8)); return [x, y, 0, r > .5 ? .5 + .5 * glanz : .35]; }
+      if (z.a < .72) { // Gabel
+        if (z.b < .45) { const [x, y] = strecke(-.82, .62, -.82, -.1, z.c); return [x + (z.d - .5) * .03, y, 3, .7]; }
+        if (z.b < .6) { const [x, y] = ring(-.82, -.12, .1, .05, .5 + z.c * .5); return [x, y, 3, .8]; }
+        const k = Math.floor(z.c * 4); return [-.9 + k * .053, -.14 - z.d * .45, 3, .85]; }
+      // Messer
+      if (z.b < .45) { const [x, y] = strecke(.82, .62, .82, .02, z.c); return [x + (z.d - .5) * .035, y, 3, .7]; }
+      const v = z.c, breite = .085 * Math.sin(PI * (.15 + v * .85)) ** .6; return [.82 + (z.d - .3) * breite, .02 - v * .66, 3, .9]; } },
+  ] },
+  { titel: 'Speisekarte · Volle Speisekarte', text: 'Die lange Liste mit allen Gerichten und Preisen.', ideen: [
+    { name: 'Aufgeschlagenes Buch', text: 'Eine offene Speisekarte mit Zeilen aus Licht. Ab und zu blättert eine Seite um.', form: (z, t) => {
+      const kante = x => -.5 - .06 * Math.sin(PI * Math.abs(x) / .85);
+      if (z.a < .14) { // Umrandung der Seiten
+        const s = z.b < .5 ? -1 : 1, x = s * (.04 + z.c * .81); return z.d < .5 ? [x, kante(x), 0, .8] : [x, .55 - .03 * Math.sin(PI * Math.abs(x) / .85), 0, .6]; }
+      if (z.a < .18) { const [x, y] = strecke(0, -.5, 0, .58, z.b); return [x, y, 0, .9]; }
+      if (z.a < .3) { // Seite, die umblättert
+        const p = (t * .22) % 1, w = PI * Math.min(1, Math.max(0, (p - .1) / .5)), x = Math.cos(w) * (.06 + z.b * .79), sicht = p > .1 && p < .6;
+        return [x, -.45 + z.c * .95 - Math.sin(w) * .05, 3, sicht ? .5 : 0]; }
+      const s = z.b < .5 ? -1 : 1, zeile = Math.floor(z.c * 9), x = s * (.14 + z.d * .62), y = -.36 + zeile * .1 + .03 * Math.sin(PI * Math.abs(x) / .85);
+      const luecke = Math.sin(x * 26 + zeile * 2.3) > .75 || (zeile % 3 === 0 && Math.abs(x) > .45);
+      return [x, y, zeile % 3 === 0 ? 0 : 3, luecke ? .06 : zeile % 3 === 0 ? .9 : .5]; } },
+    { name: 'Schriftrolle', text: 'Eine Rolle, die sich langsam öffnet und wieder einrollt, mit Zeilen darauf.', form: (z, t) => {
+      const auf = .2 + .45 * (.5 + .5 * Math.sin(t * .5)), oben = -.62, unten = oben + .14 + auf * 1.6;
+      if (z.a < .3) { const r = z.a < .15 ? oben : unten, x = -.62 + z.b * 1.24, y = r + Math.sin(z.c * TAU) * .055; return [x, y, 0, .5 + .5 * Math.max(0, Math.sin(z.c * TAU + 1))]; }
+      if (z.a < .38) { const s = z.b < .5 ? -1 : 1, [x, y] = strecke(s * .52, oben, s * .52, unten, z.c); return [x, y, 3, .5]; }
+      const zeile = Math.floor(z.c * 12), y = oben + .14 + zeile * .1, x = -.4 + z.d * .8;
+      if (y > unten - .07) return [x, unten, 0, .3];
+      return [x, y, zeile === 0 ? 0 : 3, Math.sin(x * 23 + zeile * 1.7) > .7 ? .05 : zeile === 0 ? .9 : .5]; } },
+  ] },
+  { titel: 'Döner', text: 'Die Unterseite mit allen Dönergerichten.', ideen: [
+    { name: 'Döner-Spieß', text: 'Der Spieß dreht sich, vorne leuchtet er, hinten wird er dunkler.', form: (z, t) => {
+      if (z.a < .06) return [0, -.95 + z.b * 1.9, 3, .5];
+      const v = z.b, r = (.12 + .42 * Math.pow(1 - v, .85)) * (1 + .05 * Math.sin(v * 40)), w = z.c * TAU + t * .5, vorn = Math.sin(w);
+      return [Math.cos(w) * r, -.8 + v * 1.6, z.d < .6 ? 2 : z.d < .85 ? 1 : 0, vorn < 0 ? .12 : .3 + .7 * vorn]; } },
+    { name: 'Döner im Fladenbrot', text: 'Ein gefülltes Fladenbrot von der Seite: oben quellen Salat, Tomate, Zwiebel und Fleisch heraus, unten tropft Soße.', form: (z, t) => {
+      if (z.a < .22) { const w = z.b * PI, dick = (z.c - .5) * .06; return [Math.cos(w) * (.8 + dick), .04 + Math.sin(w) * (.6 + dick), 0, .85]; }
+      if (z.a < .32) { const [x, y] = scheibe(0, .04, .76, z.b * .5, z.c, .56); return [x, y, 0, .18]; }
+      if (z.a < .37) { const x = -.8 + z.b * 1.6; return [x, .04 - .05 * Math.sqrt(Math.max(0, 1 - (x / .8) ** 2)), 0, .6]; }
+      if (z.a < .43) { const h = (z.b + t * .35) % 1, x = -.18 + Math.floor(z.c * 3) * .18; return [x, .66 + h * .26, 3, (1 - h) * .9]; }
+      const x = (z.c * 2 - 1) * .72, oben = .02 - .52 * Math.sqrt(Math.max(0, 1 - (x / .76) ** 2)), y = oben + z.d * (.04 - oben);
+      if (z.b < .26) return [x, oben * (.9 + .1 * z.d) + .035 * Math.sin(x * 26 + t * 1.5), 7, .9];
+      for (const [cx, cy] of [[-.36, -.17], [.06, -.3], [.42, -.14], [-.06, -.08]]) if (Math.hypot(x - cx, y - cy) < .085) return [x, y, 6, Math.hypot(x - cx, y - cy) > .065 ? 1 : .6];
+      for (const [cx, cy] of [[-.16, -.33], [.27, -.28], [.58, -.06]]) { const d = Math.hypot(x - cx, y - cy); if (d < .065 && d > .045) return [x, y, 3, .9]; }
+      return [x, y, z.b < .7 ? 2 : 1, .45 + .3 * Math.sin(t * 1.5 + y * 30)]; } },
+  ] },
+  { titel: 'Pizza', text: 'Die Unterseite mit allen Pizzen.', ideen: [
+    { name: 'Ganze Pizza', text: 'Von oben: Rand, Käse, Salami und Basilikum. Ein Stück schiebt sich langsam heraus.', form: (z, t) => {
+      const w = z.b * TAU, r = Math.sqrt(z.c) * .8; let x = Math.cos(w) * r, y = Math.sin(w) * r;
+      const wi = ((w + PI / 6) % TAU), stueck = wi < PI / 3, aus = .14 * (.5 + .5 * Math.sin(t * .9));
+      if (stueck) { x += aus; }
+      const linie = Math.min(wi % (PI / 3), PI / 3 - wi % (PI / 3)) * r < .012;
+      if (r > .7) return [x, y, 0, .9];
+      const SALAMI = [[.3, -.35], [-.35, -.3], [-.1, .1], [.42, .22], [-.45, .3], [.05, -.55], [.1, .5], [-.6, -.02]];
+      for (const [sx, sy] of SALAMI) if (Math.hypot(Math.cos(w) * r - sx, Math.sin(w) * r - sy) < .11) return [x, y, 2, linie ? .1 : .9];
+      if (z.d > .94) return [x, y, 7, .9];
+      return [x, y, 3, linie ? .05 : .38]; } },
+    { name: 'Pizzastück mit Käsefäden', text: 'Ein Stück wird hochgehoben, die Käsefäden ziehen sich lang.', form: (z, t) => {
+      const heb = -.12 - .12 * (.5 + .5 * Math.sin(t * 1.1)), halb = y => .52 * (.55 - y) / 1.15, rand = x => -.6 + .07 * (x / .52) ** 2;
+      if (z.a < .2) { const k = Math.floor(z.b * 6), s = k < 3 ? -1 : 1, xa = s * (.07 + (k % 3) * .12), ya = .55 - (Math.abs(xa) / .52) * 1.15 + heb, u = z.c;
+        return [xa + .025 * Math.sin(u * PI) * Math.sin(t * 2 + k), ya + (.8 - ya) * u, 3, .35 + .5 * (1 - u)]; }
+      if (z.a < .27) { const [x, y] = ring(0, .82, .72, .1, z.b); return [x, y, 0, .45]; }
+      if (z.a < .45) { const x = (z.b * 2 - 1) * .54, y = rand(x) + z.c * .11 + .015 * Math.sin(x * 30); return [x, y + heb, 0, .95]; }
+      const y = -.48 + (1 - Math.sqrt(z.c)) * 1.03, x = (z.d * 2 - 1) * halb(y), yy = y + heb;
+      for (const [sx, sy] of [[-.17, -.3], [.16, -.26], [0, .02], [-.02, -.18]]) if (Math.hypot(x - sx, y - sy) < .085) return [x, yy, 2, 1];
+      if (z.b > .95) return [x, yy, 7, .9];
+      return [x, yy, 3, .42]; } },
+  ] },
+  { titel: 'Pasta', text: 'Die Unterseite mit den Nudelgerichten.', ideen: [
+    { name: 'Gabel mit Spaghetti', text: 'Die Gabel dreht die Nudeln auf, darunter ein Teller mit Soße.', form: (z, t) => {
+      if (z.a < .12) { const [x, y] = strecke(.04, -.2, .12, -.95, z.b); return [x + (z.c - .5) * .04, y, 3, .75]; }
+      if (z.a < .25) { const [x, y] = ring(0, .62, .82, .17, z.b); return [x, y, 0, .55]; }
+      if (z.a < .32) { const [x, y] = scheibe(0, .62, .5, z.b, z.c, .1); return [x, y, 6, .6]; }
+      if (z.a < .42) { const k = Math.floor(z.b * 3), u = z.c, x0 = -.2 + k * .2; return [x0 + Math.sin(u * 6 + k + t) * .06, .32 + u * .3, 0, .7]; }
+      const u = z.b, w = u * TAU * 7 + t * 2.2, r = .3 - .06 * Math.abs(u - .5), x = Math.cos(w) * r, y = -.08 + u * .42 + Math.sin(w) * .07, vorn = Math.sin(w);
+      return [x, y, z.c < .85 ? 0 : 3, vorn > 0 ? .9 : .25]; } },
+    { name: 'Teller Spaghetti', text: 'Ein voller Teller von schräg oben, Soße und Parmesan, dazu Dampf.', form: (z, t) => {
+      if (z.a < .22) { const r = z.c < .6 ? 1 : .74, [x, y] = ring(0, .25, .86 * r, .42 * r, z.b); return [x, y, 0, r === 1 ? .7 : .35]; }
+      if (z.a < .34) return dampf(z, t, 0, -.05, .8);
+      if (z.a < .48) { const [x, y] = scheibe(0, .08, .2, z.b, z.c, .11); return [x, y, z.d < .85 ? 6 : 3, .9]; }
+      const k = Math.floor(z.b * 14), cx = Math.cos(k * 2.4) * .3 * ((k % 4) / 4 + .3), cy = .18 + Math.sin(k * 2.4) * .14 * ((k % 4) / 4 + .3), w = z.c * TAU, d = k * .7;
+      return [cx + Math.cos(w + d) * .17, cy + Math.sin(w * 2 + d) * .06, 0, .55 + .25 * Math.sin(w * 3 + t)]; } },
+  ] },
+  { titel: 'Vegetarische Gerichte', text: 'Die Unterseite mit den vegetarischen Gerichten.', ideen: [
+    { name: 'Kräuter-Kranz', text: 'Ein Kranz aus Blättern mit kleinen Tomaten, dreht sich ganz langsam.', form: (z, t) => {
+      if (z.a < .2) { const k = Math.floor(z.b * 7), w = (k + .5) / 7 * TAU + t * .05, [x, y] = scheibe(Math.cos(w) * .62, Math.sin(w) * .62, .07, z.c, z.d); return [x, y, 6, .9]; }
+      const k = Math.floor(z.b * 14), w = k / 14 * TAU + t * .05, s = z.c * 2 - 1, q = (z.d * 2 - 1) * .075 * Math.sqrt(1 - s * s), mitte = Math.abs(q) < .008;
+      const tx = -Math.sin(w), ty = Math.cos(w), nx = Math.cos(w), ny = Math.sin(w), R = .62 + (k % 2 ? .1 : -.08);
+      return [nx * R + tx * s * .15 + nx * q, ny * R + ty * s * .15 + ny * q, mitte ? 4 : 7, mitte ? 1 : .6]; } },
+    { name: 'Falafel-Schale', text: 'Eine Schale mit Falafel, Salat, Tomate und Soße, dazu etwas Dampf.', form: (z, t) => {
+      if (z.a < .22) { const w = z.b * PI, [x, y] = [Math.cos(w) * .74, .08 + Math.sin(w) * .48]; return [x, y, 0, .75]; }
+      if (z.a < .3) { const [x, y] = ring(0, .08, .74, .12, z.b); return [x, y, 0, .6]; }
+      if (z.a < .38) return dampf(z, t, 0, -.3, .6);
+      if (z.a < .7) { const k = Math.floor(z.b * 5), cx = -.44 + k * .22, cy = -.03 - (k % 2) * .1, rand = z.c < .45;
+        const [x, y] = rand ? ring(cx, cy, .1, .1, z.d) : scheibe(cx, cy, .1, z.d, z.c); return [x, y, 1, rand ? .9 : .45]; }
+      if (z.a < .82) { const x = -.6 + z.b * 1.2; return [x, -.02 + Math.sin(x * 14 + t) * .05, 3, .8]; }
+      const [x, y] = scheibe(0, .02, .6, z.b, z.c, .12); return [x, y - .05, z.d < .6 ? 7 : 6, .7]; } },
+  ] },
+  { titel: 'Fleischgerichte', text: 'Die Unterseite mit Klassikern und Grillgerichten.', ideen: [
+    { name: 'Spieß über Flammen', text: 'Fleisch, Paprika und Zwiebel am Spieß, darunter lodern die Flammen.', form: (z, t) => {
+      if (z.a < .06) { const [x, y] = strecke(-.92, -.2, .92, -.2, z.b); return [x, y, 3, .6]; }
+      if (z.a < .5) { const k = Math.floor(z.b * 7), cx = -.66 + k * .22, fa = [2, 7, 2, 3, 2, 7, 2][k];
+        const dreh = Math.cos(t * 1.2 + k * .4), [x, y] = scheibe(cx, -.2, .085, z.c, z.d, .1 * (.75 + .25 * Math.abs(dreh)));
+        return [x, y, fa, .55 + .4 * Math.max(0, dreh)]; }
+      if (z.a < .56) { const [x, y] = strecke(-.75, .82, .75, .82, z.b); return [x, y, 0, .4]; }
+      const k = Math.floor(z.b * 9), h = (z.c + t * .9 + k * .37) % 1, x0 = -.64 + k * .16;
+      return [x0 + Math.sin(h * 9 + t * 4 + k) * .05 * (1 - h), .78 - h * (.62 + .12 * Math.sin(t * 3 + k)), h < .45 ? 1 : 0, (1 - h) * .95]; } },
+    { name: 'Grillrost mit Glut', text: 'Hähnchenbrust und Cevapcici auf dem Rost, darunter glüht die Kohle.', form: (z, t) => {
+      if (z.a < .18) { const k = Math.floor(z.b * 9), x = -.72 + k * .18, lim = .48 * Math.sqrt(Math.max(0, 1 - (x / .85) ** 2)), [xx, yy] = strecke(x, -lim + .1, x, lim + .1, z.c); return [xx, yy, 3, .35]; }
+      if (z.a < .26) { const [x, y] = ring(0, .1, .85, .48, z.b); return [x, y, 0, .6]; }
+      if (z.a < .44) { const [x, y] = scheibe(0, .1, .82, z.b, z.c, .45); return [x, y + .06, 1, .25 + .6 * Math.max(0, Math.sin(t * 2.5 + z.d * 20))]; }
+      if (z.a < .7) { const [x, y] = scheibe(-.3, -.02, .32, z.b, z.c, .18), streifen = Math.abs(((x + y) * 7) % 1) < .18; return [x, y, streifen ? 1 : 0, streifen ? .95 : .6]; }
+      const k = Math.floor(z.b * 3), cx = .32 + k * .17, u = z.c, [x, y] = [cx + (z.d - .5) * .1, -.2 + u * .42]; return [x, y, 2, .75]; } },
+  ] },
+  { titel: 'Buffet', text: 'Die Unterseite mit dem Buffet für Feiern.', ideen: [
+    { name: 'Servierglocke', text: 'Eine Glocke auf dem Teller. Sie hebt sich ab und zu, darunter funkelt und dampft es.', form: (z, t) => {
+      const p = (t * .2) % 1, heb = p > .55 && p < .95 ? Math.sin(PI * (p - .55) / .4) * .32 : 0;
+      if (z.a < .2) { const [x, y] = ring(0, .52, .88, .13, z.b); return [x, y, 0, .7]; }
+      if (z.a < .62) { const w = PI + z.b * PI, x = Math.cos(w) * .7, y = .45 + Math.sin(w) * .78 - heb; const glanz = Math.abs(w - 4.1) < .25 ? 1 : .6; return [x, y, 3, glanz]; }
+      if (z.a < .68) { const [x, y] = scheibe(0, -.38 - heb, .06, z.b, z.c); return [x, y, 0, .95]; }
+      if (z.a < .76) { const [x, y] = ring(0, .45 - heb, .7, .06, z.b); return [x, y, 0, .6]; }
+      const [x, y] = scheibe(0, .32, .55, z.b, z.c, .2); return [x, y - (z.d * heb * .9), z.d < .5 ? 1 : 0, heb > .05 ? .9 * Math.abs(Math.sin(t * 6 + z.d * 20)) : 0]; } },
+    { name: 'Gedeckte Tafel', text: 'Ein langer Tisch mit Pfannen und Schalen, aus der Mitte steigt Dampf.', form: (z, t) => {
+      if (z.a < .14) { const s = z.b < .5, [x, y] = s ? strecke(-.9, .7, .9, .7, z.c) : strecke(-.6, -.05, .6, -.05, z.c); return [x, y, 0, s ? .7 : .45]; }
+      if (z.a < .2) { const s = z.b < .5 ? -1 : 1, [x, y] = strecke(s * .9, .7, s * .6, -.05, z.c); return [x, y, 0, .5]; }
+      if (z.a < .3) return dampf(z, t, 0, .2, .7);
+      const TEIL = [[-.5, .5, .17, 2], [0, .48, .22, 1], [.5, .5, .17, 7], [-.3, .18, .13, 3], [.3, .18, .13, 6]], k = Math.floor(z.b * TEIL.length), [cx, cy, r, fa] = TEIL[k];
+      if (z.c < .4) { const [x, y] = ring(cx, cy, r, r * .38, z.d); return [x, y, 0, .7]; }
+      const [x, y] = scheibe(cx, cy - .02, r * .8, z.d, (z.c - .4) / .6, r * .3); return [x, y, fa, .5 + .3 * Math.sin(t * 2 + k)]; } },
+  ] },
+];
+
+function teilchenMachen(n, w, h) { return Array.from({ length: n }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() }, x: Math.random() * w, y: Math.random() * h, vx: 0, vy: 0, fx: Math.random() * 2 - 1, fy: Math.random() * 2 - 1, s: 1.1 + Math.random() * 1.3 })); }
+function bewegen(g, teile, formA, formB, f, t, cx, cy, S, zeiger) {
+  const e = f * f * (3 - 2 * f), streu = Math.sin(PI * f);
+  g.globalCompositeOperation = 'lighter';
+  for (const p of teile) {
+    const [ax, ay, fa, ha] = formA(p.z, t), [bx, by, fb, hb] = formB(p.z, t);
+    const tx = cx + (ax + (bx - ax) * e + p.fx * streu * .9) * S, ty = cy + (ay + (by - ay) * e + p.fy * streu * .9) * S;
+    p.vx = (p.vx + (tx - p.x) * .08) * .84; p.vy = (p.vy + (ty - p.y) * .08) * .84;
+    if (zeiger.an) { const dx = p.x - zeiger.x, dy = p.y - zeiger.y, d = Math.hypot(dx, dy); if (d < 60 && d > .1) { const k = (1 - d / 60) * 2.2; p.vx += dx / d * k; p.vy += dy / d * k; } }
+    p.x += p.vx; p.y += p.vy;
+    const c = e < .5 ? FARBEN[fa] : FARBEN[fb], hel = (ha + (hb - ha) * e) * (1 - streu * .35);
+    if (hel < .02) continue;
+    g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${Math.min(1, hel * .95).toFixed(3)})`; g.fillRect(p.x, p.y, p.s, p.s);
+  }
+  g.globalCompositeOperation = 'source-over';
+}
+
+const seiten = document.getElementById('seiten'), leiste = document.getElementById('leiste'), flaechen = [];
+function flaeche(cv, n, form) { const f = { cv, g: cv.getContext('2d'), n, form, w: 0, h: 0, teile: null, zeiger: { x: 0, y: 0, an: false }, sichtbar: false };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); f.zeiger.x = e.clientX - r.left; f.zeiger.y = e.clientY - r.top; f.zeiger.an = true; });
+  cv.addEventListener('pointerleave', () => f.zeiger.an = false); cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') f.zeiger.an = false; });
+  flaechen.push(f); return f; }
+flaeche(document.getElementById('probe'), 1500, 'probe');
+const PROBE = SEITEN.map(s => s.ideen[0]);
+SEITEN.forEach((s, i) => {
+  const sek = document.createElement('section'); sek.className = 'seite';
+  sek.innerHTML = `<h2><span>${i + 1}</span>${s.titel}</h2><p>${s.text}</p><div class="paar"></div>`;
+  const paar = sek.querySelector('.paar');
+  s.ideen.forEach((m, k) => {
+    const fig = document.createElement('figure'); fig.className = 'motiv';
+    fig.innerHTML = `<canvas></canvas><figcaption><h3><span>${i + 1}${'AB'[k]}</span>${m.name}</h3><p>${m.text}</p></figcaption>`;
+    paar.append(fig); flaeche(fig.querySelector('canvas'), 1300, m.form);
+  });
+  seiten.append(sek);
+  const b = document.createElement('b'); b.textContent = s.titel.replace('Speisekarte · ', ''); leiste.append(b);
+});
+const chips = [...leiste.querySelectorAll('b')];
+function messen() { for (const f of flaechen) { const r = f.cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  if (Math.round(r.width) === f.w && Math.round(r.height) === f.h) continue;
+  f.w = Math.round(r.width); f.h = Math.round(r.height); f.dpr = dpr; f.cv.width = f.w * dpr; f.cv.height = f.h * dpr; f.teile = teilchenMachen(f.n, f.w, f.h); } }
+const io = new IntersectionObserver(es => es.forEach(e => { flaechen.find(f => f.cv === e.target).sichtbar = e.isIntersecting; }));
+flaechen.forEach(f => io.observe(f.cv));
+addEventListener('resize', messen); messen();
+let vor = performance.now(), t = 0;
+function schleife(jetzt) {
+  const dt = Math.max(0, Math.min(.05, (jetzt - vor) / 1000)); vor = jetzt; t += dt;
+  for (const f of flaechen) {
+    if (!f.sichtbar || !f.w) continue;
+    const g = f.g; g.setTransform(f.dpr, 0, 0, f.dpr, 0, 0); g.clearRect(0, 0, f.w, f.h);
+    const S = Math.min(f.w, f.h) * .45;
+    if (f.form === 'probe') {
+      // 4,5 Sekunden pro Seite: 3 s stehen, 1,5 s verwandeln
+      const takt = t / 4.5, i = Math.floor(takt) % PROBE.length, rest = takt % 1, v = rest < .67 ? 0 : (rest - .67) / .33;
+      bewegen(g, f.teile, PROBE[i].form, PROBE[(i + 1) % PROBE.length].form, v, t, f.w / 2, f.h / 2, S * .95, f.zeiger);
+      chips.forEach((c, k) => c.classList.toggle('an', k === (v > .5 ? (i + 1) % PROBE.length : i)));
+    } else bewegen(g, f.teile, f.form, f.form, 0, t, f.w / 2, f.h / 2, S, f.zeiger);
+  }
+  requestAnimationFrame(schleife);
+}
+requestAnimationFrame(schleife);
+</script>
+</body>
+</html>
