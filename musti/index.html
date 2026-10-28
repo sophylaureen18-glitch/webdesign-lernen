@@ -1229,8 +1229,11 @@ const maus = { x: -999, y: -999 };
 const ver = { x: 0, y: 0 }, VER_WEIT = 46;
 // Neigung des Handys: x und y von -1 bis 1, gemessen ab der Haltung, in der man das Handy gerade hält
 const neigung = { x: 0, y: 0, aktiv: false, basisB: null, basisG: null };
+const sensorInfo = { ereignisse: 0, mitWerten: 0, erlaubnis: '–' };
 function neigungLesen(e) {
+  sensorInfo.ereignisse++;
   if (e.beta == null || e.gamma == null) return;
+  sensorInfo.mitWerten++;
   // Querformat: die Achsen tauschen
   const winkel = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
   let lr = e.gamma, vh = e.beta;
@@ -1243,11 +1246,14 @@ function neigungLesen(e) {
   neigung.aktiv = true;
 }
 addEventListener('deviceorientation', neigungLesen);
+// Handy ohne Neige-Werte nach 2 s (Sensor gesperrt oder abgelehnt): dann wandert die Rosette von selbst
+let selbstWandern = false;
+if (matchMedia('(pointer: coarse)').matches) setTimeout(() => { if (!sensorInfo.mitWerten) selbstWandern = true; }, 2000);
 addEventListener('orientationchange', () => { neigung.basisB = null; });
 // iPhone fragt einmal um Erlaubnis, das geht nur nach einer Berührung
 if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
   addEventListener('touchend', function fragen() {
-    DeviceOrientationEvent.requestPermission().catch(() => {});
+    DeviceOrientationEvent.requestPermission().then(r => { sensorInfo.erlaubnis = r; }).catch(err => { sensorInfo.erlaubnis = 'Fehler: ' + (err && err.name || err); });
     removeEventListener('touchend', fragen);
   });
 }
@@ -1340,6 +1346,9 @@ function malen(jetzt) {
   // Handy (Adam): Neigen und Drehen wirkt wie die Maus, Handy nach links geneigt = Rosette wandert nach rechts
   // Adam (v33): deutlicher spürbar, links/rechts und vor/zurück, auf dem Handy weiter als mit der Maus
   if (neigung.aktiv && maus.x < -900) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2); zielX = -neigung.x * weit; zielY = -neigung.y * weit; }
+  // Sensor gesperrt (z. B. in der Claude-Vorschau): die Rosette wandert langsam von selbst, der Finger geht weiter vor
+  else if (selbstWandern && maus.x < -900) { const weit = Math.max(VER_WEIT, Math.min(W, H) * 0.2) * 0.7;
+    zielX = Math.sin(zeit * 0.31) * weit; zielY = Math.sin(zeit * 0.23 + 1.2) * weit * 0.8; }
   const weich = 1 - Math.pow(0.08, dt);            // gleitet sanft hinterher
   ver.x += (zielX - ver.x) * weich; ver.y += (zielY - ver.y) * weich;
   menueImKreis();
@@ -1440,6 +1449,31 @@ document.addEventListener('pointerdown', e => {
 });
 addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') maus.x = maus.y = -999; });
 addEventListener('pointercancel', () => { maus.x = maus.y = -999; });
+// Versteckter Sensor-Check für Adam: 4x schnell auf das Schmetterlings-Zeichen unten links tippen
+let checkTipps = [];
+addEventListener('pointerdown', e => {
+  if (e.clientX > 56 || e.clientY < innerHeight - 56) return;
+  const t = performance.now(); checkTipps = checkTipps.filter(x => t - x < 2500); checkTipps.push(t);
+  if (checkTipps.length >= 4) { checkTipps = []; sensorCheck(); }
+});
+function sensorCheck() {
+  let box = document.getElementById('sensor-check');
+  if (!box) {
+    box = document.createElement('div'); box.id = 'sensor-check';
+    box.style.cssText = 'position:fixed;z-index:99;left:12px;right:12px;bottom:60px;padding:14px;border-radius:14px;background:#111;color:#f4d6a4;font:13px/1.5 monospace;box-shadow:0 10px 40px #000';
+    document.body.appendChild(box);
+  }
+  const fp = document.featurePolicy || document.permissionsPolicy;
+  const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
+  let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  zeigen(); const tick = setInterval(zeigen, 500);
+  box.onclick = ev => {
+    if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
+    if (ev.target.id === 'sensor-fragen' && window.DeviceOrientationEvent && DeviceOrientationEvent.requestPermission)
+      DeviceOrientationEvent.requestPermission().then(r => { sensorInfo.erlaubnis = r; }).catch(err => { sensorInfo.erlaubnis = 'Fehler: ' + (err && err.name || err); });
+  };
+}
 
 addEventListener('resize', messen);
 messen();
