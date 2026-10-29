@@ -1191,7 +1191,7 @@ function tafelAuf(name) {
   tafel.classList.toggle('breit', !!t.breit);
   zerfallAbbrechen();
   tafel.hidden = false; tafel.classList.remove('an'); void tafel.offsetWidth;
-  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; cTeile = cLinks = null; bTeile = bLinks = null; koTeile = koLinks = null; geTeile = geLinks = null; imTeile = imLinks = null; tafelAnimationStarten();
+  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; cTeile = cLinks = null; bTeile = bLinks = null; koTeile = koLinks = null; geTeile = geLinks = null; imTeile = imLinks = null; dsTeile = dsLinks = null; tafelAnimationStarten();
   tafel.classList.add('an'); schleier.classList.add('an');
   document.getElementById('tafel-zu').focus({ preventScroll: true });
 }
@@ -1305,12 +1305,13 @@ function tafelAnimationStarten() {
     const karteLinks = offeneTafel === 'kontakt' && r.left > 240;   // Adam (v55): Stadtplan mit Nadel links neben dem Kontakt
     const linieLinks = offeneTafel === 'familie' && r.left > 240;   // Adam (v57): Lebenslinie aus Licht links neben Unsere Geschichte
     const waageLinks = offeneTafel === 'impressum' && r.left > 240;   // Adam (v58): Waage mit Herz und § links neben dem Impressum
-    const mitMotiv = ['unternehmen', 'speisekarte', 'catering', 'bewertungen', 'kontakt', 'familie', 'impressum'].includes(offeneTafel);
+    const schluesselLinks = offeneTafel === 'datenschutz' && r.left > 240;   // Adam (v59): Schlüssel im Schloss links neben dem Datenschutz
+    const mitMotiv = ['unternehmen', 'speisekarte', 'catering', 'bewertungen', 'kontakt', 'familie', 'impressum', 'datenschutz'].includes(offeneTafel);
     tafel.classList.remove('mit-baum'); tafel.classList.toggle('mit-motiv', mitMotiv);
     if (mitMotiv || bcv.classList.contains('an')) {
       if (bcv.width !== Math.round(innerWidth * dpr) || bcv.height !== Math.round(innerHeight * dpr)) { bcv.width = Math.round(innerWidth * dpr); bcv.height = Math.round(innerHeight * dpr); }
       bg.setTransform(dpr, 0, 0, dpr, 0, 0); bg.clearRect(0, 0, innerWidth, innerHeight);
-      bcv.classList.toggle('an', baumDraussen || motivLinks || laternenLinks || kranzLinks || karteLinks || linieLinks || waageLinks);
+      bcv.classList.toggle('an', baumDraussen || motivLinks || laternenLinks || kranzLinks || karteLinks || linieLinks || waageLinks || schluesselLinks);
     }
     // draußen liegt der Baum auf der abgedunkelten Startseite, darum dort immer in leuchtenden Farben
     if (baumDraussen) familienBaum(bg, r.left, innerHeight, Math.max(0, rahmenZeit - 0.3), false, maus.x, maus.y);
@@ -1320,6 +1321,7 @@ function tafelAnimationStarten() {
     if (karteLinks) kontaktLinks(bg, r.left, innerHeight, maus.x, maus.y);
     if (linieLinks) geschichteLinks(bg, r.left, innerHeight, maus.x, maus.y);
     if (waageLinks) impressumLinks(bg, r.left, innerHeight, maus.x, maus.y);
+    if (schluesselLinks) datenschutzLinks(bg, r.left, innerHeight, maus.x, maus.y);
     if (offeneTafel === 'unternehmen') verwandlung(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'speisekarte') kartenMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'catering') cateringMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
@@ -1327,6 +1329,7 @@ function tafelAnimationStarten() {
     else if (offeneTafel === 'kontakt') kontaktMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'familie') geschichteMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'impressum') impressumMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
+    else if (offeneTafel === 'datenschutz') datenschutzMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else {
     // Ornament in der Ecke unten rechts
     const cx = r.width * 0.92, cy = r.height * 0.9, R = Math.max(r.width, r.height) * 0.42;
@@ -2026,6 +2029,75 @@ function impressumLinks(c, w, h, mx, my) {   // liegt auf der abgedunkelten Star
   cPunkte(c, imLinks, IM_WAAGE, w / 2, h / 2 - S * 0.15, S, mx, my, K_FARBEN.dunkel, 1, 90);
   c.globalCompositeOperation = 'source-over';
 }
+/* Datenschutz (Adam, v59): links am Laptop ein goldener Schlüssel mit Achtstern im Griff. Er gleitet in ein Schlossblech
+   mit Spitzbogen, dreht sich, dann breitet sich ein Lichtring aus. Im Fenster ein Maschrabiyya-Gitterfenster aus Achtsternen:
+   Es schützt vor Blicken und lässt Licht durch, dahinter wandert ein warmer Schein. */
+const DS_AUS = [0, 0, 0, 0];
+const DS_SCHLUESSEL = (z, t) => {
+  const P = 9, p = (t / P) % 1, q = z.a, KX = 0, KY = .45;
+  const ein = p < .28 ? cGlatt(p / .28) : p < .8 ? 1 : 1 - cGlatt((p - .8) / .2);                                            // gleitet hinein und wieder heraus
+  const dreh = p < .3 ? 0 : p < .44 ? cGlatt((p - .3) / .14) : p < .66 ? 1 : p < .78 ? 1 - cGlatt((p - .66) / .12) : 0;      // Vierteldrehung
+  const wl = p < .42 ? -1 : (p - .42) / .34, licht = wl < 0 || wl > 1 ? 0 : Math.sin(C_PI * wl);
+  const blech = [[KX - .3, KY + .5], [KX - .3, KY - .22], [KX - .2, KY - .42], [KX, KY - .56], [KX + .2, KY - .42], [KX + .3, KY - .22], [KX + .3, KY + .5], [KX - .3, KY + .5]];
+  if (q < .14) { const [x, y] = geStrecke(blech, z.b); return [x, y, 0, .7]; }                                                // Schlossblech, Spitzbogen
+  if (q < .2) { let x, y; if (z.b < .6) [x, y] = cRing(KX, KY, .07, .07, z.b / .6); else { const v = (z.b - .6) / .4, s = z.c < .5 ? -1 : 1; x = KX + s * (.03 + .03 * v); y = KY + .06 + v * .17; }
+    return [x, y, licht > .1 ? 3 : 0, .6 + .4 * licht]; }                                                                      // Schlüsselloch
+  if (q < .58) { const r = (q - .2) / .38; let lx, ly, fa = 0;                                                                // der Schlüssel, Spitze bei (0, 0)
+    if (r < .3) [lx, ly] = cRing(0, -.92, .16, .16, z.b);
+    else if (r < .45) { [lx, ly] = koZacke(0, -.92, .1, 8, .5, z.b, t * .3); fa = 3; }
+    else if (r < .75) { lx = (z.c < .5 ? -1 : 1) * .025; ly = -.76 + z.b * .76; }
+    else if (r < .82) [lx, ly] = cRing(0, -.72, .05, .03, z.b);
+    else [lx, ly] = geStrecke([[.025, -.04], [.14, -.04], [.14, -.09], [.09, -.09], [.09, -.14], [.14, -.14], [.14, -.2], [.025, -.2]], z.b);
+    const spitze = KY - .7 + ein; if (spitze + ly > KY) return DS_AUS;                                                        // steckt im Schloss
+    const [x, y] = cDrehen(KX + lx, spitze + ly, KX, KY, dreh * C_PI / 2); return [x, y, licht > .3 ? 3 : fa, .85]; }
+  if (q < .74) { if (licht <= 0) return DS_AUS; const r = .15 + wl * 1.05, [x, y] = cRing(KX, KY, r, r, z.b); return [x, y, z.c < .5 ? 0 : 1, (1 - wl) * .75]; }   // Lichtring
+  if (q < .84) { const k = Math.floor(z.b * 8), a = k / 8 * C_TAU, [x, y] = koZacke(KX + Math.cos(a) * .82, KY + Math.sin(a) * .82, .05, 8, .5, z.c); return [x, y, 3, .15 + .8 * licht]; }   // Achtsterne ringsum
+  return imFunkel(z, t, .3);
+};
+// Maschrabiyya: Spitzbogen und die Zellen mit Achtsternen darin
+const DS_MA = { B: .66, BODEN: 1.0, SEITE: -.3, SPITZE: -1.05, G: .32, X0: -.48, Y0: -.62 };
+const dsBogen = sx => DS_MA.SEITE + (DS_MA.SPITZE - DS_MA.SEITE) * Math.pow(1 - Math.min(1, Math.abs(sx)), .6);
+const DS_ZELLEN = [];
+for (let iy = 0; iy < 6; iy++) for (let ix = 0; ix < 4; ix++) { const x = DS_MA.X0 + ix * DS_MA.G, y = DS_MA.Y0 + iy * DS_MA.G;
+  if (Math.abs(x) + .13 < DS_MA.B && y - .13 > dsBogen(x / DS_MA.B) + .03 && y + .13 < DS_MA.BODEN) DS_ZELLEN.push([x, y]); }
+const DS_GITTER = (z, t) => {
+  const M = DS_MA, q = z.a, L = [.32 * Math.sin(t * .37), .15 + .45 * Math.sin(t * .23 + 1)];                               // warmer Schein wandert hinter dem Gitter
+  const schein = (x, y) => .3 + .7 * Math.exp(-((x - L[0]) ** 2 + (y - L[1]) ** 2) / .3);
+  const abstand = (x, y) => [Math.abs(((x - M.X0) / M.G + 50) % 1 - .5) * M.G, Math.abs(((y - M.Y0) / M.G + 50) % 1 - .5) * M.G];
+  const rahmen = (u, s) => { const L1 = M.BODEN - M.SEITE, Lg = 2 * L1 + 2.4, d = u * Lg;
+    if (d < L1) return [-M.B * s, M.BODEN - d]; if (d < L1 + 2.4) { const sx = (d - L1) / 1.2 - 1; return [sx * M.B * s, M.BODEN + (dsBogen(sx) - M.BODEN) * (s > 1 ? 1.06 : 1)]; } return [M.B * s, M.SEITE + (d - L1 - 2.4)]; };
+  if (q < .16) { const s = z.c < .55 ? 1 : 1.1, [x, y] = rahmen(z.b, s); return [x, y, 0, s > 1 ? .45 : .85]; }              // Rahmen, doppelt
+  if (q < .19) return [(z.b * 2 - 1) * .82, M.BODEN, 0, .5];                                                                // Sims
+  if (q < .58) { const [cx, cy] = DS_ZELLEN[Math.floor(z.b * DS_ZELLEN.length)], innen = z.d < .18, [x, y] = innen ? cRing(cx, cy, .045, .045, z.c) : koZacke(cx, cy, .12, 8, .5, z.c);
+    return [x, y, innen ? 1 : 0, (innen ? .7 : .9) * schein(cx, cy)]; }                                                       // Achtsterne
+  if (q < .78) { const quer = z.c < .5, v = z.d * 2 - 1;                                                                     // Stäbe zwischen den Sternen
+    const x = quer ? v * M.B : M.X0 + Math.floor(z.b * 4) * M.G, y = quer ? M.Y0 + Math.floor(z.b * 6) * M.G : M.SPITZE + z.d * (M.BODEN - M.SPITZE);
+    if (Math.abs(x) > M.B - .02 || y < dsBogen(x / M.B) + .02 || y > M.BODEN - .02) return [x, y, 0, 0];
+    const [dx, dy] = abstand(x, y);
+    if (quer ? (M.G / 2 - dx) < .12 : (M.G / 2 - dy) < .12) return [x, y, 0, 0];                                             // nicht durch die Sterne
+    return [x, y, 0, .7 * schein(x, y)]; }
+  if (q < .92) { const sx = z.b * 2 - 1, oben = dsBogen(sx), x = sx * M.B * .96, y = oben + z.c * (M.BODEN - oben), [dx, dy] = abstand(x, y);   // Licht durch die Lücken
+    const loch = Math.hypot(M.G / 2 - dx, M.G / 2 - dy) > .15 && dx < M.G / 2 - .025 && dy < M.G / 2 - .025;
+    return [x, y, z.d < .5 ? 1 : 3, loch ? .22 * schein(x, y) * (.8 + .2 * Math.sin(t * 2 + z.d * 9)) : 0]; }
+  return imFunkel(z, t, .3);
+};
+let dsTeile = null, dsLinks = null;
+function datenschutzMotiv(c, w, h, dt, hellJetzt, mx, my) {
+  cZeit += dt;
+  if (!dsTeile) dsTeile = cNeueTeile(2800, w, h);
+  const kopf = document.querySelector('.tafel-kopf').offsetHeight;
+  const S = Math.min(w * 0.5, (h - kopf) * 0.42), cx = w / 2, cy = kopf + (h - kopf) * 0.5 + S * 0.05;   // Fenster mittig
+  if (!hellJetzt) c.globalCompositeOperation = 'lighter';
+  cPunkte(c, dsTeile, DS_GITTER, cx, cy, S, mx, my, hellJetzt ? K_FARBEN.hell : K_FARBEN.dunkel, hellJetzt ? 0.8 : 1, 70);
+  c.globalCompositeOperation = 'source-over';
+}
+function datenschutzLinks(c, w, h, mx, my) {   // liegt auf der abgedunkelten Startseite, darum immer leuchtend
+  if (!dsLinks || dsLinks.w !== w || dsLinks.h !== h) { dsLinks = cNeueTeile(2400, w, h); dsLinks.w = w; dsLinks.h = h; }
+  const S = Math.min(w * 0.46, h * 0.33);
+  c.globalCompositeOperation = 'lighter';
+  cPunkte(c, dsLinks, DS_SCHLUESSEL, w / 2, h / 2 + S * 0.19, S, mx, my, K_FARBEN.dunkel, 1, 90);
+  c.globalCompositeOperation = 'source-over';
+}
 
 /* Schließen (Adam): das Fenster zerfällt von oben nach unten in Lichtpartikel, die davonschweben */
 const zcv = document.getElementById('zerfall'), zg = zcv.getContext('2d');
@@ -2647,7 +2719,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v58</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v59</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
