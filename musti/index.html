@@ -207,7 +207,7 @@ h1 em { font-style: normal; font-weight: 400; color: transparent; background: li
 .tafel.mit-baum .tafel-kopf { padding-top: 206px; }
 /* Adam: das Motiv füllt das ganze Über-uns-Fenster wie beim Tee-Shop; freie Stellen geben den Blick darauf frei */
 .motiv-platz { height: 46vh; height: 46svh; flex: none; pointer-events: none; }
-.tafel.mit-motiv .tafel-inhalt p, .tafel.mit-motiv .tafel-inhalt b, .tafel.mit-motiv .seit span, .tafel.mit-motiv .karte span, .tafel.mit-motiv .karte small, .tafel.mit-motiv .volle-gruppe h3 { text-shadow: 0 0 10px var(--grund), 0 0 4px var(--grund); }
+.tafel.mit-motiv .tafel-inhalt p, .tafel.mit-motiv .tafel-inhalt b, .tafel.mit-motiv .seit span, .tafel.mit-motiv .karte span, .tafel.mit-motiv .karte small, .tafel.mit-motiv .volle-gruppe h3, .tafel.mit-motiv .karussell blockquote, .tafel.mit-motiv .karussell figcaption, .tafel.mit-motiv .stimme small { text-shadow: 0 0 10px var(--grund), 0 0 4px var(--grund); }
 .tafel.mit-baum #tafel-zu { position: absolute; top: 26px; right: 26px; }
 #tafel-glut { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .einleitung { margin: 0; font: 400 21px/1.4 var(--anzeige); text-wrap: pretty; }
@@ -1082,7 +1082,7 @@ function tafelAuf(name) {
   tafel.classList.toggle('breit', !!t.breit);
   zerfallAbbrechen();
   tafel.hidden = false; tafel.classList.remove('an'); void tafel.offsetWidth;
-  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; cTeile = cLinks = null; tafelAnimationStarten();
+  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; cTeile = cLinks = null; bTeile = bLinks = null; tafelAnimationStarten();
   tafel.classList.add('an'); schleier.classList.add('an');
   document.getElementById('tafel-zu').focus({ preventScroll: true });
 }
@@ -1192,20 +1192,23 @@ function tafelAnimationStarten() {
     const baumDraussen = offeneTafel === 'unternehmen' && r.left > 240;
     const motivLinks = offeneTafel === 'speisekarte' && r.left > 240;   // Adam (v46): festes Motiv links neben der Speisekarte
     const laternenLinks = offeneTafel === 'catering' && r.left > 240;   // Adam (v48): Laternen links neben dem Catering
-    const mitMotiv = offeneTafel === 'unternehmen' || offeneTafel === 'speisekarte' || offeneTafel === 'catering';
+    const kranzLinks = offeneTafel === 'bewertungen' && r.left > 240;   // Adam (v54): Kranz mit Sprechblasen links neben den Bewertungen
+    const mitMotiv = offeneTafel === 'unternehmen' || offeneTafel === 'speisekarte' || offeneTafel === 'catering' || offeneTafel === 'bewertungen';
     tafel.classList.remove('mit-baum'); tafel.classList.toggle('mit-motiv', mitMotiv);
     if (mitMotiv || bcv.classList.contains('an')) {
       if (bcv.width !== Math.round(innerWidth * dpr) || bcv.height !== Math.round(innerHeight * dpr)) { bcv.width = Math.round(innerWidth * dpr); bcv.height = Math.round(innerHeight * dpr); }
       bg.setTransform(dpr, 0, 0, dpr, 0, 0); bg.clearRect(0, 0, innerWidth, innerHeight);
-      bcv.classList.toggle('an', baumDraussen || motivLinks || laternenLinks);
+      bcv.classList.toggle('an', baumDraussen || motivLinks || laternenLinks || kranzLinks);
     }
     // draußen liegt der Baum auf der abgedunkelten Startseite, darum dort immer in leuchtenden Farben
     if (baumDraussen) familienBaum(bg, r.left, innerHeight, Math.max(0, rahmenZeit - 0.3), false, maus.x, maus.y);
     if (motivLinks) linkesMotiv(bg, r.left, innerHeight, dt, maus.x, maus.y, hellJetzt);
     if (laternenLinks) cateringLinks(bg, r.left, innerHeight, maus.x, maus.y);
+    if (kranzLinks) bewertungLinks(bg, r.left, innerHeight, maus.x, maus.y);
     if (offeneTafel === 'unternehmen') verwandlung(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'speisekarte') kartenMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'catering') cateringMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
+    else if (offeneTafel === 'bewertungen') bewertungMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else {
     // Ornament in der Ecke unten rechts
     const cx = r.width * 0.92, cy = r.height * 0.9, R = Math.max(r.width, r.height) * 0.42;
@@ -1586,6 +1589,106 @@ function cateringLinks(c, w, h, mx, my) {   // liegt auf der abgedunkelten Start
   cPunkte(c, cLinks, C_LATERNEN, w / 2, 1.5 * S, S, mx, my, K_FARBEN.dunkel, 1, 90);   // Ketten beginnen am oberen Rand
   c.globalCompositeOperation = 'source-over';
 }
+
+/* Bewertungen (Adam, v54): links am Laptop ein goldener Lorbeerkranz mit Mustis Google-Note,
+   rundherum steigen Sprechblasen auf (Sterne, Herz, „…“) und weichen dem Kranz aus.
+   Im Fenster liegt ein offenes Gästebuch, das sich Zeile für Zeile selbst schreibt und dann umblättert. */
+const bSternEcke = (k, R) => { const a = -C_PI / 2 + k * C_PI / 5, rr = k % 2 ? R * .42 : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const bSternRand = (cx, cy, R, u) => { const k = Math.floor(u * 10), f = u * 10 - k, [x1, y1] = bSternEcke(k, R), [x2, y2] = bSternEcke(k + 1, R); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const bSternFlaeche = (cx, cy, R, u, v, w) => { const k = Math.floor(u * 10), [x1, y1] = bSternEcke(k, R), [x2, y2] = bSternEcke(k + 1, R);
+  let a = v, b = w; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [cx + x1 * a + x2 * b, cy + y1 * a + y2 * b]; };
+const bHerzRand = (cx, cy, s, u) => { const q = u * C_TAU; return [cx + 16 * Math.pow(Math.sin(q), 3) / 17 * s, cy - (13 * Math.cos(q) - 5 * Math.cos(2 * q) - 2 * Math.cos(3 * q) - Math.cos(4 * q)) / 17 * s]; };
+const bHerzFlaeche = (cx, cy, s, u, v) => { const [x, y] = bHerzRand(cx, cy, s, u), q = Math.sqrt(v); return [cx + (x - cx) * q, cy + (y - cy) * q]; };
+const bScheibe = (cx, cy, r, u, v) => { const w = u * C_TAU, q = Math.sqrt(v); return [cx + Math.cos(w) * r * q, cy + Math.sin(w) * r * q]; };
+// die Note als Punktewolke, „4,7“ auf Deutsch, „4.7“ auf Englisch
+let bNote = [], bNoteFuer = '';
+function bNoteAbtasten() {
+  const c = document.createElement('canvas'); c.width = 420; c.height = 240; const g = c.getContext('2d'), punkte = [];
+  g.font = '400 200px Gloock, serif'; g.textAlign = 'center'; g.fillText(sprache === 'en' ? '4.7' : '4,7', 210, 190);
+  const d = g.getImageData(0, 0, 420, 240).data;
+  for (let y = 0; y < 240; y += 2) for (let x = 0; x < 420; x += 2) if (d[(y * 420 + x) * 4 + 3] > 140) punkte.push([(x - 210) / 210, (y - 120) / 210]);
+  bNote = punkte; bNoteFuer = sprache;
+}
+// Maße der linken Fläche: halbe Höhe und Breite, daraus Kranz- und Blasengröße, damit alles hineinpasst
+let bHoch = 1.7, bBreit = 1.6, bK = .8, bBlase = .27;
+const bWeich = (a, b) => (a + b + Math.sqrt((a - b) * (a - b) + .02)) / 2;   // weiches Maximum, damit die Blasen in einem Bogen ausweichen
+const B_LINKS = (z, t) => {
+  const K = bK;
+  if (z.a < .58) {
+    const q = z.a / .58, R = .86;
+    if (q < .5) {                                                                                   // zwei Lorbeerzweige
+      const seite = z.b < .5 ? -1 : 1, u = q / .5, ta = C_PI / 2 + .25, tb = 3 * C_PI / 2 - .5, th = ta + (tb - ta) * u;
+      if (z.c < .14) { const glanz = Math.pow(Math.max(0, Math.sin(u * 6 - t * 1.6)), 6); return [-seite * Math.cos(th) * R * K, Math.sin(th) * R * K, 0, .55 + .45 * glanz]; }   // Stiel
+      const j = Math.floor(u * 10), uj = (j + .5) / 10, tj = ta + (tb - ta) * uj, bx = Math.cos(tj) * R, by = Math.sin(tj) * R;
+      const tx = -Math.sin(tj), ty = Math.cos(tj), nx = Math.cos(tj), ny = Math.sin(tj), aussen = z.d < .5 ? 1 : -1;
+      const w = .62 * aussen + .08 * Math.sin(t * 1.5 + j), dx = tx * Math.cos(w) + nx * Math.sin(w), dy = ty * Math.cos(w) + ny * Math.sin(w);
+      const L = .2 * (1 - .35 * uj), s = z.c, qb = ((z.d * 2) % 1 * 2 - 1) * .055 * Math.sin(C_PI * s);
+      const x = bx + dx * s * L - dy * qb, y = by + dy * s * L + dx * qb, ader = Math.abs(qb) < .006;
+      return [-seite * x * K, y * K, ader ? 3 : 0, (ader ? .8 : .5) + .45 * Math.pow(Math.max(0, Math.sin(uj * 6 - t * 1.6)), 6)];
+    }
+    if (q < .62) { const k = Math.floor(z.b * 5), sx = (k - 2) * .2, sy = -.46 + .045 * (k - 2) * (k - 2);      // fünf kleine Sterne
+      const [x, y] = z.c < .45 ? bSternRand(sx, sy, .07, z.d) : bSternFlaeche(sx, sy, .07, z.d, z.c, (z.c * 7) % 1);
+      return [x * K, y * K, z.c < .45 ? 0 : 3, .6 + .4 * Math.sin(t * 2.2 + k * 1.3)]; }
+    if (q < .96) { if (!bNote.length) return [0, 0, 0, 0];                                         // die Note in der Mitte
+      const p = bNote[Math.floor(z.b * bNote.length)], welle = Math.pow(Math.max(0, Math.cos(p[0] * 3 - t * 1.2)), 6);
+      return [p[0] * .5 * K, (.1 + p[1] * .5) * K, welle > .3 ? 3 : 0, .7 + .3 * welle]; }
+    const w = z.b * C_TAU, r = .3 + z.c * .9; return [Math.cos(w) * r * .9 * K, Math.sin(w) * r * K, 3, .5 * Math.pow(Math.max(0, Math.sin(t * 3 + z.d * 40)), 8)];   // Funkeln
+  }
+  // Sprechblasen: sechs Stück, abwechselnd links und rechts, steigen von unten nach oben und biegen um den Kranz herum
+  const v = (z.a - .58) / .42, k = Math.floor(v * 6), u = (v * 6) % 1, seite = k % 2 ? 1 : -1;
+  const weg = 2 * bHoch + 1, h = ((t * .26 / weg) + k / 6) % 1, cy = bHoch + .5 - h * weg;
+  const bw = bBlase * [1, .9, 1.05, .95, 1, .88][k], bh = bw * .62, rand = bBreit - bw - .04;
+  const gerade = rand * [.62, .34, .9, .5, .78, .26][k], rc = .97 * K + .07 + bw, braucht = Math.sqrt(Math.max(0, rc * rc - cy * cy));
+  const cx = seite * Math.min(rand, bWeich(gerade + Math.sin(h * 9 + k) * .04, braucht));   // im Bogen um den Kranz herum
+  const ha = Math.max(0, Math.min(1, (h - .05) * 12, (1 - h - .03) * 12));   // erst sichtbar, wenn die Punkte unten angekommen sind
+  if (u < .5) { const w = z.b * C_TAU, c = Math.cos(w), s = Math.sin(w); return [cx + bw * Math.sign(c) * Math.pow(Math.abs(c), .3), cy + bh * Math.sign(s) * Math.pow(Math.abs(s), .3), 3, .7 * ha]; }   // Blase
+  if (u < .6) { const q = z.b, x = q < .5 ? -bw * .35 - q * .3 * bw / .3 : -bw * .5 + (q - .5) * .5 * bw / .3, y = q < .5 ? bh + q * .36 * bw / .3 : bh + .18 * bw / .3 - (q - .5) * .36 * bw / .3;
+    return [cx + seite * x, cy + y, 3, .6 * ha]; }                                                 // Spitze zeigt zum Kranz
+  const art = k % 3;
+  if (art === 0) { const j = Math.floor(z.b * 5), sx = cx + (j - 2) * bw * .36, [x, y] = z.c < .5 ? bSternRand(sx, cy, bw * .13, z.d) : bSternFlaeche(sx, cy, bw * .13, z.d, z.c - .5, (z.c * 9) % 1);
+    return [x, y, 0, (z.c < .5 ? .95 : .6) * ha]; }
+  if (art === 1) { const [x, y] = z.c < .5 ? bHerzRand(cx, cy + .02, bh * .55, z.b) : bHerzFlaeche(cx, cy + .02, bh * .55, z.b, z.d); return [x, y, z.c < .5 ? 6 : 5, (z.c < .5 ? .95 : .55) * ha]; }
+  const j = Math.floor(z.b * 3), [x, y] = bScheibe(cx + (j - 1) * bw * .4, cy - Math.max(0, Math.sin(t * 5 - j * .8)) * .05, bw * .09, z.c, z.d); return [x, y, 0, .9 * ha];
+};
+const B_BUCH = (z, t) => {
+  const p = (t / 8) % 1, schreiben = Math.min(1, p / .72), q = z.a, PB = .82, OB = -.56, UB = .5;
+  const oben = x => OB - .07 * Math.sin(C_PI * Math.abs(x) / PB), unten = x => UB - .03 * Math.sin(C_PI * Math.abs(x) / PB);
+  const zeile = (seite, i, u) => { const x0 = seite * .1, x1 = seite * (PB - .1), x = x0 + (x1 - x0) * u; return [x, OB + .14 + i * .1 - .07 * Math.sin(C_PI * Math.abs(x) / PB) + Math.sin(u * 60 + i) * .006]; };
+  const wort = (i, u) => Math.sin(u * 37 + i * 3) > -.6;
+  if (q < .22) { const v = z.b, seite = z.c < .5 ? -1 : 1, w = v * 4;                                    // Seitenränder und Einband
+    let x, y; if (w < 1) { x = seite * w * PB; y = oben(x); } else if (w < 2) { x = seite * PB; y = OB + (w - 1) * (UB - OB); } else if (w < 3) { x = seite * (3 - w) * PB; y = unten(x); } else { x = 0; y = OB + (w - 3) * (UB - OB); }
+    const ein = z.d < .3; return [ein ? x * 1.05 : x, ein ? y + .05 : y, ein ? 5 : 0, ein ? .45 : .75]; }
+  if (q < .47) { const i = Math.floor(z.b * 8), u = z.c, [x, y] = zeile(-1, i, u); return [x, y, 3, wort(i, u) ? .45 : 0]; }   // linke Seite: voll
+  if (q < .77) { const i = Math.floor(z.b * 8), u = z.c, fort = Math.max(0, Math.min(1, schreiben * 8 - i));               // rechte Seite: wird geschrieben
+    if (p > .8) return [PB * .5, 0, 3, 0];
+    if (i === 0) { const j = Math.floor(u * 5), [x, y] = bSternFlaeche(.18 + j * .1, OB + .14, .035, z.d, (u * 5) % 1, (z.d * 7) % 1); return [x, y, 0, fort > j / 5 ? .9 : 0]; }
+    const [x, y] = zeile(1, i, u); return [x, y, 3, wort(i, u) && u < fort ? .6 : 0]; }
+  const phi = p > .8 && p < .95 ? C_PI * cGlatt((p - .8) / .15) : -1;                                   // die Seite blättert um
+  if (phi < 0) return [PB * .5, 0, 0, 0];
+  const v = z.b, w = z.c * PB, x = w * Math.cos(phi), hebt = Math.sin(phi) * .12 * (w / PB);
+  if (v < .45) { const r = z.d < .5; return [x, (r ? oben(w) : unten(w)) - hebt, 0, .8]; }
+  const i = Math.floor((v - .45) / .55 * 8), [, y] = zeile(1, i, z.c); return [x, y - hebt, 3, wort(i, z.c) ? .35 * Math.abs(Math.cos(phi)) + .15 : 0];
+};
+let bTeile = null, bLinks = null;
+function bewertungMotiv(c, w, h, dt, hellJetzt, mx, my) {
+  cZeit += dt;
+  if (!bTeile) bTeile = cNeueTeile(2600, w, h);
+  const kopf = document.querySelector('.tafel-kopf').offsetHeight;
+  const S = Math.min(w * 0.5, (h - kopf) * 0.6), cx = w / 2, cy = kopf + (h - kopf) * 0.5;   // Buch mittig im Fenster
+  if (!hellJetzt) c.globalCompositeOperation = 'lighter';
+  cPunkte(c, bTeile, B_BUCH, cx, cy, S, mx, my, hellJetzt ? K_FARBEN.hell : K_FARBEN.dunkel, hellJetzt ? 0.8 : 1, 70);
+  c.globalCompositeOperation = 'source-over';
+}
+function bewertungLinks(c, w, h, mx, my) {   // liegt auf der abgedunkelten Startseite, darum immer leuchtend
+  if (bNoteFuer !== sprache) bNoteAbtasten();
+  if (!bLinks || bLinks.w !== w || bLinks.h !== h) { bLinks = cNeueTeile(2600, w, h); bLinks.w = w; bLinks.h = h; }
+  const S = Math.min(w * 0.46, h * 0.3); bHoch = h / 2 / S; bBreit = w / 2 / S;
+  bBlase = Math.min(.27, bBreit * .17); bK = Math.min(.8, (bBreit - .1 - 2 * bBlase) / .97);
+  c.globalCompositeOperation = 'lighter';
+  cPunkte(c, bLinks, B_LINKS, w / 2, h / 2, S, mx, my, K_FARBEN.dunkel, 1, 90);
+  c.globalCompositeOperation = 'source-over';
+}
+document.fonts.load('400 200px Gloock').catch(() => {}).then(() => { bNoteFuer = ''; });   // nach dem Laden der Schrift neu abtasten
 
 /* Schließen (Adam): das Fenster zerfällt von oben nach unten in Lichtpartikel, die davonschweben */
 const zcv = document.getElementById('zerfall'), zg = zcv.getContext('2d');
@@ -2109,7 +2212,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v53</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v54</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
