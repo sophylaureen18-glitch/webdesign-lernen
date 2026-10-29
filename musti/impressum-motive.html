@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impressum-Motive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Vorschau für Adam: je drei Motiv-Ideen für das Impressum, links (Laptop) und im Fenster */
+:root { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --safran: #f2a93b; --linie: rgba(242,169,59,.28); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); } }
+:root[data-theme="light"] { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); }
+:root[data-theme="dark"] { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --linie: rgba(242,169,59,.28); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--grund); color: var(--text); font: 400 15px/1.5 "Hanken Grotesk", system-ui, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 60px; }
+h1 { font: 400 clamp(32px, 6vw, 50px)/1.05 Gloock, serif; margin: 0 0 8px; }
+h2 { font: 400 26px/1.1 Gloock, serif; margin: 34px 0 4px; }
+.ober { font: 700 11px "Hanken Grotesk"; letter-spacing: .22em; text-transform: uppercase; color: var(--safran); margin: 0 0 8px; }
+.intro, .unter { color: var(--leise); max-width: 64ch; margin: 0 0 18px; }
+.unter { font-size: 14px; margin-bottom: 12px; }
+.knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.knoepfe button { font: 600 13px "Hanken Grotesk"; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--linie); background: transparent; color: var(--text); cursor: pointer; }
+.knoepfe button[aria-pressed="true"] { background: var(--safran); border-color: var(--safran); color: #2a0b12; }
+.drei { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .drei { grid-template-columns: 1fr; } }
+.motiv { margin: 0; background: #150508; border: 1px solid var(--linie); border-radius: 18px; overflow: hidden; color: #f7e7d3; }
+.motiv .flaeche { position: relative; }
+.motiv canvas { display: block; width: 100%; aspect-ratio: 3 / 4; touch-action: pan-y; }
+.fenster { background: #1d070d; }
+.hell .fenster { background: #efd9b5; }
+.motiv figcaption { padding: 10px 14px 14px; border-top: 1px solid rgba(242,169,59,.18); background: #150508; }
+.motiv h3 { margin: 0; font: 400 21px Gloock, serif; display: flex; gap: 8px; align-items: baseline; }
+.motiv h3 span { font: 700 12.5px "Hanken Grotesk"; color: #2a0b12; background: #f2a93b; border-radius: 999px; padding: 1px 9px; }
+.motiv p { margin: 2px 0 0; color: #cdaa8d; font-size: 13.5px; }
+/* angedeutetes Formular über dem Fenster-Motiv, damit man sieht, wie es hinter dem Text wirkt */
+.formular { position: absolute; inset: 0; padding: 22px 20px; display: flex; flex-direction: column; gap: 9px; pointer-events: none; color: #f7e7d3; }
+.formular b { font: 400 28px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; }
+.formular small { font: 700 10px "Hanken Grotesk"; letter-spacing: .2em; color: #f2a93b; margin-top: 4px; }
+.formular i { display: block; height: 32px; border-radius: 10px; border: 1px solid rgba(242,169,59,.3); background: rgba(18,4,10,.55); }
+.formular i.gross { height: 78px; }
+.formular u { text-decoration: none; text-align: center; font: 600 13px "Hanken Grotesk"; color: #2a0b12; padding: 9px; border-radius: 12px; background: linear-gradient(90deg, #f2a93b, #ff6b3d); }
+.hell .formular { color: #33100a; }
+.hell .formular b { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+.hell .formular small { color: #8a4b06; }
+.hell .formular i { border-color: rgba(138,75,6,.35); background: rgba(240,212,165,.6); }
+.hell .formular u { color: #fff4e3; background: linear-gradient(90deg, #8a4b06, #a8320c); }
+.ohne-formular .formular { display: none; }
+.formular i.zeile { height: 9px; width: 72%; border: 0; border-radius: 4px; background: rgba(247,231,211,.3); }
+.formular i.kurz { width: 46%; }
+.formular em { font: normal 400 19px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; margin-top: -6px; }
+.formular small + i, .formular small + em { margin-top: -4px; }
+.hell .formular i.zeile { background: rgba(110,56,10,.3); }
+.hell .formular em { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+</style>
+</head>
+<body>
+<main>
+  <p class="ober">Musti Bistro · Impressum · Motive</p>
+  <h1>Zwei Motive für das Impressum</h1>
+  <p class="intro">Je drei Ideen: eine Reihe für den dunklen Bereich links neben dem Impressum-Fenster am Laptop, eine Reihe für den Hintergrund im Fenster selbst. Fahr mit der Maus oder dem Finger darüber, dann weichen die Punkte aus. Schreib mir einfach eine Zahl und einen Buchstaben, zum Beispiel „2 und B“.</p>
+
+  <h2>Links daneben (nur Laptop)</h2>
+  <p class="unter">Bleibt stehen, solange das Impressum-Fenster offen ist.</p>
+  <div class="drei">
+    <figure class="motiv"><div class="flaeche"><canvas data-art="waage"></canvas></div><figcaption><h3><span>1</span>Waage</h3><p>Eine goldene Waage schwingt sanft hin und her. In der einen Schale liegt ein Herz, in der anderen ein Paragraf: Herz und Recht im Gleichgewicht.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="stempel"></canvas></div><figcaption><h3><span>2</span>Stempel</h3><p>Ein Stempel senkt sich auf ein Blatt und drückt ein rotes Siegel mit „MUSTI“ auf, kleine Funken spritzen.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="feder"></canvas></div><figcaption><h3><span>3</span>Feder mit Unterschrift</h3><p>Eine Schreibfeder setzt in einem Zug eine geschwungene Unterschrift aufs Papier.</p></figcaption></figure>
+  </div>
+
+  <h2>Im Impressum-Fenster (Handy, Tablet, Laptop)</h2>
+  <p class="unter">Liegt hinter dem Text, wie bei der Speisekarte und dem Catering.</p>
+  <div class="knoepfe">
+    <button type="button" id="k-formular" aria-pressed="true">Text darüber zeigen</button>
+    <button type="button" id="k-hell" aria-pressed="false">Helle Ansicht</button>
+  </div>
+  <div class="drei" id="fenster-reihe">
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="paragraf"></canvas><div class="formular"><b>Impressum</b><small>ANGABEN GEMÄSS § 5 DDG</small><i class="zeile kurz"></i><i class="zeile"></i><i class="zeile kurz"></i><small>KONTAKT</small><em>039209 60693</em><i class="zeile"></i><small>UMSATZSTEUER-ID</small><i class="zeile kurz"></i></div></div><figcaption><h3><span>A</span>Paragraf aus Licht</h3><p>Ein großes § aus Lichtpunkten, ein Glanz läuft hindurch. Darum drehen sich zwei Ringe mit Achtsternen.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="siegel"></canvas><div class="formular"><b>Impressum</b><small>ANGABEN GEMÄSS § 5 DDG</small><i class="zeile kurz"></i><i class="zeile"></i><i class="zeile kurz"></i><small>KONTAKT</small><em>039209 60693</em><i class="zeile"></i><small>UMSATZSTEUER-ID</small><i class="zeile kurz"></i></div></div><figcaption><h3><span>B</span>Wachssiegel</h3><p>Ein rotes Wachssiegel mit Achtstern und zwei goldenen Bändern, ab und zu streift ein Glanz darüber.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="urkunde"></canvas><div class="formular"><b>Impressum</b><small>ANGABEN GEMÄSS § 5 DDG</small><i class="zeile kurz"></i><i class="zeile"></i><i class="zeile kurz"></i><small>KONTAKT</small><em>039209 60693</em><i class="zeile"></i><small>UMSATZSTEUER-ID</small><i class="zeile kurz"></i></div></div><figcaption><h3><span>C</span>Urkunde</h3><p>Ein Doppelrahmen mit Achtsternen zeichnet sich, dann füllen sich die Zeilen, zum Schluss kommt die Unterschrift.</p></figcaption></figure>
+  </div>
+</main>
+<script>
+const TAU = Math.PI * 2, PI = Math.PI;
+// Farben: 0 Gold, 1 Glut-Orange, 2 Paprika, 3 Creme, 4 Jade, 5 Granat, 6 Tomate, 7 Kräutergrün
+const FARBEN = {
+  dunkel: [[242, 169, 59], [255, 120, 42], [224, 72, 50], [255, 226, 180], [143, 211, 162], [190, 40, 70], [255, 80, 60], [110, 200, 95]],
+  hell:   [[138, 75, 6], [168, 50, 12], [147, 32, 26], [110, 56, 10], [40, 110, 60], [120, 20, 50], [180, 40, 25], [50, 120, 40]],
+};
+const glatt = x => x * x * (3 - 2 * x);
+const ring = (cx, cy, rx, ry, u) => [cx + Math.cos(u * TAU) * rx, cy + Math.sin(u * TAU) * ry];
+const scheibe = (cx, cy, r, u, v, ry = r) => { const w = u * TAU, q = Math.sqrt(v); return [cx + Math.cos(w) * r * q, cy + Math.sin(w) * ry * q]; };
+const drehen = (x, y, px, py, w) => { const c = Math.cos(w), s = Math.sin(w), dx = x - px, dy = y - py; return [px + dx * c - dy * s, py + dx * s + dy * c]; };
+
+// Jede Form bekommt pro Punkt vier Zufallszahlen (z.a bis z.d) und die Zeit t.
+// Zurück kommt [x, y, Farbe, Helligkeit], x etwa -1 bis 1, y nach unten.
+// Sterne: 10 Ecken, abwechselnd außen und innen
+const sternEcke = (k, R, dreh) => { const a = -PI / 2 + k * PI / 5 + dreh, rr = k % 2 ? R * .42 : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const sternRand = (cx, cy, R, u, dreh = 0) => { const k = Math.floor(u * 10), f = u * 10 - k, [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const sternFlaeche = (cx, cy, R, u, v, w, dreh = 0) => { const k = Math.floor(u * 10), [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh);
+  let a = v, b = w; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [cx + x1 * a + x2 * b, cy + y1 * a + y2 * b]; };
+// Herz: Spitze unten, etwa -0,7 bis 1 hoch
+const herzRand = (cx, cy, s, u) => { const q = u * TAU; return [cx + 16 * Math.pow(Math.sin(q), 3) / 17 * s, cy - (13 * Math.cos(q) - 5 * Math.cos(2 * q) - 2 * Math.cos(3 * q) - Math.cos(4 * q)) / 17 * s]; };
+const herzFlaeche = (cx, cy, s, u, v) => { const [x, y] = herzRand(cx, cy, s, u), q = Math.sqrt(v); return [cx + (x - cx) * q, cy + (y - cy) * q]; };
+// Hilfen für die Impressum-Motive
+const strecke = (pts, u) => {   // Punkt auf einem Linienzug, gleichmäßig nach Länge verteilt
+  let L = 0; const l = [];
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); l.push(d); L += d; }
+  let s = u * L;
+  for (let i = 0; i < l.length; i++) { if (s <= l[i] || i === l.length - 1) { const f = Math.min(1, s / l[i]); return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]; } s -= l[i]; }
+};
+const dreieck = (A, B, C, u, v) => { let a = u, b = v; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [A[0] + (B[0] - A[0]) * a + (C[0] - A[0]) * b, A[1] + (B[1] - A[1]) * a + (C[1] - A[1]) * b]; };
+const zackeEcke = (k, R, n, innen, dreh) => { const a = -PI / 2 + k * PI / n + dreh, rr = k % 2 ? R * innen : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const zackeRand = (cx, cy, R, n, innen, u, dreh = 0) => { const k = Math.floor(u * 2 * n), f = u * 2 * n - k, [x1, y1] = zackeEcke(k, R, n, innen, dreh), [x2, y2] = zackeEcke(k + 1, R, n, innen, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const zackeFlaeche = (cx, cy, R, n, innen, u, v, w, dreh = 0) => { const k = Math.floor(u * 2 * n), [x, y] = dreieck([0, 0], zackeEcke(k, R, n, innen, dreh), zackeEcke(k + 1, R, n, innen, dreh), v, w); return [cx + x, cy + y]; };
+// Schrift als Punktewolke (Gloock)
+const textPunkte = {};
+function textAbtasten(s, groesse = 150) { const c = document.createElement('canvas'); c.width = 420; c.height = 240; const g = c.getContext('2d');
+  g.font = `400 ${groesse}px Gloock, serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s, 210, 125);
+  const d = g.getImageData(0, 0, 420, 240).data, pts = [];
+  for (let y = 0; y < 240; y += 2) for (let x = 0; x < 420; x += 2) if (d[(y * 420 + x) * 4 + 3] > 140) pts.push([(x - 210) / 210, (y - 120) / 210]);
+  textPunkte[s] = pts; }
+document.fonts.load('400 150px Gloock').catch(() => {}).then(() => { textAbtasten('§', 200); textAbtasten('MUSTI', 110); });
+const textPunkt = (s, u, cx, cy, gr) => { const pts = textPunkte[s]; if (!pts || !pts.length) return null; const p = pts[Math.floor(u * pts.length)]; return [cx + p[0] * gr, cy + p[1] * gr]; };
+const funkel = (z, t, a = .4) => [(z.b * 2 - 1) * 1.05, (z.c * 2 - 1) * 1.4, 3, a * Math.pow(Math.max(0, Math.sin(t * 1.8 + z.d * 50)), 10)];
+
+const FORMEN = {
+  waage: (z, t) => {
+    const q = z.a, th = .12 * Math.sin(t * .7) + .04 * Math.sin(t * 1.9), PX = 0, PY = -.5, L = .66, c = Math.cos(th), s = Math.sin(th);
+    const E = k => [PX + k * L * c, PY + k * L * s];
+    if (q < .12) { const [x, y] = strecke([[-.035, .95], [-.035, -.48], [.035, -.48], [.035, .95]], z.b); return [x, y, 0, .8]; }                 // Säule
+    if (q < .2) { const [x, y] = strecke([[-.4, 1.02], [-.3, .94], [.3, .94], [.4, 1.02], [-.4, 1.02]], z.b); return [x, y, 0, .8]; }           // Fuß
+    if (q < .26) { const [x, y] = zackeRand(PX, PY - .14, .08, 8, .5, z.b, t * .2); return [x, y, 3, .9]; }                                         // Achtstern oben
+    if (q < .38) { const v = z.b * 2 - 1, d = (z.c < .5 ? -1 : 1) * .018; return [PX + v * L * c - d * s, PY + v * L * s + d * c, 0, .85]; }     // Balken
+    const k = z.b < .5 ? -1 : 1, [ex, ey] = E(k), mx = ex, my = ey + .62, pe = Math.sin(t * .7 + k) * .015;
+    if (q < .5) { const j = Math.floor(z.c * 3), zx = mx + (j - 1) * .24 + pe, v = z.d; return [ex + (zx - ex) * v, ey + (my - ey) * v, 3, Math.floor(v * 30) % 2 ? .25 : .55]; }   // Ketten
+    if (q < .68) { const a = z.c * PI, rim = z.d < .3; return rim ? [mx + pe + (z.c * 2 - 1) * .26, my, 0, .8] : [mx + pe + Math.cos(a) * .26, my + Math.sin(a) * .09, 0, .85]; }   // Schalen
+    if (q < .84) { if (k < 0) { const [x, y] = z.c < .6 ? herzRand(mx + pe, my - .09, .1, z.d) : herzFlaeche(mx + pe, my - .09, .1, z.d, (z.c - .6) / .4); return [x, y, z.c < .6 ? 6 : 5, z.c < .6 ? .95 : .4]; }   // Herz links
+      const p = textPunkt('§', z.d, mx + pe, my - .14, .2); return p ? [p[0], p[1], 3, .9] : [mx, my, 0, 0]; }                                     // Paragraf rechts
+    return funkel(z, t, .35);
+  },
+  stempel: (z, t) => {
+    const P = 6, p = (t / P) % 1, q = z.a, SY = .88;
+    const hub = p < .28 ? -.75 + .75 * cGlattE(p / .28) : p < .34 ? 0 : p < .5 ? 0 : p < .75 ? -.75 * cGlattE((p - .5) / .25) : -.75;
+    const druck = p > .28 && p < .5 ? Math.sin(PI * (p - .28) / .22) * .03 : 0, abdruck = p < .3 ? 0 : p < .9 ? 1 : 1 - (p - .9) / .1;
+    const sy = SY - .02 + hub + druck;   // Unterkante des Stempels
+    if (q < .16) { const [x, y] = strecke([[-.85, .5], [.85, .5], [.95, 1.3], [-.95, 1.3], [-.85, .5]], z.b); return [x, y, 3, .45]; }               // Papier
+    if (q < .26) { const i = Math.floor(z.b * 5), x = -.7 + z.c * 1.4 * (i === 4 ? .5 : 1), y = .62 + i * .12; return [x, y, 3, Math.abs(x) < .42 && i > 0 && i < 4 ? 0 : (Math.sin(z.c * 40 + i) > -.4 ? .3 : 0)]; }   // Zeilen
+    if (q < .5) { const r = (q - .26) / .24; let x, y;                                                                                          // der Abdruck
+      if (r < .45) { const rr = z.c < .5 ? .36 : .3; [x, y] = ring(0, .86, rr, rr * .42, z.b); }
+      else { const pp = textPunkt('MUSTI', z.b, 0, .86, .3); if (!pp) return [0, .86, 0, 0]; [x, y] = [pp[0], .86 + (pp[1] - .86) * .42]; }
+      return [x, y, 6, .85 * abdruck * (hub < -.05 ? 1 : 0)]; }
+    if (q < .82) { const r = (q - .5) / .32; let x, y;                                                                                           // der Stempel
+      if (r < .3) [x, y] = strecke([[-.38, sy], [.38, sy], [.38, sy - .14], [-.38, sy - .14], [-.38, sy]], z.b);
+      else if (r < .45) [x, y] = strecke([[-.1, sy - .14], [-.07, sy - .42], [.07, sy - .42], [.1, sy - .14]], z.b);
+      else if (r < .75) [x, y] = ring(0, sy - .54, .13, .13, z.b);
+      else [x, y] = scheibe(0, sy - .54, .12, z.b, z.c);
+      return [x, y, r < .3 ? 0 : 3, r >= .75 ? .25 : .8]; }
+    if (q < .92) { const e = (p - .3) / .2; if (e < 0 || e > 1) return [0, SY, 0, 0]; const w = z.b * TAU, d = .4 + e * .35 * z.c; return [Math.cos(w) * d, .86 + Math.sin(w) * d * .45, z.d < .5 ? 0 : 6, (1 - e) * .8]; }   // Funken beim Aufdrücken
+    return funkel(z, t, .3);
+  },
+  feder: (z, t) => {
+    const P = 9, p = (t / P) % 1, q = z.a, schreib = Math.min(1, p / .65), aus = p > .9 ? 1 - (p - .9) / .1 : 1;
+    const bahn = s => [-.8 + 1.5 * s - .085 * Math.sin(TAU * 6 * s), .32 - .13 * Math.cos(TAU * 6 * s) * (1 - .35 * s) - .1 * s];   // Unterschrift mit Schleifen
+    const [px, py] = bahn(schreib);
+    if (q < .45) { const s = z.b, [x, y] = bahn(s); return [x, y, 3, s < schreib ? .85 * aus : 0]; }                                         // Tinte
+    if (q < .52) { const x = -.85 + z.b * 1.7; return [x, .62, 0, .35]; }                                                                       // Linie
+    const w = -.95, c = Math.cos(w), s = Math.sin(w), F = (lx, ly) => [px + lx * c - ly * s, py + lx * s + ly * c];                          // die Feder
+    if (q < .62) { const v = z.b, [x, y] = F(v * 1.05, .03 * Math.sin(PI * v)); return [x, y, 3, .9]; }                                         // Kiel
+    if (q < .86) { const v = .18 + z.b * .87, seite = z.c < .5 ? -1 : 1, breit = Math.sin(PI * (v - .18) / .87) * .15 * (seite > 0 ? 1 : .7), u = z.d;   // Fahne mit Ästen
+      const [x, y] = F(v + u * .06 * seite, seite * breit * u); return [x, y, u > .9 ? 0 : 3, u > .9 ? .75 : .25]; }
+    if (q < .94) { if (schreib >= 1) return [px, py, 0, 0]; const w2 = z.b * TAU, d = z.c * .08; return [px + Math.cos(w2) * d, py + Math.sin(w2) * d, 0, (1 - z.c) * .8]; }   // Funkeln an der Spitze
+    return funkel(z, t, .3);
+  },
+  paragraf: (z, t) => {
+    const q = z.a, atem = 1 + .02 * Math.sin(t * .9);
+    if (q < .55) { const pt = textPunkt('§', z.b, 0, -.05, 1.05 * atem); if (!pt) return [0, 0, 0, 0]; const welle = Math.pow(Math.max(0, Math.sin(pt[1] * 4 - t * 1.4)), 8); return [pt[0], pt[1], welle > .3 ? 3 : 0, .55 + .45 * welle]; }
+    if (q < .72) { const r = z.c < .5 ? .95 : .82, [x, y] = ring(0, -.05, r, r, z.b); return [x, y, 0, Math.floor(z.b * 140) % 2 ? .1 : .4]; }   // zwei Ringe
+    if (q < .86) { const k = Math.floor(z.b * 8), a = k / 8 * TAU + t * .06, [x, y] = zackeRand(Math.cos(a) * .885, -.05 + Math.sin(a) * .885, .05, 8, .5, z.c); return [x, y, 3, .7]; }   // Achtsterne auf dem Ring
+    return funkel(z, t, .35);
+  },
+  siegel: (z, t) => {
+    const q = z.a, CY = -.12, rand = a => .5 + .035 * Math.sin(a * 7 + 1) + .02 * Math.sin(a * 13), glanz = (x, y) => Math.exp(-Math.pow(((x + y) - ((t * .35) % 1 * 4 - 2)) / .18, 2));
+    if (q < .18) { const a = z.b * TAU, r = rand(a), x = Math.cos(a) * r, y = CY + Math.sin(a) * r; return [x, y, 6, .85 + .15 * glanz(x, y)]; }           // Wachsrand
+    if (q < .42) { const a = z.b * TAU, r = rand(a) * Math.sqrt(z.c) * .97, x = Math.cos(a) * r, y = CY + Math.sin(a) * r; return [x, y, z.d < .5 ? 2 : 5, .3 + .6 * glanz(x, y)]; }   // Wachs
+    if (q < .54) { const [x, y] = ring(0, CY, .37, .37, z.b); return [x, y, 0, .6 + .4 * glanz(x, y)]; }                                         // erhabener Ring
+    if (q < .74) { const [x, y] = z.c < .5 ? zackeRand(0, CY, .25, 8, .55, z.b) : ring(0, CY, .09, .09, z.b); return [x, y, 0, .85 + .15 * glanz(x, y)]; }   // Achtstern im Wachs
+    if (q < .9) { const seite = z.b < .5 ? -1 : 1, v = z.c, wehen = Math.sin(t * 1.1 + seite) * .04 * v, bx = seite * (.12 + v * .42) + wehen, by = CY + .42 + v * .75, br = .09;   // Bänder
+      const kante = z.d < .5 ? -1 : 1, ende = v > .96; return ende ? [bx + (z.d * 2 - 1) * br, by + Math.abs(z.d * 2 - 1) * .06, 0, .7] : [bx + kante * br, by - kante * seite * .03, 0, .7]; }
+    return funkel(z, t, .35);
+  },
+  urkunde: (z, t) => {
+    const P = 11, p = (t / P) % 1, q = z.a, W = .64, O = -.95, U = 1.05, rahmen = Math.min(1, p / .3), text = Math.max(0, Math.min(1, (p - .3) / .3)), unter = Math.max(0, Math.min(1, (p - .6) / .15)), aus = p > .95 ? 1 - (p - .95) / .05 : 1;
+    const RAND = [[-W, O], [W, O], [W, U], [-W, U], [-W, O]], RAND2 = [[-W + .07, O + .07], [W - .07, O + .07], [W - .07, U - .07], [-W + .07, U - .07], [-W + .07, O + .07]];
+    if (q < .26) { const innen = z.c < .5, [x, y] = strecke(innen ? RAND2 : RAND, z.b); return [x, y, 0, z.b < rahmen ? (innen ? .55 : .8) * aus : 0]; }   // Doppelrahmen zeichnet sich
+    if (q < .38) { const u = z.b, [x, y] = strecke(RAND, u), [x2, y2] = strecke(RAND2, u), m = (Math.sin(u * 160) + 1) / 2; return [x + (x2 - x) * m, y + (y2 - y) * m, 3, u < rahmen ? .5 * aus : 0]; }   // Zickzack dazwischen
+    if (q < .48) { const k = Math.floor(z.b * 4), E = [[-W + .035, O + .035], [W - .035, O + .035], [W - .035, U - .035], [-W + .035, U - .035]][k], [x, y] = zackeRand(E[0], E[1], .07, 8, .5, z.c); return [x, y, 3, rahmen > (k + 1) / 4 - .01 ? .9 * aus : 0]; }   // Achtsterne in den Ecken
+    if (q < .56) { const [x, y] = zackeRand(0, O + .3, .14, 8, .5, z.b, t * .1); return [x, y, 0, text > 0 ? .85 * aus : 0]; }                       // Siegel oben
+    if (q < .82) { const i = Math.floor(z.b * 7), u = z.c, x = -W + .18 + u * (2 * W - .36) * (i === 6 ? .55 : 1), y = O + .62 + i * .13; return [x, y, 3, (Math.sin(u * 37 + i * 3) > -.5 && u < text * 7 - i ? .45 : 0) * aus]; }   // Textzeilen
+    if (q < .94) { const s = z.b, x = .02 + s * .45 - .03 * Math.sin(TAU * 4 * s), y = U - .25 - .05 * Math.cos(TAU * 4 * s); return [x, y, 3, s < unter ? .85 * aus : 0]; }   // Unterschrift
+    return funkel(z, t, .3);
+  },
+};
+const cGlattE = x => x * x * (3 - 2 * x);
+const ANZAHL = { waage: 2400, stempel: 2600, feder: 2400, paragraf: 2400, siegel: 2600, urkunde: 2600 };
+
+let hell = false;
+const flaechen = [...document.querySelectorAll('canvas')].map(cv => {
+  const f = { cv, g: cv.getContext('2d'), art: cv.dataset.art, fenster: !!cv.closest('.fenster'), w: 0, h: 0, teile: [], zeiger: { x: -999, y: -999 }, sichtbar: false };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); f.zeiger.x = e.clientX - r.left; f.zeiger.y = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', () => { f.zeiger.x = f.zeiger.y = -999; });
+  cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') f.zeiger.x = f.zeiger.y = -999; });
+  return f;
+});
+function messen() { for (const f of flaechen) { const r = f.cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  if (Math.round(r.width) === f.w && Math.round(r.height) === f.h) continue;
+  f.w = Math.round(r.width); f.h = Math.round(r.height); f.dpr = dpr; f.cv.width = f.w * dpr; f.cv.height = f.h * dpr;
+  f.teile = Array.from({ length: ANZAHL[f.art] }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() },
+    x: Math.random() * f.w, y: Math.random() * f.h, vx: 0, vy: 0, s: 1.2 + Math.random() * 1.3 })); } }
+const io = new IntersectionObserver(es => es.forEach(e => { flaechen.find(f => f.cv === e.target).sichtbar = e.isIntersecting; }));
+flaechen.forEach(f => io.observe(f.cv));
+addEventListener('resize', messen); messen();
+
+const knopfF = document.getElementById('k-formular'), knopfH = document.getElementById('k-hell'), reihe = document.getElementById('fenster-reihe');
+knopfF.addEventListener('click', () => { const an = knopfF.getAttribute('aria-pressed') !== 'true'; knopfF.setAttribute('aria-pressed', an); reihe.classList.toggle('ohne-formular', !an); });
+knopfH.addEventListener('click', () => { hell = knopfH.getAttribute('aria-pressed') !== 'true'; knopfH.setAttribute('aria-pressed', hell); reihe.classList.toggle('hell', hell); });
+
+let vor = performance.now(), t = 0;
+function schleife(jetzt) {
+  const dt = Math.max(0, Math.min(.05, (jetzt - vor) / 1000)); vor = jetzt; t += dt;
+  for (const f of flaechen) {
+    if (!f.sichtbar || !f.w) continue;
+    const g = f.g, imHellen = f.fenster && hell, pal = imHellen ? FARBEN.hell : FARBEN.dunkel, staerke = imHellen ? .8 : 1;
+    g.setTransform(f.dpr, 0, 0, f.dpr, 0, 0); g.clearRect(0, 0, f.w, f.h);
+    const S = Math.min(f.w * .46, f.h * .345), cx = f.w / 2, cy = f.h / 2;
+    g.globalCompositeOperation = imHellen ? 'source-over' : 'lighter';
+    for (const p of f.teile) {
+      const [x, y, fa, ha] = FORMEN[f.art](p.z, t), tx = cx + x * S, ty = cy + y * S;
+      p.vx = (p.vx + (tx - p.x) * .07) * .85; p.vy = (p.vy + (ty - p.y) * .07) * .85;
+      const dx = p.x - f.zeiger.x, dy = p.y - f.zeiger.y, d = Math.hypot(dx, dy);
+      if (d < 70 && d > .1) { const k = (1 - d / 70) * 2.6; p.vx += dx / d * k; p.vy += dy / d * k; }
+      p.x += p.vx; p.y += p.vy;
+      if (ha < .02) continue;
+      const fc = pal[fa] || pal[0];
+      g.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, ha * staerke).toFixed(3)})`; g.fillRect(p.x, p.y, p.s, p.s);
+    }
+    g.globalCompositeOperation = 'source-over';
+  }
+  requestAnimationFrame(schleife);
+}
+requestAnimationFrame(schleife);
+</script>
+</body>
+</html>
