@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontakt-Motive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Vorschau für Adam: je drei Motiv-Ideen für den Kontakt, links (Laptop) und im Fenster */
+:root { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --safran: #f2a93b; --linie: rgba(242,169,59,.28); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); } }
+:root[data-theme="light"] { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); }
+:root[data-theme="dark"] { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --linie: rgba(242,169,59,.28); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--grund); color: var(--text); font: 400 15px/1.5 "Hanken Grotesk", system-ui, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 60px; }
+h1 { font: 400 clamp(32px, 6vw, 50px)/1.05 Gloock, serif; margin: 0 0 8px; }
+h2 { font: 400 26px/1.1 Gloock, serif; margin: 34px 0 4px; }
+.ober { font: 700 11px "Hanken Grotesk"; letter-spacing: .22em; text-transform: uppercase; color: var(--safran); margin: 0 0 8px; }
+.intro, .unter { color: var(--leise); max-width: 64ch; margin: 0 0 18px; }
+.unter { font-size: 14px; margin-bottom: 12px; }
+.knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.knoepfe button { font: 600 13px "Hanken Grotesk"; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--linie); background: transparent; color: var(--text); cursor: pointer; }
+.knoepfe button[aria-pressed="true"] { background: var(--safran); border-color: var(--safran); color: #2a0b12; }
+.drei { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .drei { grid-template-columns: 1fr; } }
+.motiv { margin: 0; background: #150508; border: 1px solid var(--linie); border-radius: 18px; overflow: hidden; color: #f7e7d3; }
+.motiv .flaeche { position: relative; }
+.motiv canvas { display: block; width: 100%; aspect-ratio: 3 / 4; touch-action: pan-y; }
+.fenster { background: #1d070d; }
+.hell .fenster { background: #efd9b5; }
+.motiv figcaption { padding: 10px 14px 14px; border-top: 1px solid rgba(242,169,59,.18); background: #150508; }
+.motiv h3 { margin: 0; font: 400 21px Gloock, serif; display: flex; gap: 8px; align-items: baseline; }
+.motiv h3 span { font: 700 12.5px "Hanken Grotesk"; color: #2a0b12; background: #f2a93b; border-radius: 999px; padding: 1px 9px; }
+.motiv p { margin: 2px 0 0; color: #cdaa8d; font-size: 13.5px; }
+/* angedeutetes Formular über dem Fenster-Motiv, damit man sieht, wie es hinter dem Text wirkt */
+.formular { position: absolute; inset: 0; padding: 22px 20px; display: flex; flex-direction: column; gap: 9px; pointer-events: none; color: #f7e7d3; }
+.formular b { font: 400 28px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; }
+.formular small { font: 700 10px "Hanken Grotesk"; letter-spacing: .2em; color: #f2a93b; margin-top: 4px; }
+.formular i { display: block; height: 32px; border-radius: 10px; border: 1px solid rgba(242,169,59,.3); background: rgba(18,4,10,.55); }
+.formular i.gross { height: 78px; }
+.formular u { text-decoration: none; text-align: center; font: 600 13px "Hanken Grotesk"; color: #2a0b12; padding: 9px; border-radius: 12px; background: linear-gradient(90deg, #f2a93b, #ff6b3d); }
+.hell .formular { color: #33100a; }
+.hell .formular b { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+.hell .formular small { color: #8a4b06; }
+.hell .formular i { border-color: rgba(138,75,6,.35); background: rgba(240,212,165,.6); }
+.hell .formular u { color: #fff4e3; background: linear-gradient(90deg, #8a4b06, #a8320c); }
+.ohne-formular .formular { display: none; }
+.formular i.zeile { height: 9px; width: 72%; border: 0; border-radius: 4px; background: rgba(247,231,211,.3); }
+.formular i.kurz { width: 46%; }
+.formular em { font: normal 400 19px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; margin-top: -6px; }
+.formular small + i, .formular small + em { margin-top: -4px; }
+.hell .formular i.zeile { background: rgba(110,56,10,.3); }
+.hell .formular em { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+</style>
+</head>
+<body>
+<main>
+  <p class="ober">Musti Bistro · Kontakt · Motive</p>
+  <h1>Zwei Motive für den Kontakt</h1>
+  <p class="intro">Je drei Ideen: eine Reihe für den dunklen Bereich links neben dem Kontakt-Fenster am Laptop, eine Reihe für den Hintergrund im Fenster selbst. Fahr mit der Maus oder dem Finger darüber, dann weichen die Punkte aus. Schreib mir einfach eine Zahl und einen Buchstaben, zum Beispiel „2 und B“.</p>
+
+  <h2>Links daneben (nur Laptop)</h2>
+  <p class="unter">Bleibt stehen, solange das Kontakt-Fenster offen ist.</p>
+  <div class="drei">
+    <figure class="motiv"><div class="flaeche"><canvas data-art="karte"></canvas></div><figcaption><h3><span>1</span>Stadtplan mit Nadel</h3><p>Eine rote Kartennadel fällt auf die Lindenpromenade, Lichtwellen laufen durch die Straßen, an der Promenade stehen die Linden.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="flieger"></canvas></div><figcaption><h3><span>2</span>Papierflieger</h3><p>Ein Papierflieger fliegt eine Acht, hinter ihm eine Punktspur und kleine Herzen, die langsam aufsteigen.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="telefon"></canvas></div><figcaption><h3><span>3</span>Klingelndes Telefon</h3><p>Ein altes Wählscheiben-Telefon klingelt und wackelt. Danach leuchtet auf der Wählscheibe Mustis Nummer 039209 60693 auf.</p></figcaption></figure>
+  </div>
+
+  <h2>Im Kontakt-Fenster (Handy, Tablet, Laptop)</h2>
+  <p class="unter">Liegt hinter dem Text, wie bei der Speisekarte und dem Catering.</p>
+  <div class="knoepfe">
+    <button type="button" id="k-formular" aria-pressed="true">Text darüber zeigen</button>
+    <button type="button" id="k-hell" aria-pressed="false">Helle Ansicht</button>
+  </div>
+  <div class="drei" id="fenster-reihe">
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="uhr"></canvas><div class="formular"><b>Kontakt</b><small>KOMM VORBEI</small><i class="zeile"></i><i class="zeile kurz"></i><small>TELEFON</small><em>039209 60693</em><small>ADRESSE</small><em>Lindenpromenade 34</em><small>ÖFFNUNGSZEITEN</small><i class="zeile"></i></div></div><figcaption><h3><span>A</span>Öffnungsuhr</h3><p>Eine Uhr mit der echten Uhrzeit. Der goldene Bogen zeigt die Öffnungszeiten von 11 bis 21 Uhr, mit Achtsternen statt Ziffern.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="brief"></canvas><div class="formular"><b>Kontakt</b><small>KOMM VORBEI</small><i class="zeile"></i><i class="zeile kurz"></i><small>TELEFON</small><em>039209 60693</em><small>ADRESSE</small><em>Lindenpromenade 34</em><small>ÖFFNUNGSZEITEN</small><i class="zeile"></i></div></div><figcaption><h3><span>B</span>Brief mit Herz-Siegel</h3><p>Ein Umschlag mit Herz-Siegel öffnet sich, ein Brief gleitet heraus und wieder zurück.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="kompass"></canvas><div class="formular"><b>Kontakt</b><small>KOMM VORBEI</small><i class="zeile"></i><i class="zeile kurz"></i><small>TELEFON</small><em>039209 60693</em><small>ADRESSE</small><em>Lindenpromenade 34</em><small>ÖFFNUNGSZEITEN</small><i class="zeile"></i></div></div><figcaption><h3><span>C</span>Kompass</h3><p>Eine Kompassrose im orientalischen Achtstern. Die Nadel schwingt aus und zeigt dann zu Musti.</p></figcaption></figure>
+  </div>
+</main>
+<script>
+const TAU = Math.PI * 2, PI = Math.PI;
+// Farben: 0 Gold, 1 Glut-Orange, 2 Paprika, 3 Creme, 4 Jade, 5 Granat, 6 Tomate, 7 Kräutergrün
+const FARBEN = {
+  dunkel: [[242, 169, 59], [255, 120, 42], [224, 72, 50], [255, 226, 180], [143, 211, 162], [190, 40, 70], [255, 80, 60], [110, 200, 95]],
+  hell:   [[138, 75, 6], [168, 50, 12], [147, 32, 26], [110, 56, 10], [40, 110, 60], [120, 20, 50], [180, 40, 25], [50, 120, 40]],
+};
+const glatt = x => x * x * (3 - 2 * x);
+const ring = (cx, cy, rx, ry, u) => [cx + Math.cos(u * TAU) * rx, cy + Math.sin(u * TAU) * ry];
+const scheibe = (cx, cy, r, u, v, ry = r) => { const w = u * TAU, q = Math.sqrt(v); return [cx + Math.cos(w) * r * q, cy + Math.sin(w) * ry * q]; };
+const drehen = (x, y, px, py, w) => { const c = Math.cos(w), s = Math.sin(w), dx = x - px, dy = y - py; return [px + dx * c - dy * s, py + dx * s + dy * c]; };
+
+// Jede Form bekommt pro Punkt vier Zufallszahlen (z.a bis z.d) und die Zeit t.
+// Zurück kommt [x, y, Farbe, Helligkeit], x etwa -1 bis 1, y nach unten.
+// Sterne: 10 Ecken, abwechselnd außen und innen
+const sternEcke = (k, R, dreh) => { const a = -PI / 2 + k * PI / 5 + dreh, rr = k % 2 ? R * .42 : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const sternRand = (cx, cy, R, u, dreh = 0) => { const k = Math.floor(u * 10), f = u * 10 - k, [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const sternFlaeche = (cx, cy, R, u, v, w, dreh = 0) => { const k = Math.floor(u * 10), [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh);
+  let a = v, b = w; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [cx + x1 * a + x2 * b, cy + y1 * a + y2 * b]; };
+// Herz: Spitze unten, etwa -0,7 bis 1 hoch
+const herzRand = (cx, cy, s, u) => { const q = u * TAU; return [cx + 16 * Math.pow(Math.sin(q), 3) / 17 * s, cy - (13 * Math.cos(q) - 5 * Math.cos(2 * q) - 2 * Math.cos(3 * q) - Math.cos(4 * q)) / 17 * s]; };
+const herzFlaeche = (cx, cy, s, u, v) => { const [x, y] = herzRand(cx, cy, s, u), q = Math.sqrt(v); return [cx + (x - cx) * q, cy + (y - cy) * q]; };
+// Hilfen für die Kontakt-Motive
+const strecke = (pts, u) => {   // Punkt auf einem Linienzug, gleichmäßig nach Länge verteilt
+  let L = 0; const l = [];
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); l.push(d); L += d; }
+  let s = u * L;
+  for (let i = 0; i < l.length; i++) { if (s <= l[i] || i === l.length - 1) { const f = Math.min(1, s / l[i]); return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]; } s -= l[i]; }
+};
+const dreieck = (A, B, C, u, v) => { let a = u, b = v; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [A[0] + (B[0] - A[0]) * a + (C[0] - A[0]) * b, A[1] + (B[1] - A[1]) * a + (C[1] - A[1]) * b]; };
+// Stern mit n Zacken (Achtstern wie im Ornament)
+const zackeEcke = (k, R, n, innen, dreh) => { const a = -PI / 2 + k * PI / n + dreh, rr = k % 2 ? R * innen : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const zackeRand = (cx, cy, R, n, innen, u, dreh = 0) => { const k = Math.floor(u * 2 * n), f = u * 2 * n - k, [x1, y1] = zackeEcke(k, R, n, innen, dreh), [x2, y2] = zackeEcke(k + 1, R, n, innen, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const zackeFlaeche = (cx, cy, R, n, innen, u, v, w, dreh = 0) => { const k = Math.floor(u * 2 * n), [x, y] = dreieck([0, 0], zackeEcke(k, R, n, innen, dreh), zackeEcke(k + 1, R, n, innen, dreh), v, w); return [cx + x, cy + y]; };
+// Kartennadel: Spitze bei (px, py), runder Kopf darüber
+const pinMass = s => { const r = .22 * s, h = .45 * s, al = Math.acos(r / h); return { r, h, al, tx: r * Math.sin(al), ty: r * Math.cos(al) - h }; };
+const pinRand = (px, py, s, u) => { const { r, h, al, tx, ty } = pinMass(s);
+  if (u < .3) { const seite = u < .15 ? -1 : 1, f = (u % .15) / .15; return [px + seite * tx * (1 - f), py + ty * (1 - f)]; }
+  const a = al + (u - .3) / .7 * (TAU - 2 * al); return [px + r * Math.sin(a), py - h + r * Math.cos(a)]; };
+const pinFlaeche = (px, py, s, u, v, w) => { const { r, h, tx, ty } = pinMass(s);
+  if (u < .65) return scheibe(px, py - h, r * .96, v, w);
+  return dreieck([px - tx, py + ty], [px + tx, py + ty], [px, py], v, w); };
+const funkel = (z, t) => [(z.b * 2 - 1) * 1.05, (z.c * 2 - 1) * 1.4, 3, .5 * Math.pow(Math.max(0, Math.sin(t * 2.5 + z.d * 50)), 10)];
+let uhrT = -1, uhrW = [0, 0, 0];
+
+const FORMEN = {
+  karte: (z, t) => {
+    const P = 7, p = (t / P) % 1, q = z.a, TX = .12, TY = .3;
+    const prom = x => TY + .3 * Math.sin(1.5 * (x - TX));                                    // die Lindenpromenade als sanfter Bogen
+    const seit = p > .12 ? p - .12 : -1;
+    const welle = (x, y) => { if (seit < 0) return 0; const d = Math.hypot(x - TX, (y - TY) * 1.2); return Math.exp(-Math.pow((d - seit * 4) / .14, 2)) * Math.max(0, 1 - seit * 1.4); };
+    if (q < .34) {                                                                            // Straßen
+      const v = z.b, k = Math.floor(z.c * 6); let x, y;
+      if (k < 2) { x = -1.15 + 2.3 * v; y = prom(x) + (k ? .08 : -.08); }
+      else if (k === 2) { y = -1.5 + 3 * v; x = -.6 + .12 * y; }
+      else if (k === 3) { y = -1.5 + 3 * v; x = .72 - .1 * y; }
+      else if (k === 4) { x = -1.15 + 2.3 * v; y = -.72 + .07 * x; }
+      else { x = -1.15 + 2.3 * v; y = 1.1 - .12 * x * x; }
+      const w = welle(x, y); return [x, y, w > .25 ? 0 : 3, .2 + .75 * w];
+    }
+    if (q < .44) { const i = Math.floor(z.b * 16), seite = z.c < .5 ? -1 : 1, x0 = -1.1 + i * .147, [x, y] = scheibe(x0, prom(x0) + seite * .17, .032, z.d, (z.c * 2) % 1);   // Linden
+      return [x, y, 7, .45 + .5 * welle(x, y)]; }
+    let off = 0, sicht = 1;                                                                    // die Nadel fällt, springt kurz und bleibt stecken
+    if (p < .12) off = -2.8 * (1 - Math.pow(p / .12, 2));
+    else if (p < .22) off = -.16 * Math.sin(PI * (p - .12) / .1);
+    else if (p < .94) off = -.03 * Math.sin((p - .22) * P * 2.2);
+    else { off = -2.8; sicht = 0; }
+    if (q < .76) { const r = (q - .44) / .32, PY = TY + off, s = 1.15;
+      if (r < .45) { const [x, y] = pinRand(TX, PY, s, z.b); return [x, y, 6, .95 * sicht]; }
+      if (r < .8) { const [x, y] = pinFlaeche(TX, PY, s, z.b, z.c, z.d); return [x, y, 5, .32 * sicht]; }
+      const [x, y] = sternRand(TX, PY - .45 * s, .11, z.b); return [x, y, 0, .95 * sicht]; }
+    if (q < .8) { const [x, y] = scheibe(TX, TY + .01, .14, z.b, z.c, .045); return [x, y, 2, .2 * sicht * (1 + off / 2.8)]; }   // Schatten
+    if (q < .92) { const j = Math.floor(z.b * 3), g = seit - j * .08;                                          // Ringe beim Aufprall
+      if (seit < 0 || g < 0 || g > .5) return [TX, TY, 0, 0];
+      const rad = .08 + g * 2, [x, y] = ring(TX, TY, rad, rad * .36, z.c); return [x, y, 0, .75 * (1 - g / .5)]; }
+    return funkel(z, t);
+  },
+  flieger: (z, t) => {
+    const s = t * .5, bahn = s => [.76 * Math.sin(s), -.1 + .55 * Math.sin(2 * s)], q = z.a;
+    const [fx, fy] = bahn(s), w = Math.atan2(1.1 * Math.cos(2 * s), .76 * Math.cos(s)), roll = Math.max(-1, Math.min(1, Math.cos(w) * 3));   // dreht sich beim Wenden um
+    const N = [.26, 0], A = [-.22, -.14], B = [-.22, .02], C = [-.13, .11];
+    const setze = (lx, ly) => { const xx = lx * 1.3, yy = ly * 1.3 * roll, c = Math.cos(w), sn = Math.sin(w); return [fx + xx * c - yy * sn, fy + xx * sn + yy * c]; };
+    if (q < .3) { const k = Math.floor(z.b * 5), [P1, P2] = [[N, A], [A, B], [N, B], [B, C], [N, C]][k], f = z.c;                   // Kanten
+      const [x, y] = setze(P1[0] + (P2[0] - P1[0]) * f, P1[1] + (P2[1] - P1[1]) * f); return [x, y, 3, k === 2 ? .6 : .9]; }
+    if (q < .48) { const fl = z.b < .6, [lx, ly] = fl ? dreieck(N, A, B, z.c, z.d) : dreieck(N, B, C, z.c, z.d), [x, y] = setze(lx, ly); return [x, y, fl ? 3 : 0, fl ? .28 : .22]; }
+    if (q < .82) { const v = z.b, [x, y] = bahn(s - .22 - v * 2.4); return [x, y, v < .3 ? 3 : 0, Math.floor(v * 70) % 2 ? 0 : .75 * Math.pow(1 - v, 1.4)]; }   // gepunktete Spur
+    if (q < .94) { const j = Math.floor(z.b * 3), T = 1.3, n = Math.floor((s / T - j) / 3) * 3 + j, a = (s - n * T) / (3 * T), [hx, hy] = bahn(n * T);   // kleine Herzen bleiben zurück
+      const [x, y] = z.c < .55 ? herzRand(hx, hy - a * .35, .07, z.d) : herzFlaeche(hx, hy - a * .35, .07, z.d, (z.c - .55) / .45); return [x, y, z.c < .55 ? 6 : 5, Math.sin(PI * a) * .85]; }
+    return funkel(z, t);
+  },
+  telefon: (z, t) => {
+    const P = 5.5, p = (t / P) % 1, q = z.a, an = p < .42 ? Math.sin(PI * p / .42) : 0;
+    const wack = Math.sin(t * 40) * .045 * an, hops = Math.abs(Math.sin(t * 20)) * .08 * an, OY = .05;
+    const dreh = (x, y) => drehen(x, y + OY, 0, .72 + OY, wack);
+    const NUMMER = [0, 3, 9, 2, 0, 9, 6, 0, 6, 9, 3], wahl = p > .45 && p < .97 ? NUMMER[Math.floor((p - .45) / .52 * 11)] : -1;   // Mustis Nummer leuchtet auf
+    const loch = d => { const k = d === 0 ? 9 : d - 1, a = -PI / 3 - k * PI / 6.2; return [Math.cos(a) * .19, .4 + Math.sin(a) * .19]; };
+    if (q < .2) { const [x, y] = strecke([[-.4, .02], [.4, .02], [.62, .72], [-.62, .72], [-.4, .02]], z.b), [rx, ry] = dreh(x, y); return [rx, ry, 0, .8]; }   // Gehäuse
+    if (q < .28) { const v = z.b, [rx, ry] = dreh((z.c * 2 - 1) * (.4 + .22 * v), .02 + .7 * v); return [rx, ry, 5, .14]; }
+    if (q < .5) { const r = (q - .28) / .22; let x, y, fa = 0, ha = .7;                                                // Wählscheibe
+      if (r < .35) [x, y] = ring(0, .4, .29, .29, z.b);
+      else if (r < .5) { [x, y] = ring(0, .4, .08, .08, z.b); fa = 3; }
+      else { const d = Math.floor(z.b * 10), [lx, ly] = loch(d), an2 = d === wahl;
+        if (z.c < .6) { [x, y] = ring(lx, ly, .045, .045, z.d); ha = an2 ? 1 : .55; fa = an2 ? 3 : 0; }
+        else { [x, y] = scheibe(lx, ly, .04, z.d, (z.c - .6) / .4); ha = an2 ? .9 : 0; fa = 3; } }
+      const [rx, ry] = dreh(x, y); return [rx, ry, fa, ha]; }
+    if (q < .74) { const r = (q - .5) / .24; let x, y;                                                                  // Hörer
+      if (r < .5) { const v = z.b * 2 - 1; x = v * .46; y = -.12 - .07 * (1 - v * v) + (z.c < .5 ? -.035 : .035); }
+      else { const seite = z.b < .5 ? -1 : 1, w = z.c * PI; x = seite * .5 + Math.cos(w) * .14; y = -.07 + Math.sin(w) * .11; }
+      const [rx, ry] = dreh(x, y - hops); return [rx, ry, 0, .9]; }
+    if (q < .8) { const v = z.b, a = [-.57, .55], b = [-1, .25], c = [-.62, .02], m = 1 - v;                             // Spiralkabel
+      const bx = m * m * a[0] + 2 * m * v * b[0] + v * v * c[0], by = m * m * a[1] + 2 * m * v * b[1] + v * v * c[1], w = v * 70;
+      const [rx, ry] = dreh(bx + Math.cos(w) * .03, by + Math.sin(w) * .018 - (v > .85 ? hops * (v - .85) / .15 : 0)); return [rx, ry, 3, .45]; }
+    if (q < .92) { const seite = z.b < .5 ? -1 : 1, j = Math.floor(((z.b * 2) % 1) * 3), rad = .3 + j * .14 + .03 * Math.sin(t * 20 - j), a = (z.c - .5) * 1.1 + (seite < 0 ? PI : 0);   // Klingeln
+      return [seite * .5 + Math.cos(a) * rad, -.1 + Math.sin(a) * rad, j ? 3 : 0, an * .85 * (.5 + .5 * Math.sin(t * 20 - j * 1.4))]; }
+    return funkel(z, t);
+  },
+  uhr: (z, t) => {
+    if (t !== uhrT) { uhrT = t; const d = new Date(), s = d.getSeconds() + d.getMilliseconds() / 1000, m = d.getMinutes() + s / 60, h = d.getHours() % 12 + m / 60;
+      uhrW = [h / 12 * TAU - PI / 2, m / 60 * TAU - PI / 2, s / 60 * TAU - PI / 2]; }
+    const R = .86, q = z.a, wi = hh => hh / 12 * TAU - PI / 2;
+    if (q < .14) { const aussen = z.b < .6, rr = aussen ? R : R * 1.07, [x, y] = ring(0, 0, rr, rr, z.c); return [x, y, 0, aussen ? .55 : (Math.floor(z.c * 120) % 2 ? 0 : .4)]; }
+    if (q < .36) { const hh = 11 + z.b * 10, a = wi(hh), rr = R * (.86 + .07 * z.c), glanz = Math.pow(Math.max(0, Math.sin(hh * .9 - t * 1.4)), 8);   // offen: 11 bis 21 Uhr
+      return [Math.cos(a) * rr, Math.sin(a) * rr, glanz > .4 ? 3 : 0, .35 + .6 * glanz]; }
+    if (q < .4) { const a = wi(9 + z.b * 2), rr = R * (.86 + .07 * z.c); return [Math.cos(a) * rr, Math.sin(a) * rr, 5, .3]; }   // geschlossen
+    if (q < .54) { const k = Math.floor(z.b * 12), a = wi(k), gross = k % 3 === 0, [x, y] = zackeRand(Math.cos(a) * R * .72, Math.sin(a) * R * .72, gross ? .07 : .04, 8, .45, z.c);
+      return [x, y, gross ? 0 : 3, gross ? .9 : .6]; }                                                                    // Stundenzeichen als Achtsterne
+    if (q < .8) { const r = (q - .54) / .26, k = r < .35 ? 0 : r < .75 ? 1 : 2, len = [.42, .62, .7][k], br = [.05, .035, .008][k], v = z.b, l = -.1 + (len + .1) * v, quer = (z.c * 2 - 1) * br * Math.sin(PI * v), a = uhrW[k];
+      return [Math.cos(a) * l - Math.sin(a) * quer, Math.sin(a) * l + Math.cos(a) * quer, k === 2 ? 6 : 3, k === 2 ? .95 : .8]; }   // Zeiger
+    if (q < .84) { const [x, y] = scheibe(0, 0, .045, z.b, z.c); return [x, y, 0, .9]; }
+    if (q < .94) { const [x, y] = zackeRand(0, 0, .3, 8, .62, z.b, t * .05); return [x, y, 0, .2]; }
+    return funkel(z, t);
+  },
+  brief: (z, t) => {
+    const P = 7.5, p = (t / P) % 1, q = z.a, W = .66, OB = -.02, UN = .7;
+    const klappe = p < .12 ? 0 : p < .26 ? glatt((p - .12) / .14) : p < .86 ? 1 : 1 - glatt((p - .86) / .14);
+    const raus = p < .26 ? 0 : p < .44 ? glatt((p - .26) / .18) : p < .68 ? 1 : p < .84 ? 1 - glatt((p - .68) / .16) : 0;
+    const LO = OB + .08 - raus * .8, spitze = OB + .4 * Math.cos(PI * klappe);
+    if (q < .2) { const [x, y] = strecke([[-W, OB], [W, OB], [W, UN], [-W, UN], [-W, OB]], z.b); return [x, y, 0, .85]; }   // Umschlag
+    if (q < .3) { const [x, y] = strecke([[-W, UN], [0, .3], [W, UN]], z.b); return [x, y, 0, .45]; }
+    if (q < .36) return [(z.b * 2 - 1) * W, OB + z.c * (UN - OB), 5, .1];
+    if (q < .46) { const [x, y] = strecke([[-W, OB], [0, spitze], [W, OB]], z.b); return [x, y, 0, .85]; }                 // Klappe
+    if (q < .5) { const [x, y] = dreieck([-W, OB], [W, OB], [0, spitze], z.b, z.c); return [x, y, 5, .12]; }
+    if (q < .56) { const [x, y] = z.c < .5 ? herzRand(0, spitze - .05, .1, z.b) : herzFlaeche(0, spitze - .05, .1, z.b, z.d); return [x, y, 6, (1 - klappe) * (z.c < .5 ? .95 : .5)]; }   // Herz-Siegel
+    if (q < .86) { const r = (q - .56) / .3, LW = .54, LH = .64; let x, y, fa = 3, ha;                                     // der Brief
+      if (r < .35) { [x, y] = strecke([[-LW, LO], [LW, LO], [LW, LO + LH], [-LW, LO + LH], [-LW, LO]], z.b); ha = .8; }
+      else if (r < .85) { const i = Math.floor(z.b * 6), u = z.c; x = -LW + .1 + u * (2 * LW - .2) * (i === 5 ? .45 : 1); y = LO + .12 + i * .085 + Math.sin(u * 50 + i) * .006; ha = Math.sin(u * 31 + i * 2) > -.5 ? .5 : 0; fa = 0; }
+      else { [x, y] = herzFlaeche(LW - .16, LO + LH - .13, .06, z.b, z.c); fa = 6; ha = .9; }
+      return [x, y, fa, y < OB + .01 ? ha : 0]; }                                                                          // im Umschlag unsichtbar
+    if (q < .95) { const e = (p - .3) / .3; if (e < 0 || e > 1) return [0, OB, 0, 0];                                     // Funken beim Herausgleiten
+      return [(z.b * 2 - 1) * W * .8 + (z.c * 2 - 1) * .3 * e, OB - e * (.4 + z.d * .6), z.d < .5 ? 0 : 3, (1 - e) * .8]; }
+    return funkel(z, t);
+  },
+  kompass: (z, t) => {
+    const P = 6, tau = t % P, nadel = -PI / 2 + .6 + 1.5 * Math.sin(tau * 4) * Math.exp(-tau), R = .86, q = z.a;   // schwingt aus und zeigt dann zu Musti
+    if (q < .12) { const [x, y] = ring(0, 0, R, R, z.b); return [x, y, 0, .6]; }
+    if (q < .22) { const k = Math.floor(z.b * 32), a = k / 32 * TAU - PI / 2, lang = k % 8 === 0 ? .14 : k % 2 === 0 ? .08 : .045, rr = R - .02 - z.c * lang; return [Math.cos(a) * rr, Math.sin(a) * rr, k % 8 === 0 ? 3 : 0, .7]; }
+    if (q < .42) { const quad = z.b < .5, [x, y] = strecke(quad ? [[.6, 0], [0, .6], [-.6, 0], [0, -.6], [.6, 0]] : [[.42, .42], [-.42, .42], [-.42, -.42], [.42, -.42], [.42, .42]], z.c);
+      return [x, y, quad ? 0 : 1, .5 + .2 * Math.sin(t * 1.2 + z.c * 12)]; }                                                 // Achtstern aus zwei Quadraten
+    if (q < .58) { const [x, y] = z.c < .4 ? zackeRand(0, 0, .74, 4, .16, z.b) : zackeFlaeche(0, 0, .74, 4, .16, z.b, (z.c - .4) / .6, z.d); return [x, y, z.c < .4 ? 3 : 0, z.c < .4 ? .55 : .14]; }
+    if (q < .86) { const nord = (q - .58) / .28 < .5, L = .66, B = .085, S1 = [0, nord ? -L : L], li = [-B, 0], re = [B, 0];   // Nadel
+      const [lx, ly] = z.c < .35 ? strecke([li, S1, re], z.b) : dreieck(li, re, S1, z.b, z.d), c = Math.cos(nadel + PI / 2), s = Math.sin(nadel + PI / 2);
+      return [lx * c - ly * s, lx * s + ly * c, nord ? 6 : 3, z.c < .35 ? .95 : nord ? .45 : .3]; }
+    if (q < .9) { const [x, y] = ring(0, 0, .055, .055, z.b); return [x, y, 0, .9]; }
+    if (q < .95) { const k = Math.floor(z.b * 4), a = k * PI / 2 - PI / 2, [x, y] = sternRand(Math.cos(a) * (R + .12), Math.sin(a) * (R + .12), .045, z.c); return [x, y, 3, .6 + .3 * Math.sin(t * 2 + k)]; }
+    return funkel(z, t);
+  },
+};
+const ANZAHL = { karte: 2600, flieger: 2200, telefon: 2600, uhr: 2600, brief: 2400, kompass: 2400 };
+
+let hell = false;
+const flaechen = [...document.querySelectorAll('canvas')].map(cv => {
+  const f = { cv, g: cv.getContext('2d'), art: cv.dataset.art, fenster: !!cv.closest('.fenster'), w: 0, h: 0, teile: [], zeiger: { x: -999, y: -999 }, sichtbar: false };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); f.zeiger.x = e.clientX - r.left; f.zeiger.y = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', () => { f.zeiger.x = f.zeiger.y = -999; });
+  cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') f.zeiger.x = f.zeiger.y = -999; });
+  return f;
+});
+function messen() { for (const f of flaechen) { const r = f.cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  if (Math.round(r.width) === f.w && Math.round(r.height) === f.h) continue;
+  f.w = Math.round(r.width); f.h = Math.round(r.height); f.dpr = dpr; f.cv.width = f.w * dpr; f.cv.height = f.h * dpr;
+  f.teile = Array.from({ length: ANZAHL[f.art] }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() },
+    x: Math.random() * f.w, y: Math.random() * f.h, vx: 0, vy: 0, s: 1.2 + Math.random() * 1.3 })); } }
+const io = new IntersectionObserver(es => es.forEach(e => { flaechen.find(f => f.cv === e.target).sichtbar = e.isIntersecting; }));
+flaechen.forEach(f => io.observe(f.cv));
+addEventListener('resize', messen); messen();
+
+const knopfF = document.getElementById('k-formular'), knopfH = document.getElementById('k-hell'), reihe = document.getElementById('fenster-reihe');
+knopfF.addEventListener('click', () => { const an = knopfF.getAttribute('aria-pressed') !== 'true'; knopfF.setAttribute('aria-pressed', an); reihe.classList.toggle('ohne-formular', !an); });
+knopfH.addEventListener('click', () => { hell = knopfH.getAttribute('aria-pressed') !== 'true'; knopfH.setAttribute('aria-pressed', hell); reihe.classList.toggle('hell', hell); });
+
+let vor = performance.now(), t = 0;
+function schleife(jetzt) {
+  const dt = Math.max(0, Math.min(.05, (jetzt - vor) / 1000)); vor = jetzt; t += dt;
+  for (const f of flaechen) {
+    if (!f.sichtbar || !f.w) continue;
+    const g = f.g, imHellen = f.fenster && hell, pal = imHellen ? FARBEN.hell : FARBEN.dunkel, staerke = imHellen ? .8 : 1;
+    g.setTransform(f.dpr, 0, 0, f.dpr, 0, 0); g.clearRect(0, 0, f.w, f.h);
+    const S = Math.min(f.w * .46, f.h * .345), cx = f.w / 2, cy = f.h / 2;
+    g.globalCompositeOperation = imHellen ? 'source-over' : 'lighter';
+    for (const p of f.teile) {
+      const [x, y, fa, ha] = FORMEN[f.art](p.z, t), tx = cx + x * S, ty = cy + y * S;
+      p.vx = (p.vx + (tx - p.x) * .07) * .85; p.vy = (p.vy + (ty - p.y) * .07) * .85;
+      const dx = p.x - f.zeiger.x, dy = p.y - f.zeiger.y, d = Math.hypot(dx, dy);
+      if (d < 70 && d > .1) { const k = (1 - d / 70) * 2.6; p.vx += dx / d * k; p.vy += dy / d * k; }
+      p.x += p.vx; p.y += p.vy;
+      if (ha < .02) continue;
+      const fc = pal[fa] || pal[0];
+      g.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, ha * staerke).toFixed(3)})`; g.fillRect(p.x, p.y, p.s, p.s);
+    }
+    g.globalCompositeOperation = 'source-over';
+  }
+  requestAnimationFrame(schleife);
+}
+requestAnimationFrame(schleife);
+</script>
+</body>
+</html>
