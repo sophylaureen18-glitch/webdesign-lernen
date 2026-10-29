@@ -1352,9 +1352,12 @@ function tafelAnimationStarten() {
       if (d < fw && d > 0) { f.vx += dx / d * (fw - d) * 1.2 + fingerV.x * (1 - d / fw) * 1.5; f.y += fingerV.y * (1 - d / fw) * 0.6; }
       if (f.y < -10) { f.y = r.height + 10; f.x = Math.random() * r.width; }
       const fl = 0.5 + 0.5 * Math.sin(tz * 3 + f.ph * 2);
+      if (hellJetzt) { tg.strokeStyle = `rgba(147,32,26,${(0.4 * fl).toFixed(2)})`; tg.lineWidth = 0.6 + f.s * 0.5; tg.lineCap = 'round';   // Zeichenmodus: kleiner Strich (v60)
+        tg.beginPath(); tg.moveTo(f.x, f.y); tg.lineTo(f.x - f.vx * 0.04, f.y + 5 + f.s * 3); tg.stroke(); continue; }
       tg.fillStyle = hellJetzt ? `rgba(147,32,26,${0.28 * fl})` : `rgba(255,${140 + Math.round(60 * fl)},70,${0.5 * fl})`;
       tg.beginPath(); tg.arc(f.x, f.y, f.s, 0, Math.PI * 2); tg.fill();
     }
+    if (hellJetzt) fingerLicht(tg, mx, my);
     // Berührungswellen (Adam, v58): ein Lichtring breitet sich vom Finger aus
     for (const s of wellenJetzt) {
       const al = (1 - s.a) ** 1.5, wx = s.x - r.left, wy = s.y - r.top;
@@ -1419,6 +1422,7 @@ function familienBaum(c, w, h, t, hellJetzt, mx, my) {
   }
   if (!hellJetzt) c.globalCompositeOperation = 'lighter';
   const farben = hellJetzt ? [[147, 32, 26], [60, 120, 70], [138, 75, 6]] : [[255, 130, 80], [143, 211, 162], [242, 169, 59]];
+  const zeichnen = istHell();
   for (const b of baum.blaetter) {
     const auf = Math.min(1, (t - b.start) / 0.5); if (auf <= 0) continue;
     const wind = Math.sin(t * 1.1 + b.hx * 0.01) * 2.5;
@@ -1427,6 +1431,8 @@ function familienBaum(c, w, h, t, hellJetzt, mx, my) {
     b.x += b.vx; b.y += b.vy;
     const [cr, cg, cb] = farben[b.art < 0.45 ? 0 : b.art < 0.75 ? 1 : 2];
     const fl = 0.55 + 0.45 * Math.sin(t * 2.2 + b.ph);
+    if (zeichnen) { c.strokeStyle = `rgba(${cr},${cg},${cb},${(0.75 * fl * auf).toFixed(2)})`; c.lineWidth = 1.1;   // Zeichenmodus: Blatt als Umriss (v60)
+      c.beginPath(); c.ellipse(b.x, b.y, (2.6 + b.art * 2.6) * auf + 0.01, (1.1 + b.art) * auf + 0.01, b.ph + Math.sin(t * 1.1 + b.ph) * 0.3, 0, Math.PI * 2); c.stroke(); continue; }
     c.fillStyle = `rgba(${cr},${cg},${cb},${((hellJetzt ? 0.42 : 0.6) * fl * auf).toFixed(2)})`;
     c.beginPath(); c.arc(b.x, b.y, (1.4 + b.art * 1.8) * auf, 0, Math.PI * 2); c.fill();
   }
@@ -1477,16 +1483,19 @@ function verwandlung(c, w, band, dt, hellJetzt, mx, my) {   // band = Höhe des 
   const cx = w / 2, cy = kopf + (band - kopf) * 0.5, S = Math.min(w * 0.44, (band - kopf) * 0.36);
   const pal = hellJetzt ? V_FARBEN.hell : V_FARBEN.dunkel;
   if (!hellJetzt) c.globalCompositeOperation = 'lighter';
-  for (let n = 0, bis = sparsam ? 1300 : vTeile.length; n < bis; n++) { const p = vTeile[n];
-    const [ax, ay, fa, ha] = V_FORMEN[i0](p.z, vZeit), [bx, by, fb, hb] = V_FORMEN[i0 + 1](p.z, vZeit);
+  const vBis = sparsam ? 1300 : vTeile.length;
+  for (let n = 0; n < vBis; n++) { const p = vTeile[n], z = p.z;
+    const [ax, ay, fa, ha] = V_FORMEN[i0](z, vZeit), [bx, by, fb, hb] = V_FORMEN[i0 + 1](z, vZeit);
     const tx = cx + (ax + (bx - ax) * e + p.fx * streu * 0.9) * S, ty = cy + (ay + (by - ay) * e + p.fy * streu * 0.9) * S;
     p.vx = (p.vx + (tx - p.x) * 0.08) * 0.84; p.vy = (p.vy + (ty - p.y) * 0.08) * 0.84;
     schubsen(p, mx, my, 70, 2.4);
     p.x += p.vx; p.y += p.vy;
     const fc = e < 0.5 ? pal[fa] : pal[fb], hel = (ha + (hb - ha) * e) * (1 - streu * 0.35);
+    if (hellJetzt) { p.fa = e < 0.5 ? fa : fb; p.ha = hel; continue; }
     c.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, hel * (hellJetzt ? 1 : 1.05)).toFixed(3)})`;
     c.fillRect(p.x, p.y, p.s, p.s);
   }
+  if (hellJetzt) nachbarnZeichnen(c, vTeile, vBis, pal, Math.max(6, S * 0.045), mx, my);
   c.globalCompositeOperation = 'source-over';
 }
 
@@ -1583,18 +1592,21 @@ function kartenMotiv(c, w, h, dt, hellJetzt, mx, my) {
   const cx = w / 2, cy = kopf + (h - kopf) * 0.5, S = Math.min(w * 0.48, (h - kopf) * 0.46);   // füllt das Fenster
   const pal = hellJetzt ? K_FARBEN.hell : K_FARBEN.dunkel, staerke = hellJetzt ? 0.8 : 1;
   if (!hellJetzt) c.globalCompositeOperation = 'lighter';
-  for (let n = 0, bis = sparsam ? 1300 : kTeile.length; n < bis; n++) { const p = kTeile[n];
-    const [ax, ay, fa, ha] = formA(p.z, kZeit), [bx, by, fb, hb] = formB(p.z, kZeit);
+  const kBis = sparsam ? 1300 : kTeile.length;
+  for (let n = 0; n < kBis; n++) { const p = kTeile[n], z = p.z;
+    const [ax, ay, fa, ha] = formA(z, kZeit), [bx, by, fb, hb] = formB(z, kZeit);
     const tx = cx + (ax + (bx - ax) * e + p.fx * streu * 0.9) * S, ty = cy + (ay + (by - ay) * e + p.fy * streu * 0.9) * S;
     p.vx = (p.vx + (tx - p.x) * 0.08) * 0.84; p.vy = (p.vy + (ty - p.y) * 0.08) * 0.84;
     schubsen(p, mx, my, 70, 2.4);
     p.x += p.vx; p.y += p.vy;
     const hel = (ha + (hb - ha) * e) * (1 - streu * 0.35) * staerke;
+    if (hellJetzt) { p.fa = e < 0.5 ? fa : fb; p.ha = hel; continue; }
     if (hel < 0.02) continue;
     const fc = e < 0.5 ? pal[fa] : pal[fb];
     c.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, hel).toFixed(3)})`;
     c.fillRect(p.x, p.y, p.s, p.s);
   }
+  if (hellJetzt) nachbarnZeichnen(c, kTeile, kBis, pal, Math.max(6, S * 0.045), mx, my);
   c.globalCompositeOperation = 'source-over';
 }
 
@@ -1608,30 +1620,41 @@ function logoAbtasten() {                               // einmal: alle sichtbar
   if (!img || !img.complete || !img.naturalWidth) return null;
   const w = img.naturalWidth, h = img.naturalHeight, c = document.createElement('canvas'); c.width = w; c.height = h;
   const g = c.getContext('2d'); g.drawImage(img, 0, 0); const d = g.getImageData(0, 0, w, h).data, s = Math.max(w, h) / 2, punkte = [];
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = (y * w + x) * 4; if (d[i + 3] > 140) punkte.push([(x - w / 2) / s, (y - h / 2) / s, d[i], d[i + 1], d[i + 2]]); }
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = (y * w + x) * 4; if (d[i + 3] > 140) punkte.push([(x - w / 2) / s, (y - h / 2) / s, d[i], d[i + 1], d[i + 2], x, y]); }
   return punkte.length ? punkte : null;
 }
 function linkesMotiv(c, w, h, dt, mx, my, hellJetzt) {
   lZeit += dt;
   if (!logoPunkte && !(logoPunkte = logoAbtasten())) return;
   if (!lTeile || lTeile.w !== w || lTeile.h !== h) {
-    lTeile = Array.from({ length: L_ANZAHL }, () => ({ q: logoPunkte[Math.floor(Math.random() * logoPunkte.length)],
+    // Zeichenmodus: jede zweite Schräge durch die Logopixel wird ein Farbstiftstrich, in Stücken zu je KETTE Punkten
+    const wo = new Map(), stuecke = [], lk = [];
+    for (const q of logoPunkte) wo.set(q[5] * 4096 + q[6], q);
+    for (const q of logoPunkte) { if ((q[5] + q[6]) % 2 || wo.has((q[5] - 1) * 4096 + q[6] + 1)) continue;
+      let r = q, st = []; while (r) { st.push(r); if (st.length === KETTE) { stuecke.push(st); st = []; } r = wo.get((r[5] + 1) * 4096 + r[6] - 1); }
+      if (st.length) { while (st.length < KETTE) st.push(st[st.length - 1]); stuecke.push(st); } }
+    for (let i = stuecke.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [stuecke[i], stuecke[j]] = [stuecke[j], stuecke[i]]; }
+    for (let i = 0; lk.length < L_ANZAHL; i++) lk.push(...stuecke[i % stuecke.length]);
+    lTeile = Array.from({ length: L_ANZAHL }, (_, i) => ({ q: logoPunkte[Math.floor(Math.random() * logoPunkte.length)], qk: lk[i],
       x: Math.random() * w, y: Math.random() * h, vx: 0, vy: 0, s: 1.1 + Math.random() * 1.1 }));
     lTeile.w = w; lTeile.h = h;
   }
   const S = Math.min(w * 0.44, h * 0.5), cx = w / 2, cy = h * 0.5;
   c.globalCompositeOperation = hellJetzt ? 'source-over' : 'lighter';
-  for (let n = 0, bis = sparsam ? 2500 : lTeile.length; n < bis; n++) { const p = lTeile[n], q = p.q;
+  const lBis = sparsam ? 2500 : lTeile.length, stufe = v => Math.min(255, Math.round(v / 24) * 24);
+  for (let n = 0; n < lBis; n++) { const p = lTeile[n], q = hellJetzt ? p.qk : p.q;
     const tx = cx + (q[0] * 0.95 + Math.sin(q[1] * 8 + lZeit * 1.3) * 0.006) * S, ty = cy + q[1] * 0.95 * S;
     p.vx = (p.vx + (tx - p.x) * 0.07) * 0.85; p.vy = (p.vy + (ty - p.y) * 0.07) * 0.85;
     schubsen(p, mx, my, 90, 2.6);
     p.x += p.vx; p.y += p.vy;
     const welle = Math.max(0, Math.cos(q[0] * 3 - lZeit * 1.2)) ** 6, hel = 0.8 + 0.2 * welle;
     // der Schimmer hellt die Logofarbe auf (im Dunkeln), die Punkte sind im Sparmodus etwas größer, weil es weniger sind
+    if (hellJetzt) { p.fs = `${stufe(q[2])},${stufe(q[3])},${stufe(q[4])}`; p.ha = hel; continue; }
     const auf = hellJetzt ? 0 : welle * 0.55, gr = sparsam ? p.s * 1.35 : p.s;
     c.fillStyle = `rgba(${Math.round(q[2] + (255 - q[2]) * auf)},${Math.round(q[3] + (230 - q[3]) * auf)},${Math.round(q[4] + (190 - q[4]) * auf)},${hel.toFixed(3)})`;
     c.fillRect(p.x, p.y, gr, gr);
   }
+  if (hellJetzt) kettenZeichnen(c, lTeile, lBis, S * 0.035, mx, my, 1.5);
   c.globalCompositeOperation = 'source-over';
 }
 
@@ -1684,22 +1707,97 @@ const C_LATERNEN = (z, t) => {
     return [x, y, fa, ha];
   };
 let cTeile = null, cLinks = null, cZeit = 0;
+/* Zeichenmodus (Adam, v60): im hellen Modus werden alle Lichtpunkte zu Farbstift-Linien wie im Tee-Shop.
+   Jeder Punkt verbindet sich mit seinen zwei nächsten Nachbarn gleicher Farbe. Auf den Linien einer Form sind das die
+   Punkte davor und dahinter, so entstehen durchgehende Striche; in Flächen entsteht eine feine Schraffur.
+   Fliegen die Punkte noch durcheinander oder reißt der Finger sie auseinander, sind die Abstände zu groß und es bleibt leer.
+   So zeichnet sich jedes Motiv beim Öffnen von selbst. Der dunkle Modus bleibt, wie er ist. */
+const KETTE = 10;   // Logo: so viele Pixel schräg hintereinander ergeben einen Schraffurstrich
+let lichtPos = -1;   // wo der Glanz des Lichtspiels gerade steht (setzt fingerTakt einmal pro Bild)
+function lichtspiel(x, y, mx, my) {   // wie im Tee-Shop: alle 7 Sekunden läuft ein Glanz schräg durchs Bild, am Finger wird es heller
+  const u = (x + y * 0.5) / (innerWidth + innerHeight * 0.5), dx = mx - x, dy = my - y;
+  return 1 + 0.8 * Math.exp(-((u - lichtPos) ** 2) / 0.003) + 0.7 * Math.exp(-(dx * dx + dy * dy) / 5000);
+}
+const striche = new Map();   // gebündelt nach Farbe und Deckkraft, damit nur wenige Zeichenbefehle nötig sind
+function strichMerken(x1, y1, x2, y2, farbe, alpha) {
+  const k = farbe + '|' + Math.min(10, Math.round(alpha * 10)); let l = striche.get(k);
+  if (!l) striche.set(k, l = []); l.push(x1, y1, x2, y2);
+}
+function stricheZeichnen(c, breite) {
+  c.lineCap = 'round'; c.lineWidth = breite;
+  for (const [k, l] of striche) {
+    const i = k.indexOf('|'), a = +k.slice(i + 1); if (!a) continue;
+    c.strokeStyle = `rgba(${k.slice(0, i)},${a / 10})`; c.beginPath();
+    for (let j = 0; j < l.length; j += 4) { c.moveTo(l[j], l[j + 1]); c.lineTo(l[j + 2], l[j + 3]); }
+    c.stroke();
+  }
+  striche.clear();
+}
+const palText = pal => pal._t || (pal._t = pal.map(f => f.join(',')));
+function kettenZeichnen(c, teile, bis, maxLaenge, mx, my, breite) {   // Logo: Kettenglieder nebeneinander verbinden
+  const m2 = maxLaenge * maxLaenge;
+  for (let n = 1; n < bis; n++) {
+    if (n % KETTE === 0) continue;
+    const a = teile[n - 1], b = teile[n], ha = Math.min(a.ha, b.ha); if (!(ha >= 0.03)) continue;
+    const dx = b.x - a.x, dy = b.y - a.y; if (dx * dx + dy * dy > m2) continue;
+    strichMerken(a.x, a.y, b.x, b.y, a.fs, Math.min(1, ha * lichtspiel(a.x, a.y, mx, my)));
+  }
+  stricheZeichnen(c, breite);
+}
+const zGitter = new Map();
+const SCHRAFF_X = 0.6, SCHRAFF_Y = -0.8;   // Schraffur wie mit dem Farbstift: schräg von links unten nach rechts oben
+function nachbarnZeichnen(c, teile, bis, pal, weit, mx, my, breite = 1.4) {   // Linien: zu den zwei Nachbarn; Flächen und Schrift: Schraffur
+  const pt = palText(pal), w2 = weit * weit;
+  zGitter.clear();
+  for (let n = 0; n < bis; n++) { const p = teile[n]; if (!(p.ha >= 0.03)) continue;
+    const k = Math.floor(p.x / weit) * 4096 + Math.floor(p.y / weit); let l = zGitter.get(k); if (!l) zGitter.set(k, l = []); l.push(p); }
+  for (let n = 0; n < bis; n++) { const p = teile[n]; if (!(p.ha >= 0.03)) continue;
+    const gx = Math.floor(p.x / weit), gy = Math.floor(p.y / weit); let a = null, ad = w2, b = null, bd = w2, dicht = 0;
+    for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const l = zGitter.get((gx + i) * 4096 + gy + j); if (!l) continue;
+      for (const q of l) { if (q === p || q.fa !== p.fa || q.fl !== p.fl) continue; const dx = q.x - p.x, dy = q.y - p.y, d = dx * dx + dy * dy; if (d < ad) { a = q; ad = d; } } }
+    // der zweite Nachbar liegt auf der anderen Seite, so wird die Linie fortgesetzt statt zu einem Dreieck;
+    // dabei wird gezählt, wie viele Punkte ganz nah liegen: auf einer Linie wenige, in einer Fläche viele
+    const nah = Math.max(ad, 2) * 5;
+    if (a) for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const l = zGitter.get((gx + i) * 4096 + gy + j); if (!l) continue;
+      for (const q of l) { if (q === p || q === a || q.fa !== p.fa || q.fl !== p.fl) continue; const dx = q.x - p.x, dy = q.y - p.y, d = dx * dx + dy * dy;
+        if (d < nah) dicht++;
+        if (d < bd && dx * (a.x - p.x) + dy * (a.y - p.y) < 0) { b = q; bd = d; } } }
+    const farbe = pt[p.fa] || pt[0], licht = lichtspiel(p.x, p.y, mx, my), al = Math.min(1, p.ha * licht * 1.6);
+    if (!a) { if (p.ha > 0.3) strichMerken(p.x, p.y, p.x + 0.1, p.y, farbe, al); continue; }   // einzelne Funken als Punkt
+    if (p.fl || dicht >= 6) {   // Fläche oder Schrift (fünfter Wert der Form = 1): ein kurzer Schraffurstrich, so bleibt sie lesbar
+      const h = Math.min(weit * 0.25, Math.sqrt(ad) * 0.5 + 1, 2.6);
+      strichMerken(p.x - SCHRAFF_X * h, p.y - SCHRAFF_Y * h, p.x + SCHRAFF_X * h, p.y + SCHRAFF_Y * h, farbe, al); continue;
+    }
+    strichMerken(p.x, p.y, a.x, a.y, farbe, Math.min(al, a.ha * licht * 1.6));
+    if (b) strichMerken(p.x, p.y, b.x, b.y, farbe, Math.min(al, b.ha * licht * 1.6));
+  }
+  stricheZeichnen(c, breite);
+}
+function fingerLicht(c, x, y) {   // goldenes Licht am Finger oder an der Maus (heller Modus)
+  if (x < -900) return;
+  const gl = c.createRadialGradient(x, y, 0, x, y, 90);
+  gl.addColorStop(0, 'rgba(242,169,59,.24)'); gl.addColorStop(1, 'rgba(242,169,59,0)');
+  c.fillStyle = gl; c.beginPath(); c.arc(x, y, 90, 0, Math.PI * 2); c.fill();
+}
 function cNeueTeile(n, w, h) {
   return Array.from({ length: n }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() },
     x: Math.random() * w, y: Math.random() * h, vx: 0, vy: 0, s: 1.3 + Math.random() * 1.5 }));
 }
 function cPunkte(c, teile, form, cx, cy, S, mx, my, pal, staerke, weit) {
-  for (let n = 0, bis = sparsam ? 1300 : teile.length; n < bis; n++) { const p = teile[n];
-    const [x, y, fa, ha] = form(p.z, cZeit), tx = cx + x * S, ty = cy + y * S;
+  const zeichnen = istHell(), bis = sparsam ? 1300 : teile.length;
+  for (let n = 0; n < bis; n++) { const p = teile[n];
+    const [x, y, fa, ha, fl] = form(p.z, cZeit), tx = cx + x * S, ty = cy + y * S;
     p.vx = (p.vx + (tx - p.x) * 0.07) * 0.85; p.vy = (p.vy + (ty - p.y) * 0.07) * 0.85;
     schubsen(p, mx, my, weit, 2.5);
     p.x += p.vx; p.y += p.vy;
+    if (zeichnen) { p.fa = fa; p.ha = ha * staerke; p.fl = fl; continue; }
     const hel = ha * staerke; if (hel < 0.02) continue;
     const fc = pal[fa] || pal[0];
     c.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, hel).toFixed(3)})`;
     const gr = sparsam ? p.s * 1.35 : p.s;   // im Sparmodus sind es weniger Punkte, darum etwas größer
     c.fillRect(p.x, p.y, gr, gr);
   }
+  if (zeichnen) nachbarnZeichnen(c, teile, bis, pal, Math.max(6, S * 0.045), mx, my);
 }
 function cateringMotiv(c, w, h, dt, hellJetzt, mx, my) {
   cZeit += dt;
@@ -1759,7 +1857,7 @@ const B_LINKS = (z, t) => {
       return [x * K, y * K, z.c < .45 ? 0 : 3, .6 + .4 * Math.sin(t * 2.2 + k * 1.3)]; }
     if (q < .96) { if (!bNote.length) return [0, 0, 0, 0];                                         // die Note in der Mitte
       const p = bNote[Math.floor(z.b * bNote.length)], welle = Math.pow(Math.max(0, Math.cos(p[0] * 3 - t * 1.2)), 6);
-      return [p[0] * .5 * K, (.1 + p[1] * .5) * K, welle > .3 ? 3 : 0, .7 + .3 * welle]; }
+      return [p[0] * .5 * K, (.1 + p[1] * .5) * K, welle > .3 ? 3 : 0, .7 + .3 * welle, 1]; }
     const w = z.b * C_TAU, r = .3 + z.c * .9; return [Math.cos(w) * r * .9 * K, Math.sin(w) * r * K, 3, .5 * Math.pow(Math.max(0, Math.sin(t * 3 + z.d * 40)), 8)];   // Funkeln
   }
   // Sprechblasen: sechs Stück, abwechselnd links und rechts, steigen von unten nach oben und biegen um den Kranz herum
@@ -1939,7 +2037,7 @@ const GE_LINIE = (z, t) => {
   if (q < .44) { const k = Math.floor(z.b * 5), seite = k % 2 ? 1 : -1; return [seite * (.1 + z.c * .2), Y[k], 0, Math.floor(z.c * 12) % 2 ? 0 : .2 + .4 * an(k)]; }   // Verbindung
   if (q < .93) { const k = Math.floor(z.b * 5), seite = k % 2 ? 1 : -1, cx = seite * .55, cy = Y[k], hell = .12 + .88 * an(k);
     if (k === 0 || k === 4) { const pts = geText[k ? '2022' : '1991']; if (!pts || !pts.length) return [cx, cy, 0, 0];
-      const pt = pts[Math.floor(z.c * pts.length)]; return [cx + pt[0] * .34, cy + pt[1] * .34, 3, hell]; }
+      const pt = pts[Math.floor(z.c * pts.length)]; return [cx + pt[0] * .34, cy + pt[1] * .34, 3, hell, 1]; }
     if (k === 1) { const [x, y] = z.c < .6 ? bHerzRand(cx, cy + .02, .13, z.d) : bHerzFlaeche(cx, cy + .02, .13, z.d, (z.c - .6) / .4); return [x, y, z.c < .6 ? 6 : 5, hell * (z.c < .6 ? 1 : .45)]; }
     if (k === 2) { const [x, y] = z.c < .55 ? koZacke(cx, cy, .15, 8, .45, z.d, t * .05) : geZackeFlaeche(cx, cy, .15, 8, .45, z.d, (z.c - .55) / .45, (z.c * 7) % 1, t * .05); return [x, y, z.c < .55 ? 0 : 3, hell * (z.c < .55 ? 1 : .4)]; }   // Stern für Mustafa
     if (z.c < .5) { const [x, y] = geFlamme(cx, cy - .02, .14, z.d, (z.c * 2) % 1, t, 3); return [x, y, z.d < .35 ? 3 : 1, hell]; }       // Kerze
@@ -2002,12 +2100,12 @@ const IM_WAAGE = (z, t) => {
   if (q < .5) { const j = Math.floor(z.c * 3), zx = sx + (j - 1) * .24 + pe, v = z.d; return [ex + (zx - ex) * v, ey + (sy - ey) * v, 3, Math.floor(v * 30) % 2 ? .25 : .55]; }   // Ketten
   if (q < .68) { const a = z.c * C_PI, rand = z.d < .3; return rand ? [sx + pe + (z.c * 2 - 1) * .26, sy, 0, .8] : [sx + pe + Math.cos(a) * .26, sy + Math.sin(a) * .09, 0, .85]; }   // Schalen
   if (q < .84) { if (k < 0) { const [x, y] = z.c < .6 ? bHerzRand(sx + pe, sy - .09, .1, z.d) : bHerzFlaeche(sx + pe, sy - .09, .1, z.d, (z.c - .6) / .4); return [x, y, z.c < .6 ? 6 : 5, z.c < .6 ? .95 : .4]; }   // Herz links
-    const p = imParagraf(z.d, sx + pe, sy - .14, .2); return p ? [p[0], p[1], 3, .9] : [sx, sy, 0, 0]; }                                       // § rechts
+    const p = imParagraf(z.d, sx + pe, sy - .14, .2); return p ? [p[0], p[1], 3, .9, 1] : [sx, sy, 0, 0]; }                                       // § rechts
   return imFunkel(z, t, .35);
 };
 const IM_PARAGRAF = (z, t) => {
   const q = z.a, atem = 1 + .02 * Math.sin(t * .9);
-  if (q < .55) { const pt = imParagraf(z.b, 0, -.05, 1.05 * atem); if (!pt) return [0, 0, 0, 0]; const glanz = Math.pow(Math.max(0, Math.sin(pt[1] * 4 - t * 1.4)), 8); return [pt[0], pt[1], glanz > .3 ? 3 : 0, .55 + .45 * glanz]; }
+  if (q < .55) { const pt = imParagraf(z.b, 0, -.05, 1.05 * atem); if (!pt) return [0, 0, 0, 0]; const glanz = Math.pow(Math.max(0, Math.sin(pt[1] * 4 - t * 1.4)), 8); return [pt[0], pt[1], glanz > .3 ? 3 : 0, .55 + .45 * glanz, 1]; }
   if (q < .72) { const r = z.c < .5 ? .95 : .82, [x, y] = cRing(0, -.05, r, r, z.b); return [x, y, 0, Math.floor(z.b * 140) % 2 ? .1 : .4]; }   // zwei Ringe
   if (q < .86) { const k = Math.floor(z.b * 8), a = k / 8 * C_TAU + t * .06, [x, y] = koZacke(Math.cos(a) * .885, -.05 + Math.sin(a) * .885, .05, 8, .5, z.c); return [x, y, 3, .7]; }   // Achtsterne auf dem Ring
   return imFunkel(z, t, .35);
@@ -2130,6 +2228,8 @@ function tafelZerfallen() {
       z.leben -= dt * z.tempo; if (z.leben <= 0) { zteile[i] = zteile[zteile.length - 1]; zteile.pop(); continue; }
       z.vx += Math.sin(tz * 3 + z.y * 0.02) * 30 * dt; z.vy -= 20 * dt;
       z.x += z.vx * dt; z.y += z.vy * dt;
+      if (hellJetzt) { zg.strokeStyle = `rgba(${z.c},${(z.leben * 0.7).toFixed(2)})`; zg.lineWidth = z.s * 0.7; zg.lineCap = 'round';   // Zeichenmodus: Bleistiftstriche (v60)
+        zg.beginPath(); zg.moveTo(z.x, z.y); zg.lineTo(z.x - z.vx * 0.05, z.y - z.vy * 0.05); zg.stroke(); continue; }
       zg.fillStyle = `rgba(${z.c},${(z.leben * (hellJetzt ? 0.7 : 0.85)).toFixed(2)})`;
       zg.fillRect(z.x, z.y, z.s, z.s);
     }
@@ -2292,11 +2392,12 @@ function punkteBauen() {
   const alt = punkte;
   punkte = [];
   const abstand = Math.max(3.8, RO.R / 82);          // Abstand der Punkte in Pixel
-  for (const l of LINIEN) {
-    const n = Math.max(4, Math.round(l.laenge * RO.R / (abstand * (l.luecke || 1))));
+  for (const [li, l] of LINIEN.entries()) {
+    const n = Math.max(4, Math.round(l.laenge * RO.R / (abstand * (l.luecke || 1)))), erster = punkte.length;
     for (let i = 0; i < n; i++) {
       const [ux, uy] = l.punkte(i / n);
       punkte.push({ r: Math.hypot(ux, uy), a: Math.atan2(uy, ux), ebene: l.ebene,
+        li, zu: l.luecke && i === n - 1 ? erster : -1, sp: l.laenge * RO.R / n,   // Zeichenmodus: Linie, Ringschluss, Abstand (v60)
         s: 1.05 + Math.random() * 0.9, flack: Math.random() * 6.28,
         // Einflug (Adam): jeder Punkt kommt von irgendwo außerhalb des Bildschirms, aus allen Richtungen
         ...(() => { const w = Math.random() * Math.PI * 2, d = Math.hypot(W, H) * (0.55 + Math.random() * 0.35);
@@ -2479,6 +2580,8 @@ function malen(jetzt) {
     if (d < fw && d > 0) { f.vx += dx / d * (fw - d) * 0.9 + fingerV.x * (1 - d / fw) * 1.5; f.y += fingerV.y * (1 - d / fw) * 0.6; }
     if (f.y < -20 || f.x < -30 || f.x > W + 30) Object.assign(f, neueGlut(false));
     const fl = 0.55 + 0.45 * Math.sin(zeit * 3 + f.flack);
+    if (hell) { g.strokeStyle = `rgba(147,32,26,${(0.42 * fl).toFixed(2)})`; g.lineWidth = 0.6 + f.s * 0.5; g.lineCap = 'round';   // Zeichenmodus: kleiner Strich (v60)
+      g.beginPath(); g.moveTo(f.x, f.y); g.lineTo(f.x - f.vx * 0.04, f.y + 5 + f.s * 3); g.stroke(); continue; }
     g.fillStyle = hell ? `rgba(147,32,26,${0.3 * fl})` : `rgba(255,${130 + Math.round(60 * fl)},60,${0.45 * fl})`;
     g.beginPath(); g.arc(f.x, f.y, f.s, 0, Math.PI * 2); g.fill();
   }
@@ -2525,9 +2628,22 @@ function malen(jetzt) {
     const mitteLeise = 0.72 + 0.28 * Math.min(1, p.r / 0.62);
     const einflug = Math.min(1, (zeit - p.start) / 0.6);
     const alpha = Math.min(1, (0.82 + 0.1 * Math.sin(zeit * 2 + p.flack) + glanz * 0.4 + tempo * 0.3) * mitteLeise * einflug);
+    if (hell) { p.al = alpha; continue; }
     const [r, gg, b] = EBENEN[p.ebene].farbe[hell ? 1 : 0];
     g.fillStyle = `rgba(${r},${gg},${b},${alpha.toFixed(3)})`;
     g.beginPath(); g.arc(p.x, p.y, p.s * groesse * (1 + glanz * 0.6), 0, Math.PI * 2); g.fill();
+  }
+
+  // Zeichenmodus (Adam, v60): im hellen Modus wird jede Linie der Rosette ein Farbstift-Strich, der sich beim Einflug selbst zeichnet
+  if (hell) {
+    for (let n = 0; n < punkte.length; n++) {
+      const p = punkte[n], v = p.zu >= 0 ? punkte[p.zu] : punkte[n + 1];
+      if (!v || v.li !== p.li || zeit < p.start || zeit < v.start) continue;
+      const dx = v.x - p.x, dy = v.y - p.y; if (dx * dx + dy * dy > (p.sp * 4 + 6) ** 2) continue;
+      const e = EBENEN[p.ebene]; strichMerken(p.x, p.y, v.x, v.y, e.t || (e.t = e.farbe[1].join(',')), Math.min(1, Math.min(p.al, v.al) * lichtspiel(p.x, p.y, maus.x, maus.y)));
+    }
+    stricheZeichnen(g, 1.5 * groesse);
+    fingerLicht(g, maus.x, maus.y);
   }
 
   // --- Zwei leuchtende Ringe durch die Menüpunkte (Adam), ihr Licht läuft in entgegengesetzte Richtungen ---
@@ -2630,6 +2746,7 @@ document.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' &&
 function fingerTakt() {   // einmal pro Bild: aktuelles Wischtempo und laufende Wellen
   const jetzt = performance.now(), frisch = Math.max(0, 1 - (jetzt - finger.zeit) / 120);
   fingerV.x = finger.vx * frisch; fingerV.y = finger.vy * frisch;
+  lichtPos = -0.3 + ((jetzt / 7000) % 1) * 1.9;   // Lichtspiel im hellen Modus (v60)
   while (wellen.length && jetzt - wellen[0].t > WELLE_DAUER) wellen.shift();
   wellenJetzt = wellen.map(w => { const a = (jetzt - w.t) / WELLE_DAUER; return { x: w.x, y: w.y, a, R: 18 + 340 * (1 - (1 - a) ** 2), kraft: 3.4 * (1 - a) ** 1.5 }; });
 }
@@ -2719,7 +2836,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v59</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v60</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
