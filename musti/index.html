@@ -189,6 +189,7 @@ h1 em { font-style: normal; font-weight: 400; color: transparent; background: li
 .buehne { touch-action: none; }
 .menue { touch-action: pan-x; }
 .tafel { touch-action: pan-y; }
+.schleier { touch-action: none; }   /* Tablet: Wischen links neben dem Fenster bewegt das Motiv dort (v58) */
 /* ---------- Fenster (Tafel) ---------- */
 /* Adam: ist ein Fenster offen, wird die Startseite dahinter deutlich abgedunkelt */
 .schleier { position: fixed; inset: 0; z-index: 5; background: rgba(8, 2, 4, .66); backdrop-filter: blur(2px) saturate(.8); -webkit-backdrop-filter: blur(2px) saturate(.8); opacity: 0; pointer-events: none; transition: opacity .4s; }
@@ -213,7 +214,7 @@ h1 em { font-style: normal; font-weight: 400; color: transparent; background: li
 .tafel.mit-baum .tafel-kopf { padding-top: 206px; }
 /* Adam: das Motiv füllt das ganze Über-uns-Fenster wie beim Tee-Shop; freie Stellen geben den Blick darauf frei */
 .motiv-platz { height: 46vh; height: 46svh; flex: none; pointer-events: none; }
-.tafel.mit-motiv .tafel-inhalt p, .tafel.mit-motiv .tafel-inhalt b, .tafel.mit-motiv .seit span, .tafel.mit-motiv .karte span, .tafel.mit-motiv .karte small, .tafel.mit-motiv .volle-gruppe h3, .tafel.mit-motiv .karussell blockquote, .tafel.mit-motiv .karussell figcaption, .tafel.mit-motiv .stimme small, .tafel.mit-motiv .fuss-zeile, .tafel.mit-motiv .tafel-inhalt a, .tafel.mit-motiv .zeitlinie small, .tafel.mit-motiv figcaption, .tafel.mit-motiv .widmung { text-shadow: 0 0 10px var(--grund), 0 0 4px var(--grund); }
+.tafel.mit-motiv .tafel-inhalt p, .tafel.mit-motiv .tafel-inhalt b, .tafel.mit-motiv .seit span, .tafel.mit-motiv .karte span, .tafel.mit-motiv .karte small, .tafel.mit-motiv .volle-gruppe h3, .tafel.mit-motiv .karussell blockquote, .tafel.mit-motiv .karussell figcaption, .tafel.mit-motiv .stimme small, .tafel.mit-motiv .fuss-zeile, .tafel.mit-motiv .tafel-inhalt a, .tafel.mit-motiv .zeitlinie small, .tafel.mit-motiv figcaption, .tafel.mit-motiv .widmung, .tafel.mit-motiv .recht-text h3 { text-shadow: 0 0 10px var(--grund), 0 0 4px var(--grund); }
 .tafel.mit-baum #tafel-zu { position: absolute; top: 26px; right: 26px; }
 #tafel-glut { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .einleitung { margin: 0; font: 400 21px/1.4 var(--anzeige); text-wrap: pretty; }
@@ -227,6 +228,13 @@ h1 em { font-style: normal; font-weight: 400; color: transparent; background: li
 .fotos figure:hover img { animation-play-state: paused; }
 .fotos figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 10px; font: 600 12.5px var(--sans); letter-spacing: .06em; color: #fbefe0;
   background: linear-gradient(transparent, rgba(18,4,10,.78)); }
+/* Adam (v58): Fotos reagieren auf Finger und Maus: ein warmer Lichtfleck folgt, das Bild rückt ein wenig näher */
+.fotos figure::after, .seite-bild::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity .45s;
+  background: radial-gradient(circle at var(--lx, 50%) var(--ly, 50%), rgba(255, 220, 160, .38), rgba(255, 170, 80, .1) 28%, transparent 55%); mix-blend-mode: screen; }
+.fotos figure.licht::after, .seite-bild.licht::after { opacity: 1; }
+.fotos img, .seite-bild img { transition: transform .6s, scale .8s cubic-bezier(.2,.8,.2,1); }
+.fotos figure.licht img, .seite-bild.licht img { scale: 1.06; }
+.fotos figcaption { z-index: 2; }
 @keyframes kenBurns { from { transform: scale(1.02) translate(0, 0); } to { transform: scale(1.09) translate(-1.5%, -1%); } }
 @keyframes fotoRein { from { opacity: 0; transform: translateY(14px) scale(.98); } }
 .seit { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
@@ -287,6 +295,7 @@ h1 em { font-style: normal; font-weight: 400; color: transparent; background: li
 @media (max-width: 560px) { .spezial-raster { grid-template-columns: 1fr; } }
 .gericht { cursor: pointer; transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .3s; }
 .gericht:hover, .gericht:focus-visible { transform: translateY(-3px); border-color: var(--safran); outline: none; }
+@media (hover: none) { .gericht:active { transform: translateY(-3px); border-color: var(--safran); } .gericht:active .gericht-bild img { transform: scale(1.06); } }
 .spezial-seite { display: flex; flex-direction: column; gap: 14px; animation: rein .5s both; }
 .zurueck { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font: 600 13px var(--sans); color: var(--safran); background: none; border: 1px solid var(--linie); border-radius: 999px; padding: 7px 14px 7px 10px; cursor: pointer; }
 .zurueck svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
@@ -377,6 +386,7 @@ h3 { margin: 6px 0 0; font: 700 11.5px var(--sans); letter-spacing: .2em; text-t
 .karussell::before { content: "\201C"; position: absolute; top: -6px; left: 16px; font: 400 76px/1 var(--anzeige); color: var(--safran); opacity: .45; pointer-events: none; }
 .karussell figure { grid-area: 1 / 1; align-self: center; margin: 0; opacity: 0; transform: translateY(8px); transition: opacity .7s, transform .7s; visibility: hidden; }
 .karussell figure.an { opacity: 1; transform: none; visibility: visible; }
+.karussell figure { transition: opacity .7s, transform .7s, translate .45s cubic-bezier(.2,.8,.2,1); }
 .karussell blockquote { margin: 0; font: 400 20px/1.38 var(--anzeige); }
 .karussell figcaption { margin-top: 10px; font: 600 13px var(--sans); color: var(--safran); }
 .karussell .punkte { grid-area: 2 / 1; display: flex; justify-content: center; margin-top: 8px; }
@@ -1181,7 +1191,7 @@ function tafelAuf(name) {
   tafel.classList.toggle('breit', !!t.breit);
   zerfallAbbrechen();
   tafel.hidden = false; tafel.classList.remove('an'); void tafel.offsetWidth;
-  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; cTeile = cLinks = null; bTeile = bLinks = null; koTeile = koLinks = null; geTeile = geLinks = null; tafelAnimationStarten();
+  rahmenZeit = 0; vFort = 0; kNeu = true; lTeile = null; cTeile = cLinks = null; bTeile = bLinks = null; koTeile = koLinks = null; geTeile = geLinks = null; imTeile = imLinks = null; tafelAnimationStarten();
   tafel.classList.add('an'); schleier.classList.add('an');
   document.getElementById('tafel-zu').focus({ preventScroll: true });
 }
@@ -1215,7 +1225,7 @@ function blatt(lx, ly, laenge, winkel) {           // tropfenförmiges Blatt, lo
   tg.bezierCurveTo(laenge * 0.35, -laenge * 0.32, laenge * 0.8, -laenge * 0.12, laenge, 0);
   tg.bezierCurveTo(laenge * 0.8, laenge * 0.12, laenge * 0.35, laenge * 0.32, 0, 0); tg.fill(); tg.restore();
 }
-function ornamentRahmen(bw, bh, t, hellJetzt) {
+function ornamentRahmen(bw, bh, t, hellJetzt, mx = -999, my = -999) {
   const m = bw < 500 ? 12 : 15, r = 16, x0 = m, y0 = m, w = bw - 2 * m, h = bh - 2 * m;
   const P = 2 * (w - 2 * r) + 2 * (h - 2 * r) + 2 * Math.PI * r;
   const n = Math.max(12, Math.round(P / 46)), L = P / n;
@@ -1238,18 +1248,18 @@ function ornamentRahmen(bw, bh, t, hellJetzt) {
     for (const [teil, art] of [[0.25, 'schnecke'], [0.75, 'faecher']]) {
       const s = s0 + (k + teil) * L, v = sichtbar(s);
       if (v <= 0) continue;
-      const auf = Math.min(1, v / 60), gr = (1 - Math.pow(1 - auf, 2)) * (bw < 500 ? 0.8 : 1);
-      const [x, y, a] = punkt(s);
+      const auf = Math.min(1, v / 60), [x, y, a] = punkt(s), bluete = rahmenBluete(x, y, mx, my);
+      const gr = (1 - Math.pow(1 - auf, 2)) * (bw < 500 ? 0.8 : 1) * (1 + bluete);
       tg.save(); tg.translate(x, y); tg.rotate(a); tg.scale(gr, gr);
       if (art === 'schnecke') {
         const seite = k % 2 ? 1 : -1;               // abwechselnd links und rechts eingerollt
-        tg.scale(seite, 1); tg.strokeStyle = gold + (0.7 * auf).toFixed(2) + ')'; tg.lineWidth = 1.2 / Math.max(gr, 0.3);
+        tg.scale(seite, 1); tg.strokeStyle = gold + Math.min(1, 0.7 * auf + bluete * 0.3).toFixed(2) + ')'; tg.lineWidth = 1.2 / Math.max(gr, 0.3);
         tg.beginPath();
         for (let i = 0; i <= 30; i++) { const th = i / 30 * Math.PI * 2.1, rr = 6.5 * (1 - i / 30 * 0.72); const px = Math.sin(th) * rr, py = 6.5 - Math.cos(th) * rr; i ? tg.lineTo(px, py) : tg.moveTo(px, py); }
         tg.stroke();
         tg.fillStyle = rot + (0.8 * auf).toFixed(2) + ')'; tg.beginPath(); tg.arc(0.4, 6.8, 1.3, 0, Math.PI * 2); tg.fill();
       } else {
-        tg.fillStyle = gold + (0.78 * auf).toFixed(2) + ')';
+        tg.fillStyle = gold + Math.min(1, 0.78 * auf + bluete * 0.22).toFixed(2) + ')';
         blatt(0, 0, 11, -Math.PI / 2); blatt(0, 0, 8.5, -Math.PI / 2 - 0.75); blatt(0, 0, 8.5, -Math.PI / 2 + 0.75);
         tg.fillStyle = rot + (0.85 * auf).toFixed(2) + ')'; tg.beginPath(); tg.arc(0, -1, 1.5, 0, Math.PI * 2); tg.fill();
       }
@@ -1276,10 +1286,10 @@ function ornamentRahmen(bw, bh, t, hellJetzt) {
 }
 function tafelAnimationStarten() {
   if (tafelLaeuft) return; tafelLaeuft = true;
-  let vor = performance.now(), tz = 0;
+  let vor = performance.now(), tz = 0, eckSchwung = 0; const eckDreh = [0, 0];
   function bild(jetzt) {
     if (!offeneTafel && tafel.hidden) { tafelLaeuft = false; return; }
-    const dt = Math.min(0.05, (jetzt - vor) / 1000); vor = jetzt; tz += dt;
+    const dt = Math.min(0.05, (jetzt - vor) / 1000); vor = jetzt; tz += dt; fingerTakt();
     const r = tafel.getBoundingClientRect(), dpr = pixelDichte();
     if (tcv.width !== Math.round(r.width * dpr) || tcv.height !== Math.round(r.height * dpr)) {
       tcv.width = Math.round(r.width * dpr); tcv.height = Math.round(r.height * dpr);
@@ -1294,12 +1304,13 @@ function tafelAnimationStarten() {
     const kranzLinks = offeneTafel === 'bewertungen' && r.left > 240;   // Adam (v54): Kranz mit Sprechblasen links neben den Bewertungen
     const karteLinks = offeneTafel === 'kontakt' && r.left > 240;   // Adam (v55): Stadtplan mit Nadel links neben dem Kontakt
     const linieLinks = offeneTafel === 'familie' && r.left > 240;   // Adam (v57): Lebenslinie aus Licht links neben Unsere Geschichte
-    const mitMotiv = ['unternehmen', 'speisekarte', 'catering', 'bewertungen', 'kontakt', 'familie'].includes(offeneTafel);
+    const waageLinks = offeneTafel === 'impressum' && r.left > 240;   // Adam (v58): Waage mit Herz und § links neben dem Impressum
+    const mitMotiv = ['unternehmen', 'speisekarte', 'catering', 'bewertungen', 'kontakt', 'familie', 'impressum'].includes(offeneTafel);
     tafel.classList.remove('mit-baum'); tafel.classList.toggle('mit-motiv', mitMotiv);
     if (mitMotiv || bcv.classList.contains('an')) {
       if (bcv.width !== Math.round(innerWidth * dpr) || bcv.height !== Math.round(innerHeight * dpr)) { bcv.width = Math.round(innerWidth * dpr); bcv.height = Math.round(innerHeight * dpr); }
       bg.setTransform(dpr, 0, 0, dpr, 0, 0); bg.clearRect(0, 0, innerWidth, innerHeight);
-      bcv.classList.toggle('an', baumDraussen || motivLinks || laternenLinks || kranzLinks || karteLinks || linieLinks);
+      bcv.classList.toggle('an', baumDraussen || motivLinks || laternenLinks || kranzLinks || karteLinks || linieLinks || waageLinks);
     }
     // draußen liegt der Baum auf der abgedunkelten Startseite, darum dort immer in leuchtenden Farben
     if (baumDraussen) familienBaum(bg, r.left, innerHeight, Math.max(0, rahmenZeit - 0.3), false, maus.x, maus.y);
@@ -1308,18 +1319,22 @@ function tafelAnimationStarten() {
     if (kranzLinks) bewertungLinks(bg, r.left, innerHeight, maus.x, maus.y);
     if (karteLinks) kontaktLinks(bg, r.left, innerHeight, maus.x, maus.y);
     if (linieLinks) geschichteLinks(bg, r.left, innerHeight, maus.x, maus.y);
+    if (waageLinks) impressumLinks(bg, r.left, innerHeight, maus.x, maus.y);
     if (offeneTafel === 'unternehmen') verwandlung(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'speisekarte') kartenMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'catering') cateringMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'bewertungen') bewertungMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'kontakt') kontaktMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else if (offeneTafel === 'familie') geschichteMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
+    else if (offeneTafel === 'impressum') impressumMotiv(tg, r.width, r.height, dt, hellJetzt, maus.x - r.left, maus.y - r.top);
     else {
     // Ornament in der Ecke unten rechts
     const cx = r.width * 0.92, cy = r.height * 0.9, R = Math.max(r.width, r.height) * 0.42;
-    [[R, 0.03, hellJetzt ? 'rgba(138,75,6,.16)' : 'rgba(242,169,59,.13)'], [R * 0.62, -0.05, hellJetzt ? 'rgba(147,32,26,.16)' : 'rgba(224,80,58,.14)']].forEach(([rad, tempo, farbe]) => {
+    const schub = (fingerV.x + fingerV.y) * 0.02 + wellenJetzt.reduce((s, w) => s + (1 - w.a) ** 3, 0) * 1.4;   // Adam (v58): dreht mit dem Finger mit
+    eckSchwung += (schub - eckSchwung) * 0.1; eckDreh[0] += (0.03 + eckSchwung) * dt; eckDreh[1] += (-0.05 - eckSchwung * 1.4) * dt;
+    [[R, 0.03, hellJetzt ? 'rgba(138,75,6,.16)' : 'rgba(242,169,59,.13)'], [R * 0.62, -0.05, hellJetzt ? 'rgba(147,32,26,.16)' : 'rgba(224,80,58,.14)']].forEach(([rad, , farbe], i) => {
       tg.strokeStyle = farbe; tg.lineWidth = 1.2; tg.beginPath();
-      for (let k = 0; k <= 12; k++) { const a = tz * tempo + (k * 5 % 12) * Math.PI / 6; const x = cx + Math.cos(a) * rad, y = cy + Math.sin(a) * rad; k ? tg.lineTo(x, y) : tg.moveTo(x, y); }
+      for (let k = 0; k <= 12; k++) { const a = eckDreh[i] + (k * 5 % 12) * Math.PI / 6; const x = cx + Math.cos(a) * rad, y = cy + Math.sin(a) * rad; k ? tg.lineTo(x, y) : tg.moveTo(x, y); }
       tg.stroke();
       tg.beginPath(); tg.arc(cx, cy, rad * 1.05, 0, Math.PI * 2); tg.setLineDash([2, 7]); tg.stroke(); tg.setLineDash([]);
     });
@@ -1330,14 +1345,24 @@ function tafelAnimationStarten() {
     for (const f of tglut) {
       f.ph += dt; f.y += f.vy * dt; f.x += Math.sin(f.ph * 1.2) * 8 * dt + f.vx * dt; f.vx *= 0.93;
       const dx = f.x - mx, dy = f.y - my, d = Math.hypot(dx, dy);
-      if (d < 90 && d > 0) f.vx += dx / d * (90 - d) * 1.2;
+      const fw = beruehrt ? 140 : 90;
+      if (d < fw && d > 0) { f.vx += dx / d * (fw - d) * 1.2 + fingerV.x * (1 - d / fw) * 1.5; f.y += fingerV.y * (1 - d / fw) * 0.6; }
       if (f.y < -10) { f.y = r.height + 10; f.x = Math.random() * r.width; }
       const fl = 0.5 + 0.5 * Math.sin(tz * 3 + f.ph * 2);
       tg.fillStyle = hellJetzt ? `rgba(147,32,26,${0.28 * fl})` : `rgba(255,${140 + Math.round(60 * fl)},70,${0.5 * fl})`;
       tg.beginPath(); tg.arc(f.x, f.y, f.s, 0, Math.PI * 2); tg.fill();
     }
+    // Berührungswellen (Adam, v58): ein Lichtring breitet sich vom Finger aus
+    for (const s of wellenJetzt) {
+      const al = (1 - s.a) ** 1.5, wx = s.x - r.left, wy = s.y - r.top;
+      if (s.a < 0.35) { const gl = tg.createRadialGradient(wx, wy, 0, wx, wy, 46), st = (1 - s.a / 0.35) * (hellJetzt ? 0.22 : 0.4);
+        gl.addColorStop(0, hellJetzt ? `rgba(168,90,12,${st.toFixed(3)})` : `rgba(255,214,150,${st.toFixed(3)})`); gl.addColorStop(1, 'rgba(255,180,90,0)');
+        tg.fillStyle = gl; tg.beginPath(); tg.arc(wx, wy, 46, 0, Math.PI * 2); tg.fill(); }
+      tg.strokeStyle = hellJetzt ? `rgba(138,75,6,${(0.45 * al).toFixed(3)})` : `rgba(255,190,110,${(0.6 * al).toFixed(3)})`;
+      tg.lineWidth = 1 + 2 * al; tg.beginPath(); tg.arc(wx, wy, s.R, 0, Math.PI * 2); tg.stroke();
+    }
     tg.globalCompositeOperation = 'source-over';
-    rahmenZeit += dt; ornamentRahmen(r.width, r.height, leise ? 9 : Math.max(0, rahmenZeit - 0.35), hellJetzt);
+    rahmenZeit += dt; ornamentRahmen(r.width, r.height, leise ? 9 : Math.max(0, rahmenZeit - 0.35), hellJetzt, mx, my);
     requestAnimationFrame(bild);
   }
   requestAnimationFrame(bild);
@@ -1395,8 +1420,7 @@ function familienBaum(c, w, h, t, hellJetzt, mx, my) {
     const auf = Math.min(1, (t - b.start) / 0.5); if (auf <= 0) continue;
     const wind = Math.sin(t * 1.1 + b.hx * 0.01) * 2.5;
     b.vx = (b.vx + (b.hx + wind - b.x) * 0.05) * 0.88; b.vy = (b.vy + (b.hy - b.y) * 0.05) * 0.88;
-    const dx = b.x - mx, dy = b.y - my, d = Math.hypot(dx, dy);
-    if (d < 80 && d > 0) { const k = (1 - d / 80) * 2.2; b.vx += dx / d * k; b.vy += dy / d * k; }
+    schubsen(b, mx, my, 80, 2.2);
     b.x += b.vx; b.y += b.vy;
     const [cr, cg, cb] = farben[b.art < 0.45 ? 0 : b.art < 0.75 ? 1 : 2];
     const fl = 0.55 + 0.45 * Math.sin(t * 2.2 + b.ph);
@@ -1454,8 +1478,7 @@ function verwandlung(c, w, band, dt, hellJetzt, mx, my) {   // band = Höhe des 
     const [ax, ay, fa, ha] = V_FORMEN[i0](p.z, vZeit), [bx, by, fb, hb] = V_FORMEN[i0 + 1](p.z, vZeit);
     const tx = cx + (ax + (bx - ax) * e + p.fx * streu * 0.9) * S, ty = cy + (ay + (by - ay) * e + p.fy * streu * 0.9) * S;
     p.vx = (p.vx + (tx - p.x) * 0.08) * 0.84; p.vy = (p.vy + (ty - p.y) * 0.08) * 0.84;
-    const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
-    if (d < 70 && d > 0.1) { const k = (1 - d / 70) * 2.4; p.vx += dx / d * k; p.vy += dy / d * k; }
+    schubsen(p, mx, my, 70, 2.4);
     p.x += p.vx; p.y += p.vy;
     const fc = e < 0.5 ? pal[fa] : pal[fb], hel = (ha + (hb - ha) * e) * (1 - streu * 0.35);
     c.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, hel * (hellJetzt ? 1 : 1.05)).toFixed(3)})`;
@@ -1561,8 +1584,7 @@ function kartenMotiv(c, w, h, dt, hellJetzt, mx, my) {
     const [ax, ay, fa, ha] = formA(p.z, kZeit), [bx, by, fb, hb] = formB(p.z, kZeit);
     const tx = cx + (ax + (bx - ax) * e + p.fx * streu * 0.9) * S, ty = cy + (ay + (by - ay) * e + p.fy * streu * 0.9) * S;
     p.vx = (p.vx + (tx - p.x) * 0.08) * 0.84; p.vy = (p.vy + (ty - p.y) * 0.08) * 0.84;
-    const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
-    if (d < 70 && d > 0.1) { const k = (1 - d / 70) * 2.4; p.vx += dx / d * k; p.vy += dy / d * k; }
+    schubsen(p, mx, my, 70, 2.4);
     p.x += p.vx; p.y += p.vy;
     const hel = (ha + (hb - ha) * e) * (1 - streu * 0.35) * staerke;
     if (hel < 0.02) continue;
@@ -1599,8 +1621,7 @@ function linkesMotiv(c, w, h, dt, mx, my, hellJetzt) {
   for (let n = 0, bis = sparsam ? 2500 : lTeile.length; n < bis; n++) { const p = lTeile[n], q = p.q;
     const tx = cx + (q[0] * 0.95 + Math.sin(q[1] * 8 + lZeit * 1.3) * 0.006) * S, ty = cy + q[1] * 0.95 * S;
     p.vx = (p.vx + (tx - p.x) * 0.07) * 0.85; p.vy = (p.vy + (ty - p.y) * 0.07) * 0.85;
-    const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
-    if (d < 90 && d > 0.1) { const k = (1 - d / 90) * 2.6; p.vx += dx / d * k; p.vy += dy / d * k; }
+    schubsen(p, mx, my, 90, 2.6);
     p.x += p.vx; p.y += p.vy;
     const welle = Math.max(0, Math.cos(q[0] * 3 - lZeit * 1.2)) ** 6, hel = 0.8 + 0.2 * welle;
     // der Schimmer hellt die Logofarbe auf (im Dunkeln), die Punkte sind im Sparmodus etwas größer, weil es weniger sind
@@ -1668,8 +1689,7 @@ function cPunkte(c, teile, form, cx, cy, S, mx, my, pal, staerke, weit) {
   for (let n = 0, bis = sparsam ? 1300 : teile.length; n < bis; n++) { const p = teile[n];
     const [x, y, fa, ha] = form(p.z, cZeit), tx = cx + x * S, ty = cy + y * S;
     p.vx = (p.vx + (tx - p.x) * 0.07) * 0.85; p.vy = (p.vy + (ty - p.y) * 0.07) * 0.85;
-    const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
-    if (d < weit && d > 0.1) { const k = (1 - d / weit) * 2.5; p.vx += dx / d * k; p.vy += dy / d * k; }
+    schubsen(p, mx, my, weit, 2.5);
     p.x += p.vx; p.y += p.vy;
     const hel = ha * staerke; if (hel < 0.02) continue;
     const fc = pal[fa] || pal[0];
@@ -1954,6 +1974,56 @@ function geschichteLinks(c, w, h, mx, my) {   // liegt auf der abgedunkelten Sta
   const S = Math.min(w * 0.46, h * 0.33);
   c.globalCompositeOperation = 'lighter';
   cPunkte(c, geLinks, GE_LINIE, w / 2, h / 2, S, mx, my, K_FARBEN.dunkel, 1, 90);
+  c.globalCompositeOperation = 'source-over';
+}
+/* Impressum (Adam, v58): links am Laptop eine goldene Waage mit einem Herz in der linken und einem § in der rechten Schale,
+   sie wiegt sich langsam aus. Im Fenster ein großes § aus Lichtpunkten, ein Glanz läuft hindurch,
+   darum drehen sich zwei Ringe mit Achtsternen. */
+const imText = {};   // „§“ in Gloock als Punktewolke
+function imTextAbtasten(s, groesse) { const c = document.createElement('canvas'); c.width = 420; c.height = 240; const g = c.getContext('2d');
+  g.font = `400 ${groesse}px Gloock, serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s, 210, 125);
+  const d = g.getImageData(0, 0, 420, 240).data, pts = [];
+  for (let y = 0; y < 240; y += 2) for (let x = 0; x < 420; x += 2) if (d[(y * 420 + x) * 4 + 3] > 140) pts.push([(x - 210) / 210, (y - 120) / 210]);
+  imText[s] = pts; }
+document.fonts.load('400 150px Gloock').catch(() => {}).then(() => imTextAbtasten('§', 200));
+const imParagraf = (u, cx, cy, gr) => { const pts = imText['§']; if (!pts || !pts.length) return null; const p = pts[Math.floor(u * pts.length)]; return [cx + p[0] * gr, cy + p[1] * gr]; };
+const imFunkel = (z, t, a) => [(z.b * 2 - 1) * 1.05, (z.c * 2 - 1) * 1.4, 3, a * Math.pow(Math.max(0, Math.sin(t * 1.8 + z.d * 50)), 10)];
+const IM_WAAGE = (z, t) => {
+  const q = z.a, th = .12 * Math.sin(t * .7) + .04 * Math.sin(t * 1.9), PX = 0, PY = -.5, L = .66, c = Math.cos(th), s = Math.sin(th);
+  const E = k => [PX + k * L * c, PY + k * L * s];
+  if (q < .12) { const [x, y] = geStrecke([[-.035, .95], [-.035, -.48], [.035, -.48], [.035, .95]], z.b); return [x, y, 0, .8]; }               // Säule
+  if (q < .2) { const [x, y] = geStrecke([[-.4, 1.02], [-.3, .94], [.3, .94], [.4, 1.02], [-.4, 1.02]], z.b); return [x, y, 0, .8]; }         // Fuß
+  if (q < .26) { const [x, y] = koZacke(PX, PY - .14, .08, 8, .5, z.b, t * .2); return [x, y, 3, .9]; }                                       // Achtstern oben
+  if (q < .38) { const v = z.b * 2 - 1, d = (z.c < .5 ? -1 : 1) * .018; return [PX + v * L * c - d * s, PY + v * L * s + d * c, 0, .85]; }   // Balken
+  const k = z.b < .5 ? -1 : 1, [ex, ey] = E(k), sx = ex, sy = ey + .62, pe = Math.sin(t * .7 + k) * .015;
+  if (q < .5) { const j = Math.floor(z.c * 3), zx = sx + (j - 1) * .24 + pe, v = z.d; return [ex + (zx - ex) * v, ey + (sy - ey) * v, 3, Math.floor(v * 30) % 2 ? .25 : .55]; }   // Ketten
+  if (q < .68) { const a = z.c * C_PI, rand = z.d < .3; return rand ? [sx + pe + (z.c * 2 - 1) * .26, sy, 0, .8] : [sx + pe + Math.cos(a) * .26, sy + Math.sin(a) * .09, 0, .85]; }   // Schalen
+  if (q < .84) { if (k < 0) { const [x, y] = z.c < .6 ? bHerzRand(sx + pe, sy - .09, .1, z.d) : bHerzFlaeche(sx + pe, sy - .09, .1, z.d, (z.c - .6) / .4); return [x, y, z.c < .6 ? 6 : 5, z.c < .6 ? .95 : .4]; }   // Herz links
+    const p = imParagraf(z.d, sx + pe, sy - .14, .2); return p ? [p[0], p[1], 3, .9] : [sx, sy, 0, 0]; }                                       // § rechts
+  return imFunkel(z, t, .35);
+};
+const IM_PARAGRAF = (z, t) => {
+  const q = z.a, atem = 1 + .02 * Math.sin(t * .9);
+  if (q < .55) { const pt = imParagraf(z.b, 0, -.05, 1.05 * atem); if (!pt) return [0, 0, 0, 0]; const glanz = Math.pow(Math.max(0, Math.sin(pt[1] * 4 - t * 1.4)), 8); return [pt[0], pt[1], glanz > .3 ? 3 : 0, .55 + .45 * glanz]; }
+  if (q < .72) { const r = z.c < .5 ? .95 : .82, [x, y] = cRing(0, -.05, r, r, z.b); return [x, y, 0, Math.floor(z.b * 140) % 2 ? .1 : .4]; }   // zwei Ringe
+  if (q < .86) { const k = Math.floor(z.b * 8), a = k / 8 * C_TAU + t * .06, [x, y] = koZacke(Math.cos(a) * .885, -.05 + Math.sin(a) * .885, .05, 8, .5, z.c); return [x, y, 3, .7]; }   // Achtsterne auf dem Ring
+  return imFunkel(z, t, .35);
+};
+let imTeile = null, imLinks = null;
+function impressumMotiv(c, w, h, dt, hellJetzt, mx, my) {
+  cZeit += dt;
+  if (!imTeile) imTeile = cNeueTeile(2400, w, h);
+  const kopf = document.querySelector('.tafel-kopf').offsetHeight;
+  const S = Math.min(w * 0.44, (h - kopf) * 0.4), cx = w / 2, cy = kopf + (h - kopf) * 0.5 + S * 0.05;   // § mittig im Fenster
+  if (!hellJetzt) c.globalCompositeOperation = 'lighter';
+  cPunkte(c, imTeile, IM_PARAGRAF, cx, cy, S, mx, my, hellJetzt ? K_FARBEN.hell : K_FARBEN.dunkel, hellJetzt ? 0.8 : 1, 70);
+  c.globalCompositeOperation = 'source-over';
+}
+function impressumLinks(c, w, h, mx, my) {   // liegt auf der abgedunkelten Startseite, darum immer leuchtend
+  if (!imLinks || imLinks.w !== w || imLinks.h !== h) { imLinks = cNeueTeile(2400, w, h); imLinks.w = w; imLinks.h = h; }
+  const S = Math.min(w * 0.46, h * 0.345);
+  c.globalCompositeOperation = 'lighter';
+  cPunkte(c, imLinks, IM_WAAGE, w / 2, h / 2 - S * 0.15, S, mx, my, K_FARBEN.dunkel, 1, 90);
   c.globalCompositeOperation = 'source-over';
 }
 
@@ -2323,7 +2393,7 @@ function neueGlut(irgendwo) {
 let vorher = performance.now();
 function malen(jetzt) {
   const roh = Math.max(0, (jetzt - vorher) / 1000), dt = Math.min(0.05, roh); vorher = jetzt; zeit += dt;
-  lastPruefen(Math.min(1, roh));
+  lastPruefen(Math.min(1, roh)); fingerTakt();
   const hell = istHell();
   g.clearRect(0, 0, W, H);
   g.globalCompositeOperation = hell ? 'source-over' : 'lighter';
@@ -2333,7 +2403,8 @@ function malen(jetzt) {
     f.ph += dt; f.y += f.vy * dt; f.x += Math.sin(f.ph * 1.3) * 10 * dt + f.vx * dt; f.vx *= 0.94;
     if (neigung.aktiv) { f.x += neigung.x * 60 * dt; f.y += neigung.y * 25 * dt; }
     const dx = f.x - maus.x, dy = f.y - maus.y, d = Math.hypot(dx, dy);
-    if (d < 110 && d > 0) { f.vx += dx / d * (110 - d) * 0.9; }
+    const fw = beruehrt ? 170 : 110;   // mit dem Finger weiter und beim Wischen mitgerissen (v58)
+    if (d < fw && d > 0) { f.vx += dx / d * (fw - d) * 0.9 + fingerV.x * (1 - d / fw) * 1.5; f.y += fingerV.y * (1 - d / fw) * 0.6; }
     if (f.y < -20 || f.x < -30 || f.x > W + 30) Object.assign(f, neueGlut(false));
     const fl = 0.55 + 0.45 * Math.sin(zeit * 3 + f.flack);
     g.fillStyle = hell ? `rgba(147,32,26,${0.3 * fl})` : `rgba(255,${130 + Math.round(60 * fl)},60,${0.45 * fl})`;
@@ -2362,7 +2433,7 @@ function malen(jetzt) {
   const schubX = perNeigung ? ver.x - altX : 0, schubY = perNeigung ? ver.y - altY : 0;
   menueImKreis();
   const schimmer = zeit * 0.55;                       // Lichtschimmer läuft im Kreis
-  const reich = Math.max(60, RO.R * 0.2), reich2 = reich * reich;
+  const reich = Math.max(60, RO.R * 0.2) * (beruehrt ? 1.6 : 1), reich2 = reich * reich;   // der Finger ist breiter als die Maus (v58)
   const groesse = Math.max(0.85, RO.R / 330);
   for (const p of punkte) {
     if (zeit < p.start) continue;
@@ -2373,7 +2444,7 @@ function malen(jetzt) {
     p.vy = (p.vy + (ty - p.y) * 0.06) * 0.86;
     { const sp = Math.hypot(p.vx, p.vy); if (sp > 24) { p.vx *= 24 / sp; p.vy *= 24 / sp; } }   // weicher Einflug statt Sprung
     const dx = p.x - maus.x, dy = p.y - maus.y, d2 = dx * dx + dy * dy;
-    if (d2 < reich2 && d2 > 0.01) { const d = Math.sqrt(d2), k = (1 - d / reich) * 2.6; p.vx += dx / d * k; p.vy += dy / d * k; }
+    if (d2 < reich2 && d2 > 0.01) { const d = Math.sqrt(d2), f = 1 - d / reich, k = f * 2.6; p.vx += dx / d * k + fingerV.x * f * 0.5; p.vy += dy / d * k + fingerV.y * f * 0.5; }
     p.x += p.vx; p.y += p.vy;
 
     // Helligkeit: Schimmer, leichtes Flackern, schnelle Punkte leuchten auf, zur Mitte hin leiser (dort steht die Schrift)
@@ -2457,12 +2528,109 @@ document.addEventListener('pointerdown', e => {
   if (e.target.closest('button, a, .tafel')) return;
   klickWelle(e.clientX, e.clientY);
 });
-addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') maus.x = maus.y = -999; });
-addEventListener('pointercancel', () => { maus.x = maus.y = -999; });
+addEventListener('pointerup', e => { if (e.pointerType === 'pen') maus.x = maus.y = -999; });   // Finger: siehe fingerWeg (v58)
+addEventListener('pointercancel', e => { if (e.pointerType !== 'touch') maus.x = maus.y = -999; });
+/* Finger (Adam, v58): auf Handy und Tablet reagiert jede Animation auf Berührung und Wischen, nicht nur auf einen Klick.
+   In den Fenstern scrollt der Finger gleichzeitig; dabei meldet der Browser keine Zeiger-Bewegung mehr,
+   die Touch-Ereignisse laufen aber weiter. Darum liest die Seite den Finger hier direkt. */
+const finger = { x: 0, y: 0, vx: 0, vy: 0, zeit: 0 }, fingerV = { x: 0, y: 0 };   // Wischtempo in Pixel pro Bild
+let beruehrt = false;                       // solange ein Finger aufliegt, weichen die Punkte weiter aus als vor der Maus
+const wellen = []; let wellenJetzt = [];    // jede Berührung schickt eine Welle durch die Punkte
+const WELLE_DAUER = 900;
+function fingerLesen(e) {
+  const t = e.touches[0]; if (!t) return;
+  const jetzt = performance.now();
+  if (beruehrt && finger.zeit) { const bilder = Math.max(0.5, (jetzt - finger.zeit) / 16.7);   // eigene letzte Stelle, die Zeiger-Ereignisse setzen maus schon vorher
+    finger.vx += ((t.clientX - finger.x) / bilder - finger.vx) * 0.6; finger.vy += ((t.clientY - finger.y) / bilder - finger.vy) * 0.6; }
+  maus.x = finger.x = t.clientX; maus.y = finger.y = t.clientY; finger.zeit = jetzt; beruehrt = true;
+}
+function fingerWeg(e) { if (e.touches.length) return; beruehrt = false; maus.x = maus.y = -999; finger.vx = finger.vy = 0; }
+document.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) { beruehrt = false; finger.vx = finger.vy = 0; }
+  fingerLesen(e);
+  const t = e.changedTouches[0]; wellen.push({ x: t.clientX, y: t.clientY, t: performance.now() }); if (wellen.length > 6) wellen.shift();
+}, { passive: true, capture: true });
+document.addEventListener('touchmove', fingerLesen, { passive: true, capture: true });
+document.addEventListener('touchend', fingerWeg, { passive: true, capture: true });
+document.addEventListener('touchcancel', fingerWeg, { passive: true, capture: true });
+// mit der Maus schickt ein Klick ins Fenster ebenfalls eine Welle
+document.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.target.closest('.tafel')) wellen.push({ x: e.clientX, y: e.clientY, t: performance.now() }); });
+function fingerTakt() {   // einmal pro Bild: aktuelles Wischtempo und laufende Wellen
+  const jetzt = performance.now(), frisch = Math.max(0, 1 - (jetzt - finger.zeit) / 120);
+  fingerV.x = finger.vx * frisch; fingerV.y = finger.vy * frisch;
+  while (wellen.length && jetzt - wellen[0].t > WELLE_DAUER) wellen.shift();
+  wellenJetzt = wellen.map(w => { const a = (jetzt - w.t) / WELLE_DAUER; return { x: w.x, y: w.y, a, R: 18 + 340 * (1 - (1 - a) ** 2), kraft: 3.4 * (1 - a) ** 1.5 }; });
+}
+// gemeinsame Fingerkraft für alle Punkte-Motive: ausweichen, beim Wischen mitziehen, Wellen
+function schubsen(p, mx, my, weit, staerke) {
+  const w = beruehrt ? weit * 1.7 : weit, dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
+  if (d < w && d > 0.1) { const f = 1 - d / w, k = f * staerke * (beruehrt ? 1.3 : 1); p.vx += dx / d * k + fingerV.x * f * 0.5; p.vy += dy / d * k + fingerV.y * f * 0.5; }
+  if (!wellenJetzt.length) return;
+  const ox = maus.x - mx, oy = maus.y - my;   // die Motive rechnen im eigenen Fenster, die Wellen in Bildschirm-Koordinaten
+  for (const s of wellenJetzt) {
+    const wx = p.x + ox - s.x, wy = p.y + oy - s.y, wd = Math.hypot(wx, wy), rand = Math.abs(wd - s.R);
+    if (rand < 40 && wd > 0.1) { const k = s.kraft * (1 - rand / 40); p.vx += wx / wd * k; p.vy += wy / wd * k; }
+  }
+}
+function rahmenBluete(x, y, mx, my) {   // Ornamente des Fensterrahmens unter dem Finger und auf der Welle blühen auf
+  let b = Math.max(0, 1 - Math.hypot(x - mx, y - my) / (beruehrt ? 120 : 80)) * 0.8;
+  const ox = maus.x - mx, oy = maus.y - my;
+  for (const s of wellenJetzt) b += Math.max(0, 1 - Math.abs(Math.hypot(x + ox - s.x, y + oy - s.y) - s.R) / 34) * (1 - s.a) * 0.9;
+  return b;
+}
+// Drehende Siegel, der Puls bei „Täglich geöffnet“ und Adams Schmetterling: Berühren macht sie kurz schneller, dann wieder ruhig
+function anschubsen(el, wie) {
+  if (!el || !el.getAnimations || leise) return;
+  for (const a of el.getAnimations({ subtree: true })) {
+    if (a.playState !== 'running' || !/^(drehen|fluegelschlag|puls)$/.test(a.animationName || '')) continue;
+    const start = performance.now(); a.playbackRate = wie;
+    const ab = () => { const f = Math.min(1, (performance.now() - start) / 1800); a.playbackRate = wie + (1 - wie) * f * f; if (f < 1) requestAnimationFrame(ab); };
+    requestAnimationFrame(ab);
+  }
+}
+document.addEventListener('pointerdown', e => { const s = e.target.closest('.siegel, .offen'); if (s) anschubsen(s, s.classList.contains('offen') ? 4 : 14); });
+// Fotos: ein warmer Lichtfleck folgt Finger oder Maus, das Bild rückt ein wenig näher
+let fotoJetzt = null;
+function fotoLicht(x, y) {
+  const el = offeneTafel && x > -900 ? document.elementFromPoint(x, y) : null, fig = el && el.closest('.fotos figure, .seite-bild');
+  if (fotoJetzt && fotoJetzt !== fig) fotoJetzt.classList.remove('licht');
+  fotoJetzt = fig; if (!fig) return;
+  const r = fig.getBoundingClientRect();
+  fig.style.setProperty('--lx', ((x - r.left) / r.width * 100).toFixed(1) + '%'); fig.style.setProperty('--ly', ((y - r.top) / r.height * 100).toFixed(1) + '%');
+  fig.classList.add('licht');
+}
+addEventListener('pointermove', e => { if (e.pointerType === 'mouse') fotoLicht(e.clientX, e.clientY); });
+document.addEventListener('pointerout', e => { if (!e.relatedTarget) fotoLicht(-999, -999); });
+document.addEventListener('touchstart', e => fotoLicht(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+document.addEventListener('touchmove', e => fotoLicht(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+document.addEventListener('touchend', e => { if (!e.touches.length) fotoLicht(-999, -999); }, { passive: true });
+// Karussell: seitlich wischen blättert die Stimmen, die Stimme folgt dem Finger ein Stück
+let kWisch = null;
+document.addEventListener('touchstart', e => {
+  const k = e.target.closest && e.target.closest('#karussell'); if (!k) { kWisch = null; return; }
+  const t = e.touches[0]; kWisch = { x: t.clientX, y: t.clientY, fig: k.querySelector('figure.an') }; karussellPause = true;
+}, { passive: true });
+document.addEventListener('touchmove', e => {
+  if (!kWisch || !kWisch.fig) return;
+  const t = e.touches[0], dx = t.clientX - kWisch.x, dy = t.clientY - kWisch.y;
+  kWisch.fig.style.transition = 'none'; kWisch.fig.style.translate = Math.abs(dx) > Math.abs(dy) ? `${(dx * 0.4).toFixed(1)}px 0` : '';
+}, { passive: true });
+function karussellLos(e) {
+  if (!kWisch) return;
+  const t = e.changedTouches[0], dx = t.clientX - kWisch.x, dy = t.clientY - kWisch.y, fig = kWisch.fig; kWisch = null; karussellPause = false;
+  if (fig) { fig.style.transition = ''; fig.style.translate = ''; }
+  if (e.type === 'touchend' && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+    const k = document.getElementById('karussell'), n = KARUSSELL.length;
+    karussellZeigen((+(k.dataset.jetzt || 0) + (dx < 0 ? 1 : n - 1)) % n); karussellStarten();
+  }
+}
+document.addEventListener('touchend', karussellLos, { passive: true });
+document.addEventListener('touchcancel', karussellLos, { passive: true });
 // Versteckter Sensor-Check für Adam: 4x schnell auf das Schmetterlings-Zeichen unten links tippen
 let checkTipps = [];
 addEventListener('pointerdown', e => {
   if (e.clientX > 56 || e.clientY < innerHeight - 56) return;
+  anschubsen(document.querySelector('.adams-zeichen'), 9);   // der Schmetterling flattert kurz schneller (v58)
   const t = performance.now(); checkTipps = checkTipps.filter(x => t - x < 2500); checkTipps.push(t);
   if (checkTipps.length >= 4) { checkTipps = []; sensorCheck(); }
 });
@@ -2479,7 +2647,7 @@ function sensorCheck() {
   const fp = document.featurePolicy || document.permissionsPolicy;
   const darf = n => fp && fp.allowsFeature ? (fp.allowsFeature(n) ? 'ja' : 'NEIN') : '?';
   let imRahmen; try { imRahmen = window.top !== window ? 'ja' : 'nein'; } catch (e) { imRahmen = 'ja (fremd)'; }
-  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v57</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
+  const zeigen = () => { box.innerHTML = `<b>Sensor-Check · Stand v58</b><br>Im Rahmen: ${imRahmen}<br>Gyroskop erlaubt: ${darf('gyroscope')} · Beschl.: ${darf('accelerometer')}<br>Neige-Ereignisse: ${sensorInfo.ereignisse} (mit Werten: ${sensorInfo.mitWerten})<br>Beschl.-Ereignisse: ${sensorInfo.bewegung} (mit Werten: ${sensorInfo.bewegungMitWerten})<br>Absolut-Ereignisse: ${sensorInfo.absolut} (mit Werten: ${sensorInfo.absolutMitWerten}) · Gyro: ${sensorInfo.gyro}<br>Browser-Erlaubnis Bewegung: ${chromeErlaubnis.accelerometer} · Drehung: ${chromeErlaubnis.gyroscope}<br>Automatisches Wandern: ${selbstWandern && !neigung.aktiv ? 'an' : 'aus'}<br>Quelle: ${sensorInfo.relativ ? 'Lage' : sensorInfo.bewegungMitWerten ? 'Beschleunigung' : sensorInfo.absolutMitWerten ? 'Lage (absolut)' : 'keine'}<br>iPhone-Erlaubnis: ${sensorInfo.erlaubnis}<br>Neigung: ${neigung.x.toFixed(2)} / ${neigung.y.toFixed(2)} · Sensor ${sensorInfo.proSekunde}/s<br>Bilder pro Sekunde: ${Math.round(bildRate)}${sparsam ? ' (Sparmodus)' : ''}<br><button type="button" id="sensor-fragen" style="margin-top:8px;font:inherit;padding:6px 10px">Sensor erlauben</button> <button type="button" id="sensor-zu" style="font:inherit;padding:6px 10px">Schließen</button>`; };
   zeigen(); const tick = setInterval(zeigen, 500);
   box.onclick = ev => {
     if (ev.target.id === 'sensor-zu') { clearInterval(tick); box.remove(); }
