@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geschichte-Motive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Vorschau für Adam: je drei Motiv-Ideen für Unsere Geschichte, links (Laptop) und im Fenster */
+:root { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --safran: #f2a93b; --linie: rgba(242,169,59,.28); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); } }
+:root[data-theme="light"] { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); }
+:root[data-theme="dark"] { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --linie: rgba(242,169,59,.28); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--grund); color: var(--text); font: 400 15px/1.5 "Hanken Grotesk", system-ui, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 60px; }
+h1 { font: 400 clamp(32px, 6vw, 50px)/1.05 Gloock, serif; margin: 0 0 8px; }
+h2 { font: 400 26px/1.1 Gloock, serif; margin: 34px 0 4px; }
+.ober { font: 700 11px "Hanken Grotesk"; letter-spacing: .22em; text-transform: uppercase; color: var(--safran); margin: 0 0 8px; }
+.intro, .unter { color: var(--leise); max-width: 64ch; margin: 0 0 18px; }
+.unter { font-size: 14px; margin-bottom: 12px; }
+.knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.knoepfe button { font: 600 13px "Hanken Grotesk"; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--linie); background: transparent; color: var(--text); cursor: pointer; }
+.knoepfe button[aria-pressed="true"] { background: var(--safran); border-color: var(--safran); color: #2a0b12; }
+.drei { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .drei { grid-template-columns: 1fr; } }
+.motiv { margin: 0; background: #150508; border: 1px solid var(--linie); border-radius: 18px; overflow: hidden; color: #f7e7d3; }
+.motiv .flaeche { position: relative; }
+.motiv canvas { display: block; width: 100%; aspect-ratio: 3 / 4; touch-action: pan-y; }
+.fenster { background: #1d070d; }
+.hell .fenster { background: #efd9b5; }
+.motiv figcaption { padding: 10px 14px 14px; border-top: 1px solid rgba(242,169,59,.18); background: #150508; }
+.motiv h3 { margin: 0; font: 400 21px Gloock, serif; display: flex; gap: 8px; align-items: baseline; }
+.motiv h3 span { font: 700 12.5px "Hanken Grotesk"; color: #2a0b12; background: #f2a93b; border-radius: 999px; padding: 1px 9px; }
+.motiv p { margin: 2px 0 0; color: #cdaa8d; font-size: 13.5px; }
+/* angedeutetes Formular über dem Fenster-Motiv, damit man sieht, wie es hinter dem Text wirkt */
+.formular { position: absolute; inset: 0; padding: 22px 20px; display: flex; flex-direction: column; gap: 9px; pointer-events: none; color: #f7e7d3; }
+.formular b { font: 400 28px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; }
+.formular small { font: 700 10px "Hanken Grotesk"; letter-spacing: .2em; color: #f2a93b; margin-top: 4px; }
+.formular i { display: block; height: 32px; border-radius: 10px; border: 1px solid rgba(242,169,59,.3); background: rgba(18,4,10,.55); }
+.formular i.gross { height: 78px; }
+.formular u { text-decoration: none; text-align: center; font: 600 13px "Hanken Grotesk"; color: #2a0b12; padding: 9px; border-radius: 12px; background: linear-gradient(90deg, #f2a93b, #ff6b3d); }
+.hell .formular { color: #33100a; }
+.hell .formular b { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+.hell .formular small { color: #8a4b06; }
+.hell .formular i { border-color: rgba(138,75,6,.35); background: rgba(240,212,165,.6); }
+.hell .formular u { color: #fff4e3; background: linear-gradient(90deg, #8a4b06, #a8320c); }
+.ohne-formular .formular { display: none; }
+.formular i.zeile { height: 9px; width: 72%; border: 0; border-radius: 4px; background: rgba(247,231,211,.3); }
+.formular i.kurz { width: 46%; }
+.formular em { font: normal 400 19px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; margin-top: -6px; }
+.formular small + i, .formular small + em { margin-top: -4px; }
+.hell .formular i.zeile { background: rgba(110,56,10,.3); }
+.hell .formular em { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+</style>
+</head>
+<body>
+<main>
+  <p class="ober">Musti Bistro · Unsere Geschichte · Motive</p>
+  <h1>Zwei Motive für Unsere Geschichte</h1>
+  <p class="intro">Je drei Ideen: eine Reihe für den dunklen Bereich links neben dem Geschichte-Fenster am Laptop, eine Reihe für den Hintergrund im Fenster selbst. Fahr mit der Maus oder dem Finger darüber, dann weichen die Punkte aus. Schreib mir einfach eine Zahl und einen Buchstaben, zum Beispiel „2 und B“.</p>
+
+  <h2>Links daneben (nur Laptop)</h2>
+  <p class="unter">Bleibt stehen, solange das Geschichte-Fenster offen ist.</p>
+  <div class="drei">
+    <figure class="motiv"><div class="flaeche"><canvas data-art="zeitstrahl"></canvas></div><figcaption><h3><span>1</span>Lebenslinie aus Licht</h3><p>Ein Licht wandert die Zeitleiste hinunter und lässt die Stationen aufleuchten: 1991, das Herz, ein Stern für Mustafa, eine Kerze, 2022.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="stern"></canvas></div><figcaption><h3><span>2</span>Ein Stern für Mustafa</h3><p>Ein ruhiger Nachthimmel mit einem hellen Achtstern. Kleine Lichter steigen langsam von unten zu ihm auf.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="sonne"></canvas></div><figcaption><h3><span>3</span>Sonnenaufgang über Wanzleben</h3><p>Hinter Dächern, Kirchturm und Burg geht langsam die Sonne auf, davor die Felder der Börde. Ein neuer Anfang, jeden Tag.</p></figcaption></figure>
+  </div>
+
+  <h2>Im Geschichte-Fenster (Handy, Tablet, Laptop)</h2>
+  <p class="unter">Liegt hinter dem Text, wie bei der Speisekarte und dem Catering.</p>
+  <div class="knoepfe">
+    <button type="button" id="k-formular" aria-pressed="true">Text darüber zeigen</button>
+    <button type="button" id="k-hell" aria-pressed="false">Helle Ansicht</button>
+  </div>
+  <div class="drei" id="fenster-reihe">
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="kerzen"></canvas><div class="formular"><b>Unsere Geschichte</b><small>1991</small><em>Ein neuer Anfang</em><i class="zeile"></i><i class="zeile kurz"></i><small>2022</small><em>Sein Erbe lebt weiter</em><i class="zeile"></i><i class="zeile kurz"></i></div></div><figcaption><h3><span>A</span>Kerzenlichter</h3><p>Rote Grablichter auf drei Stufen, wie vor dem Bistro. Die Flammen flackern leise, Lichtpunkte steigen auf.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="herz"></canvas><div class="formular"><b>Unsere Geschichte</b><small>1991</small><em>Ein neuer Anfang</em><i class="zeile"></i><i class="zeile kurz"></i><small>2022</small><em>Sein Erbe lebt weiter</em><i class="zeile"></i><i class="zeile kurz"></i></div></div><figcaption><h3><span>B</span>Herz aus vielen Lichtern</h3><p>Viele kleine Lichter steigen auf und bilden zusammen ein Herz, das ruhig atmet. Aus Fremden wurden Freunde.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="tuer"></canvas><div class="formular"><b>Unsere Geschichte</b><small>1991</small><em>Ein neuer Anfang</em><i class="zeile"></i><i class="zeile kurz"></i><small>2022</small><em>Sein Erbe lebt weiter</em><i class="zeile"></i><i class="zeile kurz"></i></div></div><figcaption><h3><span>C</span>Die offene Tür</h3><p>Eine Tür mit orientalischem Bogen öffnet sich, warmes Licht fällt heraus. „Ein offenes Herz öffnet jede Tür.“</p></figcaption></figure>
+  </div>
+</main>
+<script>
+const TAU = Math.PI * 2, PI = Math.PI;
+// Farben: 0 Gold, 1 Glut-Orange, 2 Paprika, 3 Creme, 4 Jade, 5 Granat, 6 Tomate, 7 Kräutergrün
+const FARBEN = {
+  dunkel: [[242, 169, 59], [255, 120, 42], [224, 72, 50], [255, 226, 180], [143, 211, 162], [190, 40, 70], [255, 80, 60], [110, 200, 95]],
+  hell:   [[138, 75, 6], [168, 50, 12], [147, 32, 26], [110, 56, 10], [40, 110, 60], [120, 20, 50], [180, 40, 25], [50, 120, 40]],
+};
+const glatt = x => x * x * (3 - 2 * x);
+const ring = (cx, cy, rx, ry, u) => [cx + Math.cos(u * TAU) * rx, cy + Math.sin(u * TAU) * ry];
+const scheibe = (cx, cy, r, u, v, ry = r) => { const w = u * TAU, q = Math.sqrt(v); return [cx + Math.cos(w) * r * q, cy + Math.sin(w) * ry * q]; };
+const drehen = (x, y, px, py, w) => { const c = Math.cos(w), s = Math.sin(w), dx = x - px, dy = y - py; return [px + dx * c - dy * s, py + dx * s + dy * c]; };
+
+// Jede Form bekommt pro Punkt vier Zufallszahlen (z.a bis z.d) und die Zeit t.
+// Zurück kommt [x, y, Farbe, Helligkeit], x etwa -1 bis 1, y nach unten.
+// Sterne: 10 Ecken, abwechselnd außen und innen
+const sternEcke = (k, R, dreh) => { const a = -PI / 2 + k * PI / 5 + dreh, rr = k % 2 ? R * .42 : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const sternRand = (cx, cy, R, u, dreh = 0) => { const k = Math.floor(u * 10), f = u * 10 - k, [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const sternFlaeche = (cx, cy, R, u, v, w, dreh = 0) => { const k = Math.floor(u * 10), [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh);
+  let a = v, b = w; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [cx + x1 * a + x2 * b, cy + y1 * a + y2 * b]; };
+// Herz: Spitze unten, etwa -0,7 bis 1 hoch
+const herzRand = (cx, cy, s, u) => { const q = u * TAU; return [cx + 16 * Math.pow(Math.sin(q), 3) / 17 * s, cy - (13 * Math.cos(q) - 5 * Math.cos(2 * q) - 2 * Math.cos(3 * q) - Math.cos(4 * q)) / 17 * s]; };
+const herzFlaeche = (cx, cy, s, u, v) => { const [x, y] = herzRand(cx, cy, s, u), q = Math.sqrt(v); return [cx + (x - cx) * q, cy + (y - cy) * q]; };
+// Hilfen für die Geschichte-Motive
+const strecke = (pts, u) => {   // Punkt auf einem Linienzug, gleichmäßig nach Länge verteilt
+  let L = 0; const l = [];
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); l.push(d); L += d; }
+  let s = u * L;
+  for (let i = 0; i < l.length; i++) { if (s <= l[i] || i === l.length - 1) { const f = Math.min(1, s / l[i]); return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]; } s -= l[i]; }
+};
+const dreieck = (A, B, C, u, v) => { let a = u, b = v; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [A[0] + (B[0] - A[0]) * a + (C[0] - A[0]) * b, A[1] + (B[1] - A[1]) * a + (C[1] - A[1]) * b]; };
+const zackeEcke = (k, R, n, innen, dreh) => { const a = -PI / 2 + k * PI / n + dreh, rr = k % 2 ? R * innen : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const zackeRand = (cx, cy, R, n, innen, u, dreh = 0) => { const k = Math.floor(u * 2 * n), f = u * 2 * n - k, [x1, y1] = zackeEcke(k, R, n, innen, dreh), [x2, y2] = zackeEcke(k + 1, R, n, innen, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const zackeFlaeche = (cx, cy, R, n, innen, u, v, w, dreh = 0) => { const k = Math.floor(u * 2 * n), [x, y] = dreieck([0, 0], zackeEcke(k, R, n, innen, dreh), zackeEcke(k + 1, R, n, innen, dreh), v, w); return [cx + x, cy + y]; };
+// Flamme: Tropfen mit Spitze oben, flackert
+const flamme = (cx, cy, h, u, v, t, k) => { const f = 1 + .12 * Math.sin(t * 9 + k * 2.3) + .06 * Math.sin(t * 15.7 + k), hh = h * f, w = u, s = Math.sin(PI * Math.pow(w, .7)) * h * .38;
+  return [cx + (v * 2 - 1) * s + Math.sin(t * 6 + k + w * 3) * h * .06 * w, cy - w * hh]; };
+// Jahreszahlen in Gloock als Punktewolke
+const textPunkte = {};
+function textAbtasten(s) { const c = document.createElement('canvas'); c.width = 420; c.height = 200; const g = c.getContext('2d');
+  g.font = '400 150px Gloock, serif'; g.textAlign = 'center'; g.fillText(s, 210, 152);
+  const d = g.getImageData(0, 0, 420, 200).data, pts = [];
+  for (let y = 0; y < 200; y += 2) for (let x = 0; x < 420; x += 2) if (d[(y * 420 + x) * 4 + 3] > 140) pts.push([(x - 210) / 210, (y - 100) / 210]);
+  textPunkte[s] = pts; }
+document.fonts.load('400 150px Gloock').catch(() => {}).then(() => { textAbtasten('1991'); textAbtasten('2022'); });
+const funkel = (z, t, a = .4) => [(z.b * 2 - 1) * 1.05, (z.c * 2 - 1) * 1.4, 3, a * Math.pow(Math.max(0, Math.sin(t * 1.8 + z.d * 50)), 10)];
+
+const FORMEN = {
+  zeitstrahl: (z, t) => {
+    const P = 12, p = (t / P) % 1, q = z.a, Y = [-1.1, -.55, 0, .55, 1.1], puls = -1.45 + p / .85 * 2.95;
+    const an = k => { const e = Math.max(0, Math.min(1, (puls - Y[k] + .05) / .18)); return p > .88 ? e * (1 - (p - .88) / .12) : e; };
+    if (q < .2) { const y = -1.42 + z.b * 2.84, nah = p < .86 ? Math.exp(-Math.pow((y - puls) / .1, 2)) : 0; return [0, y, nah > .3 ? 3 : 0, .28 + .7 * nah]; }   // die Lebenslinie
+    if (q < .24) { if (p >= .86) return [0, 1.45, 3, 0]; const [x, y] = scheibe(0, puls, .045, z.b, z.c); return [x, y, 3, .9]; }                          // das wandernde Licht
+    if (q < .38) { const k = Math.floor(z.b * 5), s = .06, [x, y] = strecke([[0, -s], [s, 0], [0, s], [-s, 0], [0, -s]], z.c); return [x, Y[k] + y, 0, .35 + .65 * an(k)]; }   // Rauten
+    if (q < .44) { const k = Math.floor(z.b * 5), seite = k % 2 ? 1 : -1; return [seite * (.1 + z.c * .2), Y[k], 0, Math.floor(z.c * 12) % 2 ? 0 : .2 + .4 * an(k)]; }   // Verbindung
+    if (q < .93) { const k = Math.floor(z.b * 5), seite = k % 2 ? 1 : -1, cx = seite * .55, cy = Y[k], hell = .12 + .88 * an(k);
+      if (k === 0 || k === 4) { const pts = textPunkte[k ? '2022' : '1991']; if (!pts || !pts.length) return [cx, cy, 0, 0];
+        const pt = pts[Math.floor(z.c * pts.length)]; return [cx + pt[0] * .34, cy + pt[1] * .34, 3, hell]; }
+      if (k === 1) { const [x, y] = z.c < .6 ? herzRand(cx, cy + .02, .13, z.d) : herzFlaeche(cx, cy + .02, .13, z.d, (z.c - .6) / .4); return [x, y, z.c < .6 ? 6 : 5, hell * (z.c < .6 ? 1 : .45)]; }
+      if (k === 2) { const [x, y] = z.c < .55 ? zackeRand(cx, cy, .15, 8, .45, z.d, t * .05) : zackeFlaeche(cx, cy, .15, 8, .45, z.d, (z.c - .55) / .45, (z.c * 7) % 1, t * .05); return [x, y, z.c < .55 ? 0 : 3, hell * (z.c < .55 ? 1 : .4)]; }   // Stern für Mustafa
+      if (z.c < .5) { const [x, y] = flamme(cx, cy - .02, .14, z.d, (z.c * 2) % 1, t, 3); return [x, y, z.d < .35 ? 3 : 1, hell]; }       // Kerze
+      const [x, y] = strecke([[cx - .06, cy - .02], [cx - .055, cy + .13], [cx + .055, cy + .13], [cx + .06, cy - .02]], z.d); return [x, y, 6, hell * .8]; }
+    return funkel(z, t, .3);
+  },
+  stern: (z, t) => {
+    const q = z.a, SX = 0, SY = -.42, atem = .88 + .12 * Math.sin(t * .8);
+    if (q < .34) return [(z.b * 2 - 1) * 1.06, (z.c * 2 - 1) * 1.42, z.d < .75 ? 3 : 0, .06 + .45 * Math.pow(Math.max(0, Math.sin(t * (.5 + z.d) + z.d * 60)), 4)];   // Himmel
+    if (q < .5) { const [x, y] = zackeRand(SX, SY, .27 * atem, 8, .45, z.b, t * .03); return [x, y, 0, .95]; }                                    // der Stern
+    if (q < .6) { const [x, y] = zackeFlaeche(SX, SY, .27 * atem, 8, .45, z.b, z.c, z.d, t * .03); return [x, y, 3, .32]; }
+    if (q < .74) { const k = Math.floor(z.b * 8), a = k * PI / 4 + t * .03 - PI / 2, L = (k % 2 ? .5 : .95) * atem, v = z.c, r = .3 + v * L;   // Strahlen
+      return [SX + Math.cos(a) * r, SY + Math.sin(a) * r, 3, (1 - v) * .5]; }
+    if (q < .8) { const [x, y] = scheibe(SX, SY, .65, z.b, z.c); return [x, y, 0, .05 * atem]; }                                                   // Schein
+    const h = (z.b + t * .03) % 1, x0 = (z.c * 2 - 1) * .95, e = glatt(h);                                                                         // Lichter steigen zu ihm auf
+    return [x0 * (1 - e) + SX * e + Math.sin(h * 9 + z.d * 20) * .05 * (1 - e), 1.5 - e * (1.5 - SY), z.d < .5 ? 0 : 3, Math.sin(PI * h) * .55];
+  },
+  sonne: (z, t) => {
+    const P = 16, p = (t / P) % 1, h = p < .45 ? glatt(p / .45) : p < .85 ? 1 : 1 - glatt((p - .85) / .15), HZ = .5, q = z.a;
+    const SX = .15, SY = HZ + .42 - h * .95, R = .28;
+    const STADT = [[-1.12, HZ], [-1.12, .3], [-.98, .2], [-.84, .3], [-.84, HZ], [-.8, HZ], [-.8, .24], [-.66, .12], [-.52, .24], [-.52, HZ],
+      [-.46, HZ], [-.46, .02], [-.38, -.32], [-.3, .02], [-.3, HZ], [-.24, HZ], [-.24, .28], [-.06, .28], [-.06, HZ], [0, HZ], [0, .22], [.14, .1], [.28, .22], [.28, HZ],
+      [.36, HZ], [.36, -.08], [.4, -.08], [.4, -.14], [.45, -.14], [.45, -.08], [.5, -.08], [.5, -.14], [.55, -.14], [.55, -.08], [.6, -.08], [.6, -.14], [.65, -.14], [.65, -.08], [.69, -.08], [.69, HZ],
+      [.74, HZ], [.74, .26], [.88, .14], [1.02, .26], [1.02, HZ], [1.12, HZ]];   // Dächer, Kirchturm, die Burg mit Zinnen
+    const dach = x => { let y = HZ; for (let i = 1; i < STADT.length; i++) { const [x1, y1] = STADT[i - 1], [x2, y2] = STADT[i]; if (x1 !== x2 && x >= Math.min(x1, x2) && x <= Math.max(x1, x2)) y = Math.min(y, y1 + (y2 - y1) * (x - x1) / (x2 - x1)); } return y; };
+    const hinten = (x, y) => y > dach(x) - .01;   // Sonne und Strahlen liegen hinter der Stadt
+    if (q < .26) { const [x, y] = strecke(STADT, z.b); return [x, y, 3, .45 + .35 * h]; }
+    if (q < .34) { const F = [[-.98, .38], [-.66, .3], [-.66, .42], [-.38, .1], [-.15, .38], [.14, .32], [.14, .42], [.52, .05], [.52, .3], [.88, .34], [.88, .44]], k = Math.floor(z.b * F.length);   // Fenster
+      const [x, y] = scheibe(F[k][0], F[k][1], .025, z.c, z.d); return [x, y, 1, (.25 + .6 * (1 - h)) * (.8 + .2 * Math.sin(t * 3 + k))]; }
+    if (q < .5) { const [x, y] = z.c < .5 ? ring(SX, SY, R, R, z.b) : scheibe(SX, SY, R, z.b, (z.c - .5) * 2); return [x, y, z.c < .5 ? 0 : 1, hinten(x, y) ? 0 : (z.c < .5 ? .9 : .3)]; }   // Sonne hinter der Stadt
+    if (q < .66) { const k = Math.floor(z.b * 16), a = k * PI / 8 + t * .05, r = R + .06 + z.c * (k % 2 ? .3 : .55), x = SX + Math.cos(a) * r, y = SY + Math.sin(a) * r;   // Strahlen
+      return [x, y, 0, hinten(x, y) ? 0 : (1 - z.c) * .45 * h]; }
+    if (q < .86) { const k = Math.floor(z.b * 7), y = HZ + .06 + Math.pow((k + 1) / 7, 1.6) * .9, x = (z.c * 2 - 1) * 1.1;   // Felder der Börde
+      return [x, y, k % 2 ? 7 : 0, (.12 + .25 * h) * (Math.floor(z.c * 60) % 3 ? 1 : 0)]; }
+    if (q < .9) { const k = z.b < .5 ? 0 : 1, bp = ((t / 9) + k * .5) % 1, bx = -1.2 + bp * 2.4, by = -.6 - k * .25 + Math.sin(bp * 6) * .05, s = .05, flug = Math.sin(t * 7 + k) * .02;   // zwei Vögel
+      const [x, y] = strecke([[bx - s, by - flug], [bx, by + .02], [bx + s, by - flug]], z.c); return [x, y, 3, .6 * h * Math.sin(PI * bp)]; }
+    return funkel(z, t, .25);
+  },
+  kerzen: (z, t) => {
+    const q = z.a, STUFE = [.35, .72, 1.08], N = [5, 6, 7];
+    if (q < .12) { const r = Math.floor(z.b * 3), y = STUFE[r] + .14, w = .62 + r * .16; return [(z.c * 2 - 1) * w, y, 0, .3]; }   // Stufenkanten
+    const rr = Math.min(2, Math.floor(z.b * 3)), n = N[rr], k = Math.floor(z.c * n), w = .5 + rr * .14;
+    const cx = -w + (k + .5) / n * 2 * w + Math.sin(k * 7.1 + rr) * .03, cy = STUFE[rr] + Math.sin(k * 3.3) * .015, id = rr * 10 + k, wack = .75 + .25 * Math.sin(t * 5 + id * 1.7) * Math.sin(t * 2.3 + id);
+    if (q < .4) { const [x, y] = strecke([[cx - .045, cy - .1], [cx - .042, cy + .1], [cx + .042, cy + .1], [cx + .045, cy - .1]], z.d); return [x, y, 6, .75]; }   // rotes Glas
+    if (q < .55) return [cx + (z.d * 2 - 1) * .038, cy - .08 + ((z.d * 13) % 1) * .17, 6, .25 * wack];                                                      // Licht im Glas
+    if (q < .78) { const [x, y] = flamme(cx, cy - .1, .085, z.d, (z.d * 7) % 1, t, id); return [x, y, z.d < .4 ? 3 : 1, .95 * wack]; }                       // Flamme
+    if (q < .9) { const [x, y] = scheibe(cx, cy - .14, .11, z.d, (z.d * 11) % 1); return [x, y, 1, .07 * wack]; }                                               // Schein
+    const hh = (z.b + t * .025) % 1; return [(z.c * 2 - 1) * .9 + Math.sin(hh * 7 + z.d * 30) * .05, 1 - hh * 2.3, z.d < .5 ? 1 : 3, Math.sin(PI * hh) * .4 * (z.d < .7 ? 1 : 0)];   // Lichter steigen auf
+  },
+  herz: (z, t) => {
+    const q = z.a, atem = 1 + .025 * Math.sin(t * .8), s = .8 * atem, cy = -.05, an = Math.max(0, Math.min(1, (t - z.c * 4.5) / 1.6)), e = glatt(an);
+    const start = [(z.d * 2 - 1) * 1.1, 1.6 + z.b * .4], misch = ([x, y]) => [start[0] + (x - start[0]) * e, start[1] + (y - start[1]) * e];
+    if (q < .55) { const [x, y] = misch(herzRand(0, cy, s, z.b)); const funk = .55 + .45 * Math.pow(Math.max(0, Math.sin(t * (1.2 + z.d) + z.b * 80)), 3); return [x, y, z.d < .3 ? 3 : z.d < .75 ? 0 : 6, (.25 + .75 * e) * funk]; }   // viele kleine Lichter
+    if (q < .82) { const [x, y] = misch(herzFlaeche(0, cy, s * .97, z.b, (z.d * 7) % 1)); return [x, y, z.d < .5 ? 5 : 1, .22 * e * (.7 + .3 * Math.sin(t * 2 + z.b * 40))]; }
+    if (q < .9) { const [x, y] = scheibe(0, cy - .1, .95, z.b, (z.d * 5) % 1); return [x, y, 1, .03 * e]; }
+    const hh = (z.b + t * .03) % 1; return [(z.d * 2 - 1) * 1 + Math.sin(hh * 8 + z.c * 30) * .05, 1.45 - hh * 2.9, 3, Math.sin(PI * hh) * .35];
+  },
+  tuer: (z, t) => {
+    const P = 12, p = (t / P) % 1, auf = p < .3 ? glatt(p / .3) : p < .85 ? 1 : 1 - glatt((p - .85) / .15), q = z.a, B = .42, BODEN = .85, SEITE = -.25, SPITZE = -.82;
+    const bogen = sx => SEITE + (SPITZE - SEITE) * Math.pow(1 - Math.abs(sx), .6);                             // orientalischer Spitzbogen
+    const rahmen = u => { const L1 = BODEN - SEITE, L = 2 * L1 + 2.2, s = u * L;
+      if (s < L1) return [-B, BODEN - s]; if (s < L1 + 2.2) { const sx = (s - L1) / 1.1 - 1; return [sx * B, bogen(sx)]; } return [B, SEITE + (s - L1 - 2.2)]; };
+    const winkel = auf * 1.25, dreh = (x, y) => [-B + (x + B) * Math.cos(winkel), y + (x + B) * Math.sin(winkel) * .06];   // Türflügel schwingt um die linke Angel
+    if (q < .18) { const [x, y] = rahmen(z.b); return z.c < .5 ? [x, y, 0, .85] : [x * 1.13, BODEN + (y - BODEN) * 1.07, 0, .4]; }   // Rahmen, innen und außen
+    if (q < .22) return [(z.b * 2 - 1) * 1.05, BODEN, 0, .3];                                                                               // Boden
+    if (q < .44) { const [x, y] = rahmen(z.b), [dx, dy] = dreh(x, y); return [dx, dy, 3, .7]; }                                             // Türflügel
+    if (q < .54) { const [x, y] = zackeRand(0, .2, .16, 8, .5, z.b), [dx, dy] = dreh(x, y); return [dx, dy, 0, .7]; }                      // Achtstern auf der Tür
+    if (q < .76) { const sx = z.b * 2 - 1, oben = bogen(sx), x = sx * B * .96, y = oben + z.c * (BODEN - oben);                             // warmes Licht in der Öffnung
+      const kante = dreh(B, y)[0]; return [x, y, z.d < .4 ? 3 : 1, x > kante ? .5 * auf * (.85 + .15 * Math.sin(t * 2 + z.d * 9)) : 0]; }
+    if (q < .9) { const v = z.c, w = B + v * .65, x = (z.b * 2 - 1) * w, y = BODEN + .02 + v * .55; return [x, y, 1, auf * .42 * (1 - v) * (1 - Math.abs(x) / w * .5)]; }   // Lichtkegel auf dem Boden
+    const hh = (z.b + t * .04) % 1, x0 = (z.c * 2 - 1) * B * .7; return [x0 * (1 + hh * 1.5), .6 - hh * 1.9 + Math.sin(hh * 6 + z.d * 20) * .04, z.d < .5 ? 3 : 0, auf * Math.sin(PI * hh) * .55];   // Lichtpunkte schweben heraus
+  },
+};
+const ANZAHL = { zeitstrahl: 2400, stern: 2400, sonne: 2600, kerzen: 2600, herz: 2400, tuer: 2600 };
+
+let hell = false;
+const flaechen = [...document.querySelectorAll('canvas')].map(cv => {
+  const f = { cv, g: cv.getContext('2d'), art: cv.dataset.art, fenster: !!cv.closest('.fenster'), w: 0, h: 0, teile: [], zeiger: { x: -999, y: -999 }, sichtbar: false };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); f.zeiger.x = e.clientX - r.left; f.zeiger.y = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', () => { f.zeiger.x = f.zeiger.y = -999; });
+  cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') f.zeiger.x = f.zeiger.y = -999; });
+  return f;
+});
+function messen() { for (const f of flaechen) { const r = f.cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  if (Math.round(r.width) === f.w && Math.round(r.height) === f.h) continue;
+  f.w = Math.round(r.width); f.h = Math.round(r.height); f.dpr = dpr; f.cv.width = f.w * dpr; f.cv.height = f.h * dpr;
+  f.teile = Array.from({ length: ANZAHL[f.art] }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() },
+    x: Math.random() * f.w, y: Math.random() * f.h, vx: 0, vy: 0, s: 1.2 + Math.random() * 1.3 })); } }
+const io = new IntersectionObserver(es => es.forEach(e => { flaechen.find(f => f.cv === e.target).sichtbar = e.isIntersecting; }));
+flaechen.forEach(f => io.observe(f.cv));
+addEventListener('resize', messen); messen();
+
+const knopfF = document.getElementById('k-formular'), knopfH = document.getElementById('k-hell'), reihe = document.getElementById('fenster-reihe');
+knopfF.addEventListener('click', () => { const an = knopfF.getAttribute('aria-pressed') !== 'true'; knopfF.setAttribute('aria-pressed', an); reihe.classList.toggle('ohne-formular', !an); });
+knopfH.addEventListener('click', () => { hell = knopfH.getAttribute('aria-pressed') !== 'true'; knopfH.setAttribute('aria-pressed', hell); reihe.classList.toggle('hell', hell); });
+
+let vor = performance.now(), t = 0;
+function schleife(jetzt) {
+  const dt = Math.max(0, Math.min(.05, (jetzt - vor) / 1000)); vor = jetzt; t += dt;
+  for (const f of flaechen) {
+    if (!f.sichtbar || !f.w) continue;
+    const g = f.g, imHellen = f.fenster && hell, pal = imHellen ? FARBEN.hell : FARBEN.dunkel, staerke = imHellen ? .8 : 1;
+    g.setTransform(f.dpr, 0, 0, f.dpr, 0, 0); g.clearRect(0, 0, f.w, f.h);
+    const S = Math.min(f.w * .46, f.h * .345), cx = f.w / 2, cy = f.h / 2;
+    g.globalCompositeOperation = imHellen ? 'source-over' : 'lighter';
+    for (const p of f.teile) {
+      const [x, y, fa, ha] = FORMEN[f.art](p.z, t), tx = cx + x * S, ty = cy + y * S;
+      p.vx = (p.vx + (tx - p.x) * .07) * .85; p.vy = (p.vy + (ty - p.y) * .07) * .85;
+      const dx = p.x - f.zeiger.x, dy = p.y - f.zeiger.y, d = Math.hypot(dx, dy);
+      if (d < 70 && d > .1) { const k = (1 - d / 70) * 2.6; p.vx += dx / d * k; p.vy += dy / d * k; }
+      p.x += p.vx; p.y += p.vy;
+      if (ha < .02) continue;
+      const fc = pal[fa] || pal[0];
+      g.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, ha * staerke).toFixed(3)})`; g.fillRect(p.x, p.y, p.s, p.s);
+    }
+    g.globalCompositeOperation = 'source-over';
+  }
+  requestAnimationFrame(schleife);
+}
+requestAnimationFrame(schleife);
+</script>
+</body>
+</html>
