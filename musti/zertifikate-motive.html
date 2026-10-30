@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zertifikate-Motive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Vorschau für Adam: je drei Motiv-Ideen für die Zertifikate, links (Laptop) und im Fenster */
+:root { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --safran: #f2a93b; --linie: rgba(242,169,59,.28); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); } }
+:root[data-theme="light"] { --grund: #f4d6a4; --text: #33100a; --leise: #6e3a20; --linie: rgba(138,75,6,.35); }
+:root[data-theme="dark"] { --grund: #2a0b12; --text: #f7e7d3; --leise: #cdaa8d; --linie: rgba(242,169,59,.28); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--grund); color: var(--text); font: 400 15px/1.5 "Hanken Grotesk", system-ui, sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 60px; }
+h1 { font: 400 clamp(32px, 6vw, 50px)/1.05 Gloock, serif; margin: 0 0 8px; }
+h2 { font: 400 26px/1.1 Gloock, serif; margin: 34px 0 4px; }
+.ober { font: 700 11px "Hanken Grotesk"; letter-spacing: .22em; text-transform: uppercase; color: var(--safran); margin: 0 0 8px; }
+.intro, .unter { color: var(--leise); max-width: 64ch; margin: 0 0 18px; }
+.unter { font-size: 14px; margin-bottom: 12px; }
+.knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.knoepfe button { font: 600 13px "Hanken Grotesk"; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--linie); background: transparent; color: var(--text); cursor: pointer; }
+.knoepfe button[aria-pressed="true"] { background: var(--safran); border-color: var(--safran); color: #2a0b12; }
+.drei { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .drei { grid-template-columns: 1fr; } }
+.motiv { margin: 0; background: #150508; border: 1px solid var(--linie); border-radius: 18px; overflow: hidden; color: #f7e7d3; }
+.motiv .flaeche { position: relative; }
+.motiv canvas { display: block; width: 100%; aspect-ratio: 3 / 4; touch-action: pan-y; }
+.fenster { background: #1d070d; }
+.hell .fenster { background: #efd9b5; }
+.hell #links-reihe .flaeche { background: #876b50; }   /* links: die abgedunkelte helle Startseite */
+.motiv figcaption { padding: 10px 14px 14px; border-top: 1px solid rgba(242,169,59,.18); background: #150508; }
+.motiv h3 { margin: 0; font: 400 21px Gloock, serif; display: flex; gap: 8px; align-items: baseline; }
+.motiv h3 span { font: 700 12.5px "Hanken Grotesk"; color: #2a0b12; background: #f2a93b; border-radius: 999px; padding: 1px 9px; }
+.motiv p { margin: 2px 0 0; color: #cdaa8d; font-size: 13.5px; }
+/* angedeutetes Formular über dem Fenster-Motiv, damit man sieht, wie es hinter dem Text wirkt */
+.formular { position: absolute; inset: 0; padding: 22px 20px; display: flex; flex-direction: column; gap: 9px; pointer-events: none; color: #f7e7d3; }
+.formular b { font: 400 28px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; }
+.formular small { font: 700 10px "Hanken Grotesk"; letter-spacing: .2em; color: #f2a93b; margin-top: 4px; }
+.formular i { display: block; height: 32px; border-radius: 10px; border: 1px solid rgba(242,169,59,.3); background: rgba(18,4,10,.55); }
+.formular i.gross { height: 78px; }
+.formular u { text-decoration: none; text-align: center; font: 600 13px "Hanken Grotesk"; color: #2a0b12; padding: 9px; border-radius: 12px; background: linear-gradient(90deg, #f2a93b, #ff6b3d); }
+.hell .formular { color: #33100a; }
+.hell .formular b { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+.hell .formular small { color: #8a4b06; }
+.hell .formular i { border-color: rgba(138,75,6,.35); background: rgba(240,212,165,.6); }
+.hell .formular u { color: #fff4e3; background: linear-gradient(90deg, #8a4b06, #a8320c); }
+.ohne-formular .formular { display: none; }
+.formular i.zeile { height: 9px; width: 72%; border: 0; border-radius: 4px; background: rgba(247,231,211,.3); }
+.formular i.kurz { width: 46%; }
+.formular em { font: normal 400 19px Gloock, serif; text-shadow: 0 0 10px #1d070d, 0 0 18px #1d070d; margin-top: -6px; }
+.formular small + i, .formular small + em { margin-top: -4px; }
+.hell .formular i.zeile { background: rgba(110,56,10,.3); }
+.hell .formular em { text-shadow: 0 0 10px #efd9b5, 0 0 18px #efd9b5; }
+</style>
+</head>
+<body>
+<main>
+  <p class="ober">Musti Bistro · Zertifikate · Motive</p>
+  <h1>Zwei Motive für die Zertifikate</h1>
+  <p class="intro">Je drei Ideen: eine Reihe für den Bereich links neben dem Zertifikate-Fenster am Laptop, eine Reihe für den Hintergrund im Fenster selbst. Fahr mit der Maus oder dem Finger darüber oder wisch darüber, dann weichen die Punkte aus. Mit „Helle Ansicht“ siehst du beide Reihen so, wie sie im hellen Modus als Farbstift-Zeichnung aussehen. Schreib mir einfach eine Zahl und einen Buchstaben, zum Beispiel „2 und A“.</p>
+  <div class="knoepfe">
+    <button type="button" id="k-hell" aria-pressed="false">Helle Ansicht</button>
+  </div>
+
+  <h2>Links daneben (nur Laptop)</h2>
+  <p class="unter">Bleibt stehen, solange das Zertifikate-Fenster offen ist.</p>
+  <div class="drei" id="links-reihe">
+    <figure class="motiv"><div class="flaeche"><canvas data-art="pokal"></canvas></div><figcaption><h3><span>1</span>Pokal voller Licht</h3><p>Ein Siegerpokal mit Achtstern. Goldenes Licht steigt in ihm auf, läuft über den Rand, und Sterne steigen auf.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="medaille"></canvas></div><figcaption><h3><span>2</span>Medaille am Band</h3><p>Eine Goldmedaille mit Achtstern schwingt sanft an zwei roten Bändern, ein Glanz läuft über sie hinweg.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche"><canvas data-art="jahr"></canvas></div><figcaption><h3><span>3</span>Sternschnuppe auf 2025</h3><p>Ein Stern fliegt im Bogen heran und landet über der Jahreszahl der Auszeichnung. Funken sprühen, dann leuchtet „2025“ von links nach rechts auf.</p></figcaption></figure>
+  </div>
+
+  <h2>Im Zertifikate-Fenster (Handy, Tablet, Laptop)</h2>
+  <p class="unter">Liegt hinter dem Text, wie bei Impressum und Datenschutz.</p>
+  <div class="knoepfe">
+    <button type="button" id="k-formular" aria-pressed="true">Text darüber zeigen</button>
+  </div>
+  <div class="drei" id="fenster-reihe">
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="siegel"></canvas><div class="formular"><b>Zertifikate</b><small>WORAUF DU DICH VERLASSEN KANNST</small><i class="gross"></i><small>HALAL</small><i class="zeile"></i><i class="zeile kurz"></i><small>HYGIENE-SCHULUNG</small><i class="zeile"></i><i class="zeile kurz"></i><small>GOOGLE</small><em>4,7 von 5</em></div></div><figcaption><h3><span>A</span>Gütesiegel</h3><p>Ein Siegel mit Zackenrand, Punktekranz und Achtstern dreht sich langsam, ein Glanz läuft rundherum.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="guilloche"></canvas><div class="formular"><b>Zertifikate</b><small>WORAUF DU DICH VERLASSEN KANNST</small><i class="gross"></i><small>HALAL</small><i class="zeile"></i><i class="zeile kurz"></i><small>HYGIENE-SCHULUNG</small><i class="zeile"></i><i class="zeile kurz"></i><small>GOOGLE</small><em>4,7 von 5</em></div></div><figcaption><h3><span>B</span>Urkunden-Muster</h3><p>Das feine Wellenmuster von Urkunden und Geldscheinen (Guilloche). Vier Ringe drehen sich gegeneinander, Licht läuft von innen nach außen.</p></figcaption></figure>
+    <figure class="motiv"><div class="flaeche fenster"><canvas data-art="schleife"></canvas><div class="formular"><b>Zertifikate</b><small>WORAUF DU DICH VERLASSEN KANNST</small><i class="gross"></i><small>HALAL</small><i class="zeile"></i><i class="zeile kurz"></i><small>HYGIENE-SCHULUNG</small><i class="zeile"></i><i class="zeile kurz"></i><small>GOOGLE</small><em>4,7 von 5</em></div></div><figcaption><h3><span>C</span>Siegerschleife</h3><p>Eine Rosette aus Falten mit Achtstern, darunter zwei lange Bänder, die sanft im Wind wehen.</p></figcaption></figure>
+  </div>
+</main>
+<script>
+const TAU = Math.PI * 2, PI = Math.PI;
+// Farben: 0 Gold, 1 Glut-Orange, 2 Paprika, 3 Creme, 4 Jade, 5 Granat, 6 Tomate, 7 Kräutergrün
+const FARBEN = {
+  dunkel: [[242, 169, 59], [255, 120, 42], [224, 72, 50], [255, 226, 180], [143, 211, 162], [190, 40, 70], [255, 80, 60], [110, 200, 95]],
+  hell:   [[138, 75, 6], [168, 50, 12], [147, 32, 26], [110, 56, 10], [40, 110, 60], [120, 20, 50], [180, 40, 25], [50, 120, 40]],
+};
+const glatt = x => x * x * (3 - 2 * x);
+const ring = (cx, cy, rx, ry, u) => [cx + Math.cos(u * TAU) * rx, cy + Math.sin(u * TAU) * ry];
+const scheibe = (cx, cy, r, u, v, ry = r) => { const w = u * TAU, q = Math.sqrt(v); return [cx + Math.cos(w) * r * q, cy + Math.sin(w) * ry * q]; };
+const drehen = (x, y, px, py, w) => { const c = Math.cos(w), s = Math.sin(w), dx = x - px, dy = y - py; return [px + dx * c - dy * s, py + dx * s + dy * c]; };
+
+// Jede Form bekommt pro Punkt vier Zufallszahlen (z.a bis z.d) und die Zeit t.
+// Zurück kommt [x, y, Farbe, Helligkeit], x etwa -1 bis 1, y nach unten.
+// Sterne: 10 Ecken, abwechselnd außen und innen
+const sternEcke = (k, R, dreh) => { const a = -PI / 2 + k * PI / 5 + dreh, rr = k % 2 ? R * .42 : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const sternRand = (cx, cy, R, u, dreh = 0) => { const k = Math.floor(u * 10), f = u * 10 - k, [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const sternFlaeche = (cx, cy, R, u, v, w, dreh = 0) => { const k = Math.floor(u * 10), [x1, y1] = sternEcke(k, R, dreh), [x2, y2] = sternEcke(k + 1, R, dreh);
+  let a = v, b = w; if (a + b > 1) { a = 1 - a; b = 1 - b; } return [cx + x1 * a + x2 * b, cy + y1 * a + y2 * b]; };
+// Herz: Spitze unten, etwa -0,7 bis 1 hoch
+const herzRand = (cx, cy, s, u) => { const q = u * TAU; return [cx + 16 * Math.pow(Math.sin(q), 3) / 17 * s, cy - (13 * Math.cos(q) - 5 * Math.cos(2 * q) - 2 * Math.cos(3 * q) - Math.cos(4 * q)) / 17 * s]; };
+const herzFlaeche = (cx, cy, s, u, v) => { const [x, y] = herzRand(cx, cy, s, u), q = Math.sqrt(v); return [cx + (x - cx) * q, cy + (y - cy) * q]; };
+// Hilfen
+const strecke = (pts, u) => {   // Punkt auf einem Linienzug, gleichmäßig nach Länge verteilt
+  let L = 0; const l = [];
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); l.push(d); L += d; }
+  let s = u * L;
+  for (let i = 0; i < l.length; i++) { if (s <= l[i] || i === l.length - 1) { const f = Math.min(1, s / l[i]); return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]; } s -= l[i]; }
+};
+const zackeEcke = (k, R, n, innen, dreh) => { const a = -PI / 2 + k * PI / n + dreh, rr = k % 2 ? R * innen : R; return [Math.cos(a) * rr, Math.sin(a) * rr]; };
+const zackeRand = (cx, cy, R, n, innen, u, dreh = 0) => { const k = Math.floor(u * 2 * n), f = u * 2 * n - k, [x1, y1] = zackeEcke(k, R, n, innen, dreh), [x2, y2] = zackeEcke(k + 1, R, n, innen, dreh); return [cx + x1 + (x2 - x1) * f, cy + y1 + (y2 - y1) * f]; };
+const funkel = (z, t, a = .4) => [(z.b * 2 - 1) * 1.05, (z.c * 2 - 1) * 1.4, 3, a * Math.pow(Math.max(0, Math.sin(t * 1.8 + z.d * 50)), 10)];
+const AUS = [0, 0, 0, 0];
+// Zertifikate-Motive (Vorschau). Hilfen aus der Datenschutz-Vorschau: glatt, ring, scheibe, drehen, strecke, zackeRand, funkel, AUS.
+// Schrift als Punktewolke („2025“ in Gloock), fünfter Wert 1 = im hellen Modus schraffieren
+const ztText = {};
+function ztTextAbtasten(s) { const c = document.createElement('canvas'); c.width = 520; c.height = 240; const g = c.getContext('2d');
+  g.font = '400 190px Gloock, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s, 260, 128);
+  const d = g.getImageData(0, 0, 520, 240).data, pts = [];
+  for (let y = 0; y < 240; y += 2) for (let x = 0; x < 520; x += 2) if (d[(y * 520 + x) * 4 + 3] > 140) pts.push([(x - 260) / 260, (y - 120) / 260]);
+  ztText[s] = pts; }
+document.fonts.load('400 150px Gloock').catch(() => {}).then(() => ztTextAbtasten('2025'));
+// Achtstern aus zwei verdrehten Quadraten (wie in den Ornamenten der Startseite)
+const achtstern = (cx, cy, R, u, dreh) => { const k = u < .5 ? 0 : 1, v = (u * 2) % 1, a0 = dreh + k * PI / 4;
+  const ecken = [0, 1, 2, 3, 4].map(i => [cx + Math.cos(a0 + i * PI / 2) * R, cy + Math.sin(a0 + i * PI / 2) * R]); return strecke(ecken, v); };
+// Glanz, der schräg über eine Fläche läuft (0 bis 1)
+const glanzBand = (x, y, pos, breite = .12) => Math.exp(-Math.pow((x * .7 + y * .7 - pos) / breite, 2));
+
+const ZT_FORMEN = {
+  // 1 Pokal: goldenes Licht steigt im Pokal auf, läuft über den Rand, Sterne steigen auf
+  pokal: (z, t) => {
+    const P = 10, p = (t / P) % 1, q = z.a, RAND = -.95, BODEN = 0, RB = .52;
+    const L = p < .45 ? glatt(p / .45) : p < .85 ? 1 : 1 - glatt((p - .85) / .15);                       // Füllstand 0 bis 1
+    const ueber = p < .45 ? 0 : p < .8 ? (p - .45) / .35 : 0;                                                 // Überlaufen
+    const profil = v => RB * Math.pow(Math.cos(v * PI / 2), .6);                                               // Halbbreite der Schale, v 0 oben bis 1 unten
+    const glanz = x => .25 * Math.exp(-Math.pow((x - (((t * .35) % 1.6) - .8)) / .08, 2));
+    if (q < .32) { const r = z.b;
+      if (r < .14) { const [x, y] = ring(0, RAND, RB, .07, z.c); return [x, y, 0, .9]; }                                   // Rand
+      if (r < .46) { const v = z.c, s = z.d < .5 ? -1 : 1, x = s * profil(v); return [x, RAND + v * (BODEN - RAND), 0, .85 + glanz(x)]; }   // Schale
+      if (r < .62) { const s = z.c < .5 ? -1 : 1, a = ((z.c * 2) % 1 - .5) * PI;                                           // Henkel: äußere Bogenhälfte
+        return [s * (.44 + Math.cos(a) * .3), -.64 + Math.sin(a) * .25, 0, .8]; }
+      if (r < .74) { const s = z.c < .5 ? -1 : 1, v = (z.c * 2) % 1, y = BODEN + v * .5, w = .05 + .05 * Math.exp(-Math.pow((y - .24) / .05, 2));   // Stiel mit Knauf
+        return [s * w, y, 0, .8]; }
+      if (r < .84) { const s = z.c < .5 ? -1 : 1, v = (z.c * 2) % 1, y = .5 + v * .14; return [s * (.1 + v * v * .26), y, 0, .85]; }   // Fuß wird breiter
+      const [x, y] = strecke([[-.44, .64], [.44, .64], [.44, .82], [-.44, .82], [-.44, .64]], z.c); return [x, y, 0, .85]; }   // Sockel
+    if (q < .38) { const [x, y] = achtstern(0, -.5, .13, z.b, t * .3); return [x, y, 3, .95]; }                          // Achtstern auf der Schale
+    if (q < .66) { const v = 1 - L * (1 - z.b * z.b) , y = RAND + v * (BODEN - RAND), x = (z.c * 2 - 1) * profil(v) * .9;           // Licht im Pokal
+      const voll = z.b < L ? 1 : 0, wogen = Math.sin(x * 9 + t * 3) * .015 * L;
+      return [x, Math.max(y + wogen, RAND + (1 - L) * (BODEN - RAND)), z.d < .4 ? 3 : 1, voll * (.45 + .25 * Math.sin(t * 2 + z.d * 20)), 1]; }
+    if (q < .8) { if (!ueber) return [0, RAND, 1, 0]; const s = z.b < .5 ? -1 : 1, e = ((z.c + ueber * 1.8) % 1), v = e * .95;   // läuft außen über
+      return [s * (profil(v) + .04 + .02 * Math.sin(e * 12)), RAND + v * (BODEN - RAND), z.d < .5 ? 3 : 1, .7 * Math.sin(PI * e) * Math.min(1, ueber * 4) * (1 - Math.max(0, (ueber - .8) * 5))]; }
+    if (q < .94) { if (L < .9) return [0, RAND, 3, 0]; const e = ((z.b + t * .25) % 1), x = (z.c * 2 - 1) * .4 * (1 + e), y = RAND - .05 - e * .5;   // Sterne steigen auf
+      return [x + Math.sin(e * 8 + z.d * 6) * .04, y, 3, Math.sin(PI * e) * .8 * Math.pow(Math.max(0, Math.sin(t * 5 + z.d * 40)), 2)]; }
+    return funkel(z, t, .3);
+  },
+  // 2 Medaille am Band: Goldmedaille mit Achtstern schwingt am Band, ein Glanz läuft darüber
+  medaille: (z, t) => {
+    const q = z.a, dreh = .1 * Math.sin(t * 1.1), PX = 0, PY = -1.42, MY = .32, R = .5;
+    const pos = ((t * .28) % 1.8) - .9, schwing = (x, y) => drehen(x, y, PX, PY, dreh);
+    if (q < .3) { const s = z.b < .5 ? -1 : 1, v = (z.b * 2) % 1, w = z.c * 2 - 1;                                     // zwei Bänder, rot mit goldenem Streifen
+      const x0 = s * .48, x1 = s * .1, y0 = PY, y1 = MY - R - .1, x = x0 + (x1 - x0) * v + w * .12, y = y0 + (y1 - y0) * v + w * s * .03;
+      const kante = z.d < .35, fa = Math.abs(w) < .3 ? 0 : 2, [sx, sy] = schwing(kante ? x0 + (x1 - x0) * v + (z.d < .17 ? -1 : 1) * .12 : x, y);
+      return [sx, sy, kante ? 0 : fa, kante ? .8 : (fa === 0 ? .5 : .4), kante ? 0 : 1]; }
+    let x, y, fa = 0, ha = .85, fl = 0;
+    if (q < .34) [x, y] = ring(0, MY - R - .05, .07, .07, z.b);                                                           // Öse
+    else if (q < .52) [x, y] = ring(0, MY, z.c < .5 ? R : R * .86, z.c < .5 ? R : R * .86, z.b);                           // Rand doppelt
+    else if (q < .58) { [x, y] = zackeRand(0, MY, R * 1.08, 24, .92, z.b, t * .1); ha = .55; }                              // feiner Zackenkranz
+    else if (q < .7) { [x, y] = achtstern(0, MY, R * .62, z.b, PI / 8); fa = 3; ha = .95; }                                 // Achtstern
+    else if (q < .86) { [x, y] = scheibe(0, MY, R * .84, z.b, z.c); ha = .22; fa = 1; fl = 1; }                                     // Fläche
+    else if (q < .9) { [x, y] = ring(0, MY, .08, .08, z.b); fa = 3; }
+    else return funkel(z, t, .3);
+    const g = glanzBand(x, y - MY, pos); [x, y] = schwing(x, y);
+    return [x, y, g > .4 ? 3 : fa, Math.min(1, ha + g * .6), fl];
+  },
+  // 3 Sternschnuppe: ein Stern fliegt im Bogen heran und landet über „2025“, dann leuchtet die Jahreszahl auf
+  jahr: (z, t) => {
+    const P = 9, p = (t / P) % 1, q = z.a, flug = Math.min(1, p / .3), gelandet = p >= .3, aus = p > .88 ? 1 - (p - .88) / .12 : 1;
+    const bahn = s => [(1 - s) * (1 - s) * -1.05 + 2 * s * (1 - s) * -.15 + s * s * 0, (1 - s) * (1 - s) * -1.35 + 2 * s * (1 - s) * -1.5 + s * s * -.45];   // Bogen von links oben
+    const [SX, SY] = gelandet ? [0, -.45] : bahn(glatt(flug));
+    const an = gelandet ? Math.min(1, (p - .3) / .2) : 0;                                                                  // Jahreszahl leuchtet von links nach rechts auf
+    if (q < .48) { const pts = ztText['2025']; if (!pts || !pts.length) return AUS; const pt = pts[Math.floor(z.b * pts.length)], x = pt[0] * 1.02, y = .12 + pt[1] * 1.02;
+      const hier = an * 1.6 - (x + 1) * .5, licht = Math.max(0, Math.min(1, hier * 3)), welle = Math.exp(-Math.pow((x - (((t * .4) % 2.4) - 1.2)) / .12, 2));
+      return [x, y, welle > .4 && licht > .5 ? 3 : 0, (.12 + .78 * licht + .2 * welle * licht) * aus, 1]; }
+    if (q < .58) { const R = gelandet ? .12 + .02 * Math.sin(t * 4) : .1, [x, y] = z.c < .6 ? zackeRand(SX, SY, R, 8, .45, z.b, t * (gelandet ? .5 : 3)) : scheibe(SX, SY, R * .4, z.b, z.d);
+      return [x, y, 3, .95 * aus]; }                                                                                          // der Stern
+    if (q < .76) { if (!gelandet) { const s = glatt(flug) - z.b * .28; if (s < 0) return [SX, SY, 3, 0]; const [x, y] = bahn(s);   // Schweif
+        return [x + (z.c - .5) * .04 * (1 + z.b * 3), y + (z.d - .5) * .04 * (1 + z.b * 3), z.b < .3 ? 3 : 0, .8 * (1 - z.b)]; }
+      const e = (p - .3) / .18; if (e > 1) return [SX, SY, 3, 0]; const w = z.b * TAU, r = .08 + .7 * Math.pow(e, .6) * (.7 + .3 * z.c);   // Funkenkranz beim Landen
+      return [SX + Math.cos(w) * r, SY + Math.sin(w) * r * .8, z.d < .5 ? 3 : 1, .85 * (1 - e)]; }
+    if (q < .86) { const u = z.b * 2 - 1, breit = Math.min(1, an * 1.2), x = u * .78 * breit, y = .58 + Math.sin(u * PI * 2) * .035;   // Schwung unter der Zahl
+      return [x, y, 0, .7 * aus * (breit > 0 ? 1 : 0)]; }
+    return funkel(z, t, .3);
+  },
+  // A Gütesiegel: Zackenrand, Punktekranz und Achtstern drehen sich langsam, ein Glanz läuft rundherum
+  siegel: (z, t) => {
+    const q = z.a, gw = (t * 1.1) % TAU, glanz = (x, y) => { let d = Math.atan2(y, x) - gw; d = Math.atan2(Math.sin(d), Math.cos(d)); return Math.exp(-d * d / .08); };
+    let x, y, fa = 0, ha = .85, fl = 0;
+    if (q < .3) { [x, y] = zackeRand(0, 0, 1, 24, .9, z.b, t * .06); }                                                       // Zackenrand
+    else if (q < .42) { const k = Math.floor(z.b * 32), a = k / 32 * TAU - t * .06, [px, py] = scheibe(Math.cos(a) * .8, Math.sin(a) * .8, .028, z.c, z.d); x = px; y = py; fa = 3; ha = .8; fl = 1; }   // Punktekranz
+    else if (q < .56) { const r = z.c < .5 ? .72 : .67; [x, y] = ring(0, 0, r, r, z.b); ha = .7; }                             // zwei Ringe
+    else if (q < .74) { [x, y] = achtstern(0, 0, .46, z.b, -t * .08); fa = 3; ha = .9; }                                     // Achtstern
+    else if (q < .84) { [x, y] = zackeRand(0, 0, .3, 8, .62, z.b, t * .08 + PI / 8); fa = 1; ha = .6; }                        // kleiner Stern innen
+    else if (q < .89) { [x, y] = ring(0, 0, .1, .1, z.b); ha = .85; }
+    else return funkel(z, t, .3);
+    const g = glanz(x, y); return [x, y, g > .5 ? 3 : fa, Math.min(1, ha + g * .5), fl];
+  },
+  // B Guilloche: das feine Wellenmuster von Urkunden und Geldscheinen, vier Bänder drehen sich gegeneinander, Licht läuft hindurch
+  guilloche: (z, t) => {
+    const q = z.a;
+    if (q < .88) { const k = Math.floor(z.b * 8), band = k >> 1, s = k % 2 ? 1 : -1, n = [12, 16, 20, 24][band], b = [.32, .55, .78, 1.0][band];
+      const dreh = (band % 2 ? 1 : -1) * t * .05, th = z.c * TAU, r = b + s * .065 * Math.sin(n * (th - dreh)) + .02 * Math.sin(3 * th + t * .4);
+      const x = Math.cos(th) * r, y = Math.sin(th) * r, puls = Math.exp(-Math.pow(r - ((t * .25) % 1.5), 2) / .004);
+      return [x, y, puls > .3 ? 3 : (k % 2 ? 2 : 0), .55 + .45 * puls]; }
+    if (q < .96) { const [x, y] = achtstern(0, 0, .15, z.b, t * .1); return [x, y, 3, .85]; }
+    return funkel(z, t, .3);
+  },
+  // C Siegerschleife: Rosette aus Falten mit Achtstern, darunter zwei Bänder, die im Wind wehen
+  schleife: (z, t) => {
+    const q = z.a, CY = -.42, wind = t * 2.2;
+    if (q < .24) { const k = Math.floor(z.b * 36), a = k / 36 * TAU + t * .04, r = .3 + z.c * .28, w = .012 * Math.sin(z.c * 9 + t);   // Falten
+      return [Math.cos(a) * r - Math.sin(a) * w, CY + Math.sin(a) * r + Math.cos(a) * w, 2, .7]; }
+    if (q < .32) { const a = z.b * TAU, r = .58 + .035 * Math.abs(Math.sin(18 * (a + t * .04))); return [Math.cos(a) * r, CY + Math.sin(a) * r, 0, .85]; }   // gewellter Rand
+    if (q < .42) { const r = z.c < .5 ? .3 : .26, [x, y] = ring(0, CY, r, r, z.b); return [x, y, 0, .9]; }
+    if (q < .54) { const [x, y] = achtstern(0, CY, .2, z.b, t * .2); return [x, y, 3, .95]; }
+    if (q < .9) { const s = z.b < .5 ? -1 : 1, v = (z.b * 2) % 1, w = z.c * 2 - 1;                                        // zwei Bänder
+      const mitte = v2 => s * (.1 + .32 * v2) + Math.sin(v2 * 5 - wind + (s > 0 ? 1 : 0)) * .07 * v2, y = CY + .2 + v * 1.25;
+      const kerbe = v > .9 ? Math.abs(w) * (v - .9) * 10 * .08 : 0;                                                          // Schwalbenschwanz am Ende
+      if (z.d < .35) { const kw = z.d < .175 ? -1 : 1; return [mitte(v) + kw * .13, y - (v > .9 ? (1 - Math.abs(kw)) : 0), 0, .85]; }
+      if (v > .97) { return [mitte(v) + w * .13, y - (1 - Math.abs(w)) * .08, 0, .85]; }
+      return [mitte(v) + w * .13, y - kerbe, Math.abs(w) < .25 ? 0 : 2, Math.abs(w) < .25 ? .5 : .32, 1]; }
+    return funkel(z, t, .3);
+  },
+};
+const ZT_ANZAHL = { pokal: 2800, medaille: 2600, jahr: 2600, siegel: 2600, guilloche: 3400, schleife: 2800 };
+
+// Heller Modus wie auf der Seite (v60): Farbstift-Linien statt Punkte. Linien verbinden sich mit ihren Nachbarn, Flächen und Schrift werden schraffiert.
+const striche = new Map();
+function strichMerken(x1, y1, x2, y2, farbe, alpha) { const k = farbe + '|' + Math.min(10, Math.round(alpha * 10)); let l = striche.get(k); if (!l) striche.set(k, l = []); l.push(x1, y1, x2, y2); }
+function stricheZeichnen(c, breite) { c.lineCap = 'round'; c.lineWidth = breite;
+  for (const [k, l] of striche) { const i = k.indexOf('|'), a = +k.slice(i + 1); if (!a) continue; c.strokeStyle = `rgba(${k.slice(0, i)},${a / 10})`; c.beginPath();
+    for (let j = 0; j < l.length; j += 4) { c.moveTo(l[j], l[j + 1]); c.lineTo(l[j + 2], l[j + 3]); } c.stroke(); }
+  striche.clear(); }
+const palText = pal => pal._t || (pal._t = pal.map(f => f.join(',')));
+let lichtPos = -1;
+function lichtspiel(x, y, w, h, mx, my) { const u = (x + y * .5) / (w + h * .5), dx = mx - x, dy = my - y; return 1 + .8 * Math.exp(-((u - lichtPos) ** 2) / .003) + .7 * Math.exp(-(dx * dx + dy * dy) / 5000); }
+const zGitter = new Map();
+function nachbarnZeichnen(c, teile, pal, weit, w, h, mx, my, breite = 1.4) {
+  const pt = palText(pal), w2 = weit * weit; zGitter.clear();
+  for (const p of teile) { if (!(p.ha >= .03)) continue; const k = Math.floor(p.x / weit) * 4096 + Math.floor(p.y / weit); let l = zGitter.get(k); if (!l) zGitter.set(k, l = []); l.push(p); }
+  for (const p of teile) { if (!(p.ha >= .03)) continue;
+    const gx = Math.floor(p.x / weit), gy = Math.floor(p.y / weit); let a = null, ad = w2, b = null, bd = w2, dicht = 0;
+    for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const l = zGitter.get((gx + i) * 4096 + gy + j); if (!l) continue;
+      for (const q of l) { if (q === p || q.fa !== p.fa || q.fl !== p.fl) continue; const dx = q.x - p.x, dy = q.y - p.y, d = dx * dx + dy * dy; if (d < ad) { a = q; ad = d; } } }
+    const nah = Math.max(ad, 2) * 5;
+    if (a) for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const l = zGitter.get((gx + i) * 4096 + gy + j); if (!l) continue;
+      for (const q of l) { if (q === p || q === a || q.fa !== p.fa || q.fl !== p.fl) continue; const dx = q.x - p.x, dy = q.y - p.y, d = dx * dx + dy * dy;
+        if (d < nah) dicht++; if (d < bd && dx * (a.x - p.x) + dy * (a.y - p.y) < 0) { b = q; bd = d; } } }
+    const farbe = pt[p.fa] || pt[0], licht = lichtspiel(p.x, p.y, w, h, mx, my), al = Math.min(1, p.ha * licht * 1.6);
+    if (!a) { if (p.ha > .3) strichMerken(p.x, p.y, p.x + .1, p.y, farbe, al); continue; }
+    if (p.fl || dicht >= 6) { const s = Math.min(weit * .25, Math.sqrt(ad) * .5 + 1, 2.6); strichMerken(p.x - .6 * s, p.y + .8 * s, p.x + .6 * s, p.y - .8 * s, farbe, al); continue; }
+    strichMerken(p.x, p.y, a.x, a.y, farbe, Math.min(al, a.ha * licht * 1.6));
+    if (b) strichMerken(p.x, p.y, b.x, b.y, farbe, Math.min(al, b.ha * licht * 1.6));
+  }
+  stricheZeichnen(c, breite);
+}
+function fingerLicht(c, x, y) { if (x < -900) return; const gl = c.createRadialGradient(x, y, 0, x, y, 90);
+  gl.addColorStop(0, 'rgba(242,169,59,.24)'); gl.addColorStop(1, 'rgba(242,169,59,0)'); c.fillStyle = gl; c.beginPath(); c.arc(x, y, 90, 0, TAU); c.fill(); }
+
+let hell = false;
+const flaechen = [...document.querySelectorAll('canvas')].map(cv => {
+  const f = { cv, g: cv.getContext('2d'), art: cv.dataset.art, fenster: !!cv.closest('.fenster'), w: 0, h: 0, teile: [], zeiger: { x: -999, y: -999 }, zug: { x: 0, y: 0 }, sichtbar: false };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); f.zeiger.x = e.clientX - r.left; f.zeiger.y = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', () => { f.zeiger.x = f.zeiger.y = -999; });
+  cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') f.zeiger.x = f.zeiger.y = -999; });
+  const finger = e => { const t = e.touches[0]; if (!t) return; const r = cv.getBoundingClientRect(), x = t.clientX - r.left, y = t.clientY - r.top;   // Finger: auch beim Wischen, die Punkte werden mitgezogen
+    if (f.finger) { f.zug.x = x - f.zeiger.x; f.zug.y = y - f.zeiger.y; } f.zeiger.x = x; f.zeiger.y = y; f.finger = true; };
+  cv.addEventListener('touchstart', finger, { passive: true }); cv.addEventListener('touchmove', finger, { passive: true });
+  cv.addEventListener('touchend', () => { f.zeiger.x = f.zeiger.y = -999; f.finger = false; f.zug.x = f.zug.y = 0; }, { passive: true });
+  return f;
+});
+function messen() { for (const f of flaechen) { const r = f.cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  if (Math.round(r.width) === f.w && Math.round(r.height) === f.h) continue;
+  f.w = Math.round(r.width); f.h = Math.round(r.height); f.dpr = dpr; f.cv.width = f.w * dpr; f.cv.height = f.h * dpr;
+  f.teile = Array.from({ length: ZT_ANZAHL[f.art] }, () => ({ z: { a: Math.random(), b: Math.random(), c: Math.random(), d: Math.random() },
+    x: Math.random() * f.w, y: Math.random() * f.h, vx: 0, vy: 0, s: 1.2 + Math.random() * 1.3 })); } }
+const io = new IntersectionObserver(es => es.forEach(e => { flaechen.find(f => f.cv === e.target).sichtbar = e.isIntersecting; }));
+flaechen.forEach(f => io.observe(f.cv));
+addEventListener('resize', messen); messen();
+
+const knopfF = document.getElementById('k-formular'), knopfH = document.getElementById('k-hell'), reihe = document.getElementById('fenster-reihe');
+knopfF.addEventListener('click', () => { const an = knopfF.getAttribute('aria-pressed') !== 'true'; knopfF.setAttribute('aria-pressed', an); reihe.classList.toggle('ohne-formular', !an); });
+knopfH.addEventListener('click', () => { hell = knopfH.getAttribute('aria-pressed') !== 'true'; knopfH.setAttribute('aria-pressed', hell); document.body.classList.toggle('hell', hell); });
+
+let vor = performance.now(), t = 0;
+function schleife(jetzt) {
+  const dt = Math.max(0, Math.min(.05, (jetzt - vor) / 1000)); vor = jetzt; t += dt;
+  lichtPos = -.3 + ((jetzt / 7000) % 1) * 1.9;   // Lichtspiel im hellen Modus: alle 7 Sekunden ein Glanz
+  for (const f of flaechen) {
+    if (!f.sichtbar || !f.w) continue;
+    // im hellen Modus: Fenster in dunklen Farbstift-Farben, links bleibt es auf der abgedunkelten Startseite leuchtend
+    const g = f.g, imHellen = f.fenster && hell, zeichnen = hell, pal = imHellen ? FARBEN.hell : FARBEN.dunkel, staerke = imHellen ? .8 : 1;
+    g.setTransform(f.dpr, 0, 0, f.dpr, 0, 0); g.clearRect(0, 0, f.w, f.h);
+    const S = Math.min(f.w * .46, f.h * .345), cx = f.w / 2, cy = f.h / 2;
+    g.globalCompositeOperation = imHellen ? 'source-over' : 'lighter';
+    const weit = f.finger ? 120 : 70;
+    for (const p of f.teile) {
+      const [x, y, fa, ha, fl] = ZT_FORMEN[f.art](p.z, t), tx = cx + x * S, ty = cy + y * S;
+      p.vx = (p.vx + (tx - p.x) * .07) * .85; p.vy = (p.vy + (ty - p.y) * .07) * .85;
+      const dx = p.x - f.zeiger.x, dy = p.y - f.zeiger.y, d = Math.hypot(dx, dy);
+      if (d < weit && d > .1) { const k = (1 - d / weit) * 2.6 * (f.finger ? 1.3 : 1); p.vx += dx / d * k + f.zug.x * (1 - d / weit) * .5; p.vy += dy / d * k + f.zug.y * (1 - d / weit) * .5; }
+      p.x += p.vx; p.y += p.vy;
+      if (zeichnen) { p.fa = fa; p.ha = ha * staerke; p.fl = fl; continue; }
+      if (ha < .02) continue;
+      const fc = pal[fa] || pal[0];
+      g.fillStyle = `rgba(${fc[0]},${fc[1]},${fc[2]},${Math.min(1, ha * staerke).toFixed(3)})`; g.fillRect(p.x, p.y, p.s, p.s);
+    }
+    if (zeichnen) { nachbarnZeichnen(g, f.teile, pal, Math.max(6, S * .045), f.w, f.h, f.zeiger.x, f.zeiger.y); if (imHellen) fingerLicht(g, f.zeiger.x, f.zeiger.y); }
+    f.zug.x *= .8; f.zug.y *= .8;
+    g.globalCompositeOperation = 'source-over';
+  }
+  requestAnimationFrame(schleife);
+}
+requestAnimationFrame(schleife);
+</script>
+</body>
+</html>
